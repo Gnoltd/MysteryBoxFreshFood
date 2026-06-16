@@ -8,10 +8,10 @@ import { VendorLayout } from './components/layouts/VendorLayout'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import BrowsePage from './pages/customer/BrowsePage'
+import ListingDetailPage from './pages/customer/ListingDetailPage'
 
 // Stub pages — replaced in Tasks 11–16
 const P = (name: string) => () => <div className="p-8 text-white">{name}</div>
-const ListingDetailPage = P('ListingDetail')
 const CheckoutSuccessPage = P('CheckoutSuccess')
 const CheckoutCancelPage = P('CheckoutCancel')
 const OrdersPage = P('Orders')
