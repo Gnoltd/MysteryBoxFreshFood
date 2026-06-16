@@ -12,7 +12,7 @@
 | Phase | Status |
 |---|---|
 | Brainstorming & design | ✅ Complete — approved 2026-06-17 |
-| Implementation plan | ⏳ Not started |
+| Implementation plan | ✅ Complete — `docs/superpowers/plans/2026-06-17-mysterybox-implementation.md` |
 | Project scaffold (Vite + Firebase + Tailwind) | ⏳ Not started |
 | Firebase config + Auth | ⏳ Not started |
 | Firestore data layer + services | ⏳ Not started |
