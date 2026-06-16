@@ -1,0 +1,80 @@
+<h2>Section 2 — Page Structure & Routing</h2>
+<p class="subtitle">React Router v6 · Role-based layouts · Protected routes</p>
+
+<div class="section">
+  <h3>Route Map</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:1rem;">
+
+    <!-- Auth -->
+    <div style="background:var(--surface-2);border-radius:8px;padding:1rem;border-top:3px solid #6366f1;">
+      <div class="label" style="color:#6366f1;">Auth (public)</div>
+      <ul style="margin:.75rem 0 0;padding-left:1.2rem;font-size:.83rem;line-height:2;">
+        <li><code>/login</code></li>
+        <li><code>/register</code> — role selector (vendor / customer)</li>
+      </ul>
+    </div>
+
+    <!-- Customer -->
+    <div style="background:var(--surface-2);border-radius:8px;padding:1rem;border-top:3px solid #10b981;">
+      <div class="label" style="color:#10b981;">Customer (role: customer)</div>
+      <ul style="margin:.75rem 0 0;padding-left:1.2rem;font-size:.83rem;line-height:2;">
+        <li><code>/browse</code> — listings feed + filter</li>
+        <li><code>/listing/:id</code> — detail + buy</li>
+        <li><code>/checkout/success</code> — Stripe return</li>
+        <li><code>/checkout/cancel</code> — Stripe return</li>
+        <li><code>/orders</code> — order history</li>
+        <li><code>/orders/:id</code> — QR code display</li>
+      </ul>
+    </div>
+
+    <!-- Vendor -->
+    <div style="background:var(--surface-2);border-radius:8px;padding:1rem;border-top:3px solid #f59e0b;">
+      <div class="label" style="color:#f59e0b;">Vendor (role: vendor)</div>
+      <ul style="margin:.75rem 0 0;padding-left:1.2rem;font-size:.83rem;line-height:2;">
+        <li><code>/vendor</code> — dashboard (stats)</li>
+        <li><code>/vendor/listings</code> — manage listings</li>
+        <li><code>/vendor/listings/new</code> — create listing</li>
+        <li><code>/vendor/listings/:id/edit</code> — edit listing</li>
+        <li><code>/vendor/orders</code> — incoming orders</li>
+        <li><code>/vendor/scan</code> — QR scanner</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<div class="section">
+  <h3>Layout Tree</h3>
+  <div style="background:var(--surface-2);border-radius:8px;padding:1.25rem;font-size:.83rem;font-family:monospace;line-height:2;">
+    <div><span style="color:#6366f1;">App</span></div>
+    <div style="padding-left:1.5rem;"><span style="color:#94a3b8;">├─</span> <span style="color:#e2e8f0;">AuthLayout</span> <span style="color:#64748b;">(no nav)</span></div>
+    <div style="padding-left:3rem;"><span style="color:#94a3b8;">├─</span> /login</div>
+    <div style="padding-left:3rem;"><span style="color:#94a3b8;">└─</span> /register</div>
+    <div style="padding-left:1.5rem;"><span style="color:#94a3b8;">├─</span> <span style="color:#10b981;">CustomerLayout</span> <span style="color:#64748b;">(top nav + lang toggle)</span></div>
+    <div style="padding-left:3rem;"><span style="color:#94a3b8;">└─</span> ProtectedRoute role="customer"</div>
+    <div style="padding-left:4.5rem;"><span style="color:#94a3b8;">├─</span> /browse, /listing/:id</div>
+    <div style="padding-left:4.5rem;"><span style="color:#94a3b8;">├─</span> /checkout/success, /checkout/cancel</div>
+    <div style="padding-left:4.5rem;"><span style="color:#94a3b8;">└─</span> /orders, /orders/:id</div>
+    <div style="padding-left:1.5rem;"><span style="color:#94a3b8;">└─</span> <span style="color:#f59e0b;">VendorLayout</span> <span style="color:#64748b;">(sidebar nav + lang toggle)</span></div>
+    <div style="padding-left:3rem;"><span style="color:#94a3b8;">└─</span> ProtectedRoute role="vendor"</div>
+    <div style="padding-left:4.5rem;"><span style="color:#94a3b8;">├─</span> /vendor (dashboard)</div>
+    <div style="padding-left:4.5rem;"><span style="color:#94a3b8;">├─</span> /vendor/listings, /new, /:id/edit</div>
+    <div style="padding-left:4.5rem;"><span style="color:#94a3b8;">├─</span> /vendor/orders</div>
+    <div style="padding-left:4.5rem;"><span style="color:#94a3b8;">└─</span> /vendor/scan</div>
+  </div>
+  <p style="font-size:.8rem;color:var(--text-secondary);margin-top:.5rem;">Customer gets a top nav bar (mobile-friendly). Vendor gets a sidebar (dashboard-style). Both share the same auth system and language toggle.</p>
+</div>
+
+<div class="section">
+  <h3>Does this page structure look right?</h3>
+  <div class="options">
+    <div class="option" data-choice="yes" onclick="toggleSelect(this)">
+      <div class="letter">✓</div>
+      <div class="content"><h3>Looks good</h3><p>Move to component architecture</p></div>
+    </div>
+    <div class="option" data-choice="changes" onclick="toggleSelect(this)">
+      <div class="letter">✎</div>
+      <div class="content"><h3>I'd like changes</h3><p>I'll explain in the terminal</p></div>
+    </div>
+  </div>
+</div>

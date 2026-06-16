@@ -1,0 +1,145 @@
+<h2>Section 4 — Data Flow & Error Handling</h2>
+<p class="subtitle">Two critical journeys: Purchase flow · QR pickup flow</p>
+
+<div class="section">
+  <h3>Journey 1 — Customer Purchases a Box</h3>
+  <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:1rem;font-size:.83rem;">
+
+    <div style="display:flex;align-items:stretch;gap:.75rem;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#10b981;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.75rem;flex-shrink:0;">1</div>
+        <div style="width:2px;background:#334155;flex:1;margin-top:2px;"></div>
+      </div>
+      <div style="background:var(--surface-2);border-radius:8px;padding:.75rem 1rem;flex:1;margin-bottom:.5rem;">
+        <strong>Customer clicks "Buy"</strong> on ListingDetailPage<br>
+        <span style="color:var(--text-secondary);">→ calls <code>stripe.createCheckoutSession(listingId, qty)</code> service fn</span>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:stretch;gap:.75rem;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#10b981;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.75rem;flex-shrink:0;">2</div>
+        <div style="width:2px;background:#334155;flex:1;margin-top:2px;"></div>
+      </div>
+      <div style="background:var(--surface-2);border-radius:8px;padding:.75rem 1rem;flex:1;margin-bottom:.5rem;">
+        <strong>Cloud Fn: createCheckoutSession</strong><br>
+        <span style="color:var(--text-secondary);">Checks <code>quantityRemaining ≥ qty</code> (transaction) · Creates Stripe Checkout session · Writes <code>orders/{id}</code> with status <code>"pending"</code> + <code>stripeSessionId</code> · Returns session URL</span>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:stretch;gap:.75rem;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#10b981;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.75rem;flex-shrink:0;">3</div>
+        <div style="width:2px;background:#334155;flex:1;margin-top:2px;"></div>
+      </div>
+      <div style="background:var(--surface-2);border-radius:8px;padding:.75rem 1rem;flex:1;margin-bottom:.5rem;">
+        <strong>Browser redirects to Stripe Checkout</strong><br>
+        <span style="color:var(--text-secondary);">Customer enters test card (4242 4242 4242 4242) · Stripe processes payment</span>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:stretch;gap:.75rem;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#10b981;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.75rem;flex-shrink:0;">4</div>
+        <div style="width:2px;background:#334155;flex:1;margin-top:2px;"></div>
+      </div>
+      <div style="background:var(--surface-2);border-radius:8px;padding:.75rem 1rem;flex:1;margin-bottom:.5rem;">
+        <strong>Cloud Fn: stripeWebhook fires</strong><br>
+        <span style="color:var(--text-secondary);">Verifies Stripe signature · Finds order by <code>stripeSessionId</code> · Sets status → <code>"paid"</code> · Decrements <code>quantityRemaining</code> via transaction</span>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:stretch;gap:.75rem;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#10b981;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.75rem;flex-shrink:0;">5</div>
+      </div>
+      <div style="background:var(--surface-2);border-radius:8px;padding:.75rem 1rem;flex:1;">
+        <strong>Stripe redirects to /checkout/success</strong><br>
+        <span style="color:var(--text-secondary);">Page polls order status (onSnapshot) until <code>"paid"</code> · Navigates to <code>/orders/:id</code> · QR code displayed</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Journey 2 — Vendor Scans QR at Pickup</h3>
+  <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:1rem;font-size:.83rem;">
+
+    <div style="display:flex;align-items:stretch;gap:.75rem;">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.75rem;flex-shrink:0;">1</div>
+        <div style="width:2px;background:#334155;flex:1;margin-top:2px;"></div>
+      </div>
+      <div style="background:var(--surface-2);border-radius:8px;padding:.75rem 1rem;flex:1;margin-bottom:.5rem;">
+        <strong>Vendor opens /vendor/scan</strong> · html5-qrcode activates device camera
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:stretch;gap:.75rem;">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.75rem;flex-shrink:0;">2</div>
+        <div style="width:2px;background:#334155;flex:1;margin-top:2px;"></div>
+      </div>
+      <div style="background:var(--surface-2);border-radius:8px;padding:.75rem 1rem;flex:1;margin-bottom:.5rem;">
+        <strong>Customer shows QR code</strong> from /orders/:id · Vendor scans it
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:stretch;gap:.75rem;">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.75rem;flex-shrink:0;">3</div>
+        <div style="width:2px;background:#334155;flex:1;margin-top:2px;"></div>
+      </div>
+      <div style="background:var(--surface-2);border-radius:8px;padding:.75rem 1rem;flex:1;margin-bottom:.5rem;">
+        <strong>QR decoded = UUID (order's qrCode field)</strong><br>
+        <span style="color:var(--text-secondary);">Firestore query: find order where <code>qrCode == uuid AND vendorId == currentUser.uid AND status == "paid"</code></span>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:stretch;gap:.75rem;">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.75rem;flex-shrink:0;">4</div>
+      </div>
+      <div style="background:var(--surface-2);border-radius:8px;padding:.75rem 1rem;flex:1;">
+        <strong>Order found → update status to "picked_up"</strong> · Show confirmation screen<br>
+        <span style="color:var(--text-secondary);">If not found or wrong vendor → show error: "Invalid or already used QR code"</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Error Handling Strategy</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.75rem;font-size:.82rem;">
+    <div style="background:var(--surface-2);border-radius:8px;padding:.75rem 1rem;">
+      <div class="label">Out of stock at checkout</div>
+      <p style="margin:.3rem 0 0;color:var(--text-secondary);">createCheckoutSession checks qty before creating session · Returns error → client shows "Sold out" toast, disables button</p>
+    </div>
+    <div style="background:var(--surface-2);border-radius:8px;padding:.75rem 1rem;">
+      <div class="label">Stripe payment fails</div>
+      <p style="margin:.3rem 0 0;color:var(--text-secondary);">Stripe redirects to /checkout/cancel · Pending order stays in Firestore (cleaned up by a scheduled function or TTL)</p>
+    </div>
+    <div style="background:var(--surface-2);border-radius:8px;padding:.75rem 1rem;">
+      <div class="label">Invalid / used QR code</div>
+      <p style="margin:.3rem 0 0;color:var(--text-secondary);">Query returns nothing or wrong vendor → inline error in scanner UI, camera stays open for retry</p>
+    </div>
+    <div style="background:var(--surface-2);border-radius:8px;padding:.75rem 1rem;">
+      <div class="label">Auth / Firestore errors</div>
+      <p style="margin:.3rem 0 0;color:var(--text-secondary);">Toast notifications via a shared <code>useToast</code> hook · Form validation errors shown inline</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Does this data flow look right?</h3>
+  <div class="options">
+    <div class="option" data-choice="yes" onclick="toggleSelect(this)">
+      <div class="letter">✓</div>
+      <div class="content"><h3>Looks good</h3><p>Move to i18n & final design summary</p></div>
+    </div>
+    <div class="option" data-choice="changes" onclick="toggleSelect(this)">
+      <div class="letter">✎</div>
+      <div class="content"><h3>I'd like changes</h3><p>I'll explain in the terminal</p></div>
+    </div>
+  </div>
+</div>

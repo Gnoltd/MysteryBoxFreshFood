@@ -1,0 +1,88 @@
+<h2>Section 1 — Architecture & Data Model</h2>
+<p class="subtitle">Single SPA · React/Vite · Firebase Auth + Firestore</p>
+
+<div class="section">
+  <h3>App Structure</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:1rem;">
+    <div style="background:var(--surface-2);border-radius:8px;padding:1rem;">
+      <div class="label">Auth Layer</div>
+      <p style="margin:.5rem 0 0;font-size:.9rem;">Firebase Auth<br>AuthContext (React)<br>Role stored in Firestore <code>users/{uid}</code></p>
+    </div>
+    <div style="background:var(--surface-2);border-radius:8px;padding:1rem;">
+      <div class="label">Routing</div>
+      <p style="margin:.5rem 0 0;font-size:.9rem;">React Router v6<br><code>ProtectedRoute</code> (auth guard)<br><code>RoleRoute</code> (vendor/customer)</p>
+    </div>
+    <div style="background:var(--surface-2);border-radius:8px;padding:1rem;">
+      <div class="label">Real-time Data</div>
+      <p style="margin:.5rem 0 0;font-size:.9rem;">Firestore <code>onSnapshot</code><br>Transactions for stock<br>No manual refresh needed</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Firestore Collections</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:1rem;">
+
+    <div style="background:var(--surface-2);border-radius:8px;padding:1rem;border-left:3px solid #6366f1;">
+      <div class="label" style="color:#6366f1;">users/{uid}</div>
+      <ul style="margin:.5rem 0 0;padding-left:1.2rem;font-size:.85rem;line-height:1.8;">
+        <li><code>role</code>: "vendor" | "customer"</li>
+        <li><code>displayName</code>: string</li>
+        <li><code>email</code>: string</li>
+        <li><em style="color:var(--text-secondary);">vendor only:</em></li>
+        <li><code>storeName</code>: string</li>
+        <li><code>address</code>: string</li>
+        <li><code>storeDescription</code>: string</li>
+      </ul>
+    </div>
+
+    <div style="background:var(--surface-2);border-radius:8px;padding:1rem;border-left:3px solid #f59e0b;">
+      <div class="label" style="color:#f59e0b;">listings/{listingId}</div>
+      <ul style="margin:.5rem 0 0;padding-left:1.2rem;font-size:.85rem;line-height:1.8;">
+        <li><code>vendorId</code>: string</li>
+        <li><code>type</code>: "mystery_box" | "item"</li>
+        <li><code>title</code>: string</li>
+        <li><code>description</code>: string</li>
+        <li><code>price</code>: number</li>
+        <li><code>originalPrice</code>: number</li>
+        <li><code>quantityTotal</code>: number</li>
+        <li><code>quantityRemaining</code>: number ⚡</li>
+        <li><code>pickupStart</code>: timestamp</li>
+        <li><code>pickupEnd</code>: timestamp</li>
+        <li><code>category</code>: string</li>
+        <li><code>status</code>: "active"|"sold_out"|"expired"</li>
+      </ul>
+    </div>
+
+    <div style="background:var(--surface-2);border-radius:8px;padding:1rem;border-left:3px solid #10b981;">
+      <div class="label" style="color:#10b981;">orders/{orderId}</div>
+      <ul style="margin:.5rem 0 0;padding-left:1.2rem;font-size:.85rem;line-height:1.8;">
+        <li><code>customerId</code>: string</li>
+        <li><code>vendorId</code>: string</li>
+        <li><code>listingId</code>: string</li>
+        <li><code>listingTitle</code>: string</li>
+        <li><code>quantity</code>: number</li>
+        <li><code>totalPrice</code>: number</li>
+        <li><code>status</code>: "paid"|"picked_up"|"cancelled"</li>
+        <li><code>qrCode</code>: string (UUID)</li>
+        <li><code>createdAt</code>: timestamp</li>
+      </ul>
+    </div>
+
+  </div>
+  <p style="margin-top:.75rem;font-size:.82rem;color:var(--text-secondary);">⚡ = decremented via Firestore transaction to prevent overselling under concurrent purchases</p>
+</div>
+
+<div class="section">
+  <h3>Does this data model look right?</h3>
+  <div class="options">
+    <div class="option" data-choice="yes" onclick="toggleSelect(this)">
+      <div class="letter">✓</div>
+      <div class="content"><h3>Looks good</h3><p>Move to page structure &amp; routing</p></div>
+    </div>
+    <div class="option" data-choice="changes" onclick="toggleSelect(this)">
+      <div class="letter">✎</div>
+      <div class="content"><h3>I'd like changes</h3><p>I'll explain in the terminal</p></div>
+    </div>
+  </div>
+</div>
