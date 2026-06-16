@@ -1,0 +1,28 @@
+import { useEffect, useState } from 'react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
+import { subscribeToOrder } from '../../services/orders'
+import type { Order } from '../../types'
+
+export default function CheckoutSuccessPage() {
+  const [params] = useSearchParams()
+  const orderId = params.get('order_id')
+  const navigate = useNavigate()
+  const [order, setOrder] = useState<Order | null>(null)
+
+  useEffect(() => {
+    if (!orderId) { navigate('/browse'); return }
+    const unsub = subscribeToOrder(orderId, o => {
+      setOrder(o)
+      if (o?.status === 'paid') navigate(`/orders/${orderId}`, { replace: true })
+    })
+    return unsub
+  }, [orderId])
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+      <div className="text-4xl mb-4 animate-spin">⏳</div>
+      <h2 className="text-white text-xl font-bold">Confirming your payment…</h2>
+      <p className="text-slate-400 mt-2">This usually takes a few seconds.</p>
+    </div>
+  )
+}

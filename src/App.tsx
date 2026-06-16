@@ -9,13 +9,13 @@ import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import BrowsePage from './pages/customer/BrowsePage'
 import ListingDetailPage from './pages/customer/ListingDetailPage'
+import CheckoutSuccessPage from './pages/customer/CheckoutSuccessPage'
+import CheckoutCancelPage from './pages/customer/CheckoutCancelPage'
+import OrdersPage from './pages/customer/OrdersPage'
+import OrderDetailPage from './pages/customer/OrderDetailPage'
 
-// Stub pages — replaced in Tasks 11–16
+// Stub pages — replaced in Tasks 14–16
 const P = (name: string) => () => <div className="p-8 text-white">{name}</div>
-const CheckoutSuccessPage = P('CheckoutSuccess')
-const CheckoutCancelPage = P('CheckoutCancel')
-const OrdersPage = P('Orders')
-const OrderDetailPage = P('OrderDetail')
 const VendorDashboardPage = P('VendorDashboard')
 const ListingsPage = P('Listings')
 const ListingFormPage = P('ListingForm')
