@@ -1,20 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { subscribeToOrder } from '../../services/orders'
-import type { Order } from '../../types'
 
 export default function CheckoutSuccessPage() {
   const { t } = useTranslation()
   const [params] = useSearchParams()
   const orderId = params.get('order_id')
   const navigate = useNavigate()
-  const [order, setOrder] = useState<Order | null>(null)
 
   useEffect(() => {
     if (!orderId) { navigate('/browse'); return }
     const unsub = subscribeToOrder(orderId, o => {
-      setOrder(o)
       if (o?.status === 'paid') navigate(`/orders/${orderId}`, { replace: true })
     })
     return unsub
