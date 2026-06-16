@@ -1,0 +1,10 @@
+{
+  "indexes": [
+    { "collectionGroup": "listings", "queryScope": "COLLECTION", "fields": [{"fieldPath":"status","order":"ASCENDING"},{"fieldPath":"createdAt","order":"DESCENDING"}]},
+    { "collectionGroup": "listings", "queryScope": "COLLECTION", "fields": [{"fieldPath":"vendorId","order":"ASCENDING"},{"fieldPath":"createdAt","order":"DESCENDING"}]},
+    { "collectionGroup": "orders", "queryScope": "COLLECTION", "fields": [{"fieldPath":"customerId","order":"ASCENDING"},{"fieldPath":"createdAt","order":"DESCENDING"}]},
+    { "collectionGroup": "orders", "queryScope": "COLLECTION", "fields": [{"fieldPath":"vendorId","order":"ASCENDING"},{"fieldPath":"createdAt","order":"DESCENDING"}]},
+    { "collectionGroup": "orders", "queryScope": "COLLECTION", "fields": [{"fieldPath":"qrCode","order":"ASCENDING"},{"fieldPath":"vendorId","order":"ASCENDING"},{"fieldPath":"status","order":"ASCENDING"}]}
+  ],
+  "fieldOverrides": []
+}
