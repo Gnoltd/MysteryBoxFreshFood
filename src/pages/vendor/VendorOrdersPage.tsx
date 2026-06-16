@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { subscribeToVendorOrders } from '../../services/orders'
 import type { Order, OrderStatus } from '../../types'
@@ -12,6 +13,7 @@ const STATUS_BADGE: Record<OrderStatus, string> = {
 }
 
 export default function VendorOrdersPage() {
+  const { t } = useTranslation()
   const { currentUser } = useAuth()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
@@ -25,21 +27,21 @@ export default function VendorOrdersPage() {
     return unsub
   }, [currentUser])
 
-  if (loading) return <p className="text-slate-400">Loading…</p>
+  if (loading) return <p className="text-slate-400">{t('browse.loading')}</p>
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">Orders</h1>
+        <h1 className="text-2xl font-bold text-white">{t('vendor.orders')}</h1>
         <Link
           to="/vendor/scan"
           className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium px-4 py-2 rounded-lg"
         >
-          Scan QR →
+          {t('vendor.scanQRArrow')}
         </Link>
       </div>
 
-      {orders.length === 0 && <p className="text-slate-400">No orders yet.</p>}
+      {orders.length === 0 && <p className="text-slate-400">{t('vendor.noOrders')}</p>}
 
       <div className="space-y-3">
         {orders.map(o => (

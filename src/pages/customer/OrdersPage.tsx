@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { subscribeToCustomerOrders } from '../../services/orders'
 import type { Order } from '../../types'
@@ -12,6 +13,7 @@ const STATUS_BADGE: Record<Order['status'], string> = {
 }
 
 export default function OrdersPage() {
+  const { t } = useTranslation()
   const { currentUser } = useAuth()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
@@ -22,17 +24,17 @@ export default function OrdersPage() {
     return unsub
   }, [currentUser])
 
-  if (loading) return <p className="text-slate-400">Loading…</p>
+  if (loading) return <p className="text-slate-400">{t('browse.loading')}</p>
   if (orders.length === 0) return (
     <div className="text-center mt-16">
-      <p className="text-slate-400">No orders yet.</p>
+      <p className="text-slate-400">{t('order.noOrders')}</p>
       <Link to="/browse" className="text-indigo-400 hover:underline text-sm mt-2 block">Browse listings →</Link>
     </div>
   )
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-white mb-6">My Orders</h1>
+      <h1 className="text-2xl font-bold text-white mb-6">{t('order.title')}</h1>
       <div className="space-y-3">
         {orders.map(order => (
           <Link key={order.id} to={`/orders/${order.id}`} className="block">

@@ -1,20 +1,22 @@
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { signOut } from '../../services/auth'
 import { LanguageToggle } from '../shared/LanguageToggle'
 import { LayoutDashboard, Package, ShoppingBag, QrCode, LogOut } from 'lucide-react'
 
-const navItems = [
-  { to: '/vendor', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-  { to: '/vendor/listings', label: 'Listings', icon: Package, exact: false },
-  { to: '/vendor/orders', label: 'Orders', icon: ShoppingBag, exact: false },
-  { to: '/vendor/scan', label: 'Scan QR', icon: QrCode, exact: false },
-]
-
 export function VendorLayout() {
+  const { t } = useTranslation()
   const { userProfile } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+
+  const navItems = [
+    { to: '/vendor', label: t('nav.dashboard'), icon: LayoutDashboard, exact: true },
+    { to: '/vendor/listings', label: t('nav.listings'), icon: Package, exact: false },
+    { to: '/vendor/orders', label: t('nav.orders'), icon: ShoppingBag, exact: false },
+    { to: '/vendor/scan', label: t('nav.scanQR'), icon: QrCode, exact: false },
+  ]
 
   const handleSignOut = async () => {
     await signOut()
@@ -42,7 +44,7 @@ export function VendorLayout() {
         <div className="px-3 space-y-2">
           <LanguageToggle />
           <button onClick={handleSignOut} className="flex items-center gap-2 text-slate-400 hover:text-white text-sm w-full px-3 py-2 rounded-lg hover:bg-slate-800">
-            <LogOut size={16} /> Sign out
+            <LogOut size={16} /> {t('nav.signOut')}
           </button>
         </div>
       </aside>

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { subscribeToVendorListings, deleteListing } from '../../services/listings'
 import { Button } from '@/components/ui/button'
 import type { Listing } from '../../types'
 
 export default function ListingsPage() {
+  const { t } = useTranslation()
   const { currentUser } = useAuth()
   const [listings, setListings] = useState<Listing[]>([])
   const [loading, setLoading] = useState(true)
@@ -28,14 +30,14 @@ export default function ListingsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">My Listings</h1>
+        <h1 className="text-2xl font-bold text-white">{t('vendor.myListings')}</h1>
         <Link to="/vendor/listings/new">
-          <Button className="bg-indigo-600 hover:bg-indigo-500">+ New Listing</Button>
+          <Button className="bg-indigo-600 hover:bg-indigo-500">{t('vendor.newListing')}</Button>
         </Link>
       </div>
 
-      {loading && <p className="text-slate-400">Loading…</p>}
-      {!loading && listings.length === 0 && <p className="text-slate-400">No listings yet. Create your first one!</p>}
+      {loading && <p className="text-slate-400">{t('browse.loading')}</p>}
+      {!loading && listings.length === 0 && <p className="text-slate-400">{t('vendor.noListings')}</p>}
 
       <div className="space-y-3">
         {listings.map(l => (
@@ -52,9 +54,9 @@ export default function ListingsPage() {
             </div>
             <div className="flex gap-2 flex-shrink-0">
               <Link to={`/vendor/listings/${l.id}/edit`}>
-                <Button variant="outline" size="sm" className="border-slate-700 text-slate-300 hover:text-white">Edit</Button>
+                <Button variant="outline" size="sm" className="border-slate-700 text-slate-300 hover:text-white">{t('vendor.edit')}</Button>
               </Link>
-              <Button variant="destructive" size="sm" onClick={() => handleDelete(l.id)}>Delete</Button>
+              <Button variant="destructive" size="sm" onClick={() => handleDelete(l.id)}>{t('vendor.delete')}</Button>
             </div>
           </div>
         ))}

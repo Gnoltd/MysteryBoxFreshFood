@@ -1,9 +1,11 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { signOut } from '../../services/auth'
 import { LanguageToggle } from '../shared/LanguageToggle'
 
 export function CustomerLayout() {
+  const { t } = useTranslation()
   const { userProfile } = useAuth()
   const navigate = useNavigate()
 
@@ -20,11 +22,11 @@ export function CustomerLayout() {
             MysteryBox
           </Link>
           <nav className="flex items-center gap-4 text-sm">
-            <Link to="/browse" className="text-slate-300 hover:text-white">Browse</Link>
-            <Link to="/orders" className="text-slate-300 hover:text-white">My Orders</Link>
+            <Link to="/browse" className="text-slate-300 hover:text-white">{t('nav.browse')}</Link>
+            <Link to="/orders" className="text-slate-300 hover:text-white">{t('nav.myOrders')}</Link>
             <LanguageToggle />
             <span className="text-slate-500 text-xs">{userProfile?.displayName}</span>
-            <button onClick={handleSignOut} className="text-slate-400 hover:text-white text-xs">Sign out</button>
+            <button onClick={handleSignOut} className="text-slate-400 hover:text-white text-xs">{t('nav.signOut')}</button>
           </nav>
         </div>
       </header>

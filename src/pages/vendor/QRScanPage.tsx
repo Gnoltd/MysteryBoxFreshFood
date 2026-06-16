@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Html5QrcodeScanner } from 'html5-qrcode'
 import { useAuth } from '../../contexts/AuthContext'
 import { redeemQRCode } from '../../services/orders'
 import type { Order } from '../../types'
 
 export default function QRScanPage() {
+  const { t } = useTranslation()
   const { currentUser } = useAuth()
   const scannerRef = useRef<Html5QrcodeScanner | null>(null)
   const [status, setStatus] = useState<'scanning' | 'success' | 'error'>('scanning')
@@ -52,8 +54,8 @@ export default function QRScanPage() {
 
   return (
     <div className="max-w-md mx-auto text-center">
-      <h1 className="text-2xl font-bold text-white mb-2">Scan QR Code</h1>
-      <p className="text-slate-400 text-sm mb-6">Point camera at customer's QR code to confirm pickup</p>
+      <h1 className="text-2xl font-bold text-white mb-2">{t('vendor.scanQR')}</h1>
+      <p className="text-slate-400 text-sm mb-6">{t('vendor.scanInstruction')}</p>
 
       {status === 'scanning' && (
         <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
@@ -64,7 +66,7 @@ export default function QRScanPage() {
       {status === 'success' && result && (
         <div className="bg-slate-900 border border-green-700 rounded-xl p-8">
           <div className="text-5xl mb-4">✅</div>
-          <h2 className="text-white text-xl font-bold">Pickup Confirmed!</h2>
+          <h2 className="text-white text-xl font-bold">{t('vendor.pickupConfirmed')}</h2>
           <p className="text-slate-400 mt-2">{result.listingTitle}</p>
           <p className="text-slate-400 text-sm">
             {result.quantity} box · {result.totalPrice.toLocaleString('vi-VN')} đ
@@ -73,7 +75,7 @@ export default function QRScanPage() {
             onClick={handleReset}
             className="mt-6 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg text-sm font-medium"
           >
-            Scan another
+            {t('vendor.scanAnother')}
           </button>
         </div>
       )}
@@ -81,13 +83,13 @@ export default function QRScanPage() {
       {status === 'error' && (
         <div className="bg-slate-900 border border-red-700 rounded-xl p-8">
           <div className="text-5xl mb-4">❌</div>
-          <h2 className="text-white text-xl font-bold">Invalid QR Code</h2>
+          <h2 className="text-white text-xl font-bold">{t('vendor.invalidQR')}</h2>
           <p className="text-red-400 mt-2">{errorMsg}</p>
           <button
             onClick={handleReset}
             className="mt-6 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg text-sm font-medium"
           >
-            Try again
+            {t('vendor.tryAgain')}
           </button>
         </div>
       )}
