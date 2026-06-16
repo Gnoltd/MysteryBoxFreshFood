@@ -3,6 +3,7 @@ import { onAuthStateChanged, User } from 'firebase/auth'
 import { auth } from '../firebase'
 import { getUserProfile } from '../services/auth'
 import type { UserProfile } from '../types'
+import i18n from '../i18n'
 
 interface AuthContextValue {
   currentUser: User | null
@@ -27,6 +28,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (user) {
         const profile = await getUserProfile(user.uid)
         setUserProfile(profile)
+        if (profile?.lang) {
+          i18n.changeLanguage(profile.lang)
+        }
       } else {
         setUserProfile(null)
       }

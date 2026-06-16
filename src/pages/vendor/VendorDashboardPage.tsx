@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { subscribeToVendorListings } from '../../services/listings'
 import { subscribeToVendorOrders } from '../../services/orders'
@@ -15,6 +16,7 @@ function StatCard({ label, value, sub }: { label: string; value: string | number
 }
 
 export default function VendorDashboardPage() {
+  const { t } = useTranslation()
   const { currentUser, userProfile } = useAuth()
   const [listings, setListings] = useState<Listing[]>([])
   const [orders, setOrders] = useState<Order[]>([])
@@ -33,15 +35,15 @@ export default function VendorDashboardPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-white mb-2">Dashboard</h1>
-      <p className="text-slate-400 mb-8">Welcome back, {userProfile?.displayName}</p>
+      <h1 className="text-2xl font-bold text-white mb-2">{t('vendor.dashboard')}</h1>
+      <p className="text-slate-400 mb-8">{t('vendor.welcome')}, {userProfile?.displayName}</p>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <StatCard label="Active Listings" value={activeListings} />
-        <StatCard label="Pending Pickups" value={paidOrders.length} sub="awaiting QR scan" />
-        <StatCard label="Total Revenue" value={`${revenue.toLocaleString('vi-VN')} đ`} />
+        <StatCard label={t('vendor.activeListings')} value={activeListings} />
+        <StatCard label={t('vendor.pendingPickups')} value={paidOrders.length} sub={t('vendor.awaitingQR')} />
+        <StatCard label={t('vendor.totalRevenue')} value={`${revenue.toLocaleString('vi-VN')} đ`} />
       </div>
       <div>
-        <h2 className="text-white font-semibold mb-3">Recent Orders</h2>
+        <h2 className="text-white font-semibold mb-3">{t('vendor.recentOrders')}</h2>
         {orders.slice(0, 5).map(o => (
           <div key={o.id} className="flex items-center justify-between py-3 border-b border-slate-800 text-sm">
             <span className="text-white">{o.listingTitle}</span>
@@ -50,7 +52,7 @@ export default function VendorDashboardPage() {
             </span>
           </div>
         ))}
-        {orders.length === 0 && <p className="text-slate-500 text-sm">No orders yet.</p>}
+        {orders.length === 0 && <p className="text-slate-500 text-sm">{t('vendor.noOrders')}</p>}
       </div>
     </div>
   )
