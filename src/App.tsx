@@ -16,11 +16,8 @@ import OrderDetailPage from './pages/customer/OrderDetailPage'
 import VendorDashboardPage from './pages/vendor/VendorDashboardPage'
 import ListingsPage from './pages/vendor/ListingsPage'
 import ListingFormPage from './pages/vendor/ListingFormPage'
-
-// Stub pages — replaced in Tasks 16
-const P = (name: string) => () => <div className="p-8 text-white">{name}</div>
-const VendorOrdersPage = P('VendorOrders')
-const QRScanPage = P('QRScan')
+import VendorOrdersPage from './pages/vendor/VendorOrdersPage'
+import QRScanPage from './pages/vendor/QRScanPage'
 
 export default function App() {
   return (
