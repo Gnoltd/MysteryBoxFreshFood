@@ -7,12 +7,13 @@ function getStripe() {
   return new Stripe(functions.config().stripe.secret_key, { apiVersion: '2023-10-16' })
 }
 
-export const createCheckoutSession = functions.https.onCall(async (data, context) => {
+export const createCheckoutSession = functions.https.onCall(
+  async (data: { listingId: string; quantity: number }, context: functions.https.CallableContext) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'Must be signed in')
   }
 
-  const { listingId, quantity } = data as { listingId: string; quantity: number }
+  const { listingId, quantity } = data
   const customerId = context.auth.uid
   const db = admin.firestore()
   const stripe = getStripe()
@@ -66,5 +67,6 @@ export const createCheckoutSession = functions.https.onCall(async (data, context
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
   })
 
+  if (!session.url) throw new functions.https.HttpsError('internal', 'No checkout URL returned')
   return { url: session.url, orderId }
 })
