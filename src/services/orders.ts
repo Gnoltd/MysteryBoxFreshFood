@@ -1,6 +1,6 @@
 import {
-  collection, doc, updateDoc, onSnapshot,
-  query, where, orderBy, getDocs, Unsubscribe
+  collection, doc, onSnapshot,
+  query, where, orderBy, getDocs, runTransaction, Unsubscribe
 } from 'firebase/firestore'
 import { db } from '../firebase'
 import type { Order } from '../types'
@@ -29,6 +29,13 @@ export async function redeemQRCode(qrCode: string, vendorId: string): Promise<Or
       where('status', '==', 'paid'))
   )
   if (snap.empty) throw new Error('Invalid or already used QR code')
-  await updateDoc(snap.docs[0].ref, { status: 'picked_up' })
-  return { id: snap.docs[0].id, ...snap.docs[0].data() } as Order
+
+  const orderRef = snap.docs[0].ref
+  return runTransaction(db, async (tx) => {
+    const fresh = await tx.get(orderRef)
+    if (!fresh.exists()) throw new Error('Invalid or already used QR code')
+    if (fresh.data().status !== 'paid') throw new Error('Invalid or already used QR code')
+    tx.update(orderRef, { status: 'picked_up' })
+    return { id: fresh.id, ...fresh.data(), status: 'picked_up' } as Order
+  })
 }
