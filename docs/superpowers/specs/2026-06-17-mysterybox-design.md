@@ -62,8 +62,8 @@ quantityTotal    number
 quantityRemaining number  ← decremented via transaction
 pickupStart      timestamp
 pickupEnd        timestamp
-category         string
-imageUrl         string
+category         "bakery" | "rice" | "noodles" | "drinks" | "snacks" | "other"
+imageUrl         string  ← Firebase Storage URL (vendor uploads image on listing creation)
 status           "active" | "sold_out" | "expired"
 stripeProductId  string
 stripePriceId    string
@@ -77,7 +77,7 @@ listingId        string
 listingTitle     string
 quantity         number
 totalPrice       number  (VND)
-status           "pending" | "paid" | "picked_up" | "cancelled"
+status           "pending" | "paid" | "picked_up" | "cancelled"  ← "cancelled" set only by vendor from VendorOrdersPage (prototype: disabled for simplicity, reserved for v2)
 qrCode           string  (UUID v4 — the scannable value)
 stripeSessionId  string
 createdAt        timestamp

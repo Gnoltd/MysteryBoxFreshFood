@@ -60,7 +60,7 @@ functions/src/
 | Collection | Key fields |
 |---|---|
 | `users/{uid}` | `role` ("vendor"\|"customer"), `lang` ("en"\|"vi"), vendor fields: `storeName`, `address`, `storeDescription` |
-| `listings/{id}` | `vendorId`, `type`, `price`, `quantityRemaining` (transaction-safe), `status`, `stripeProductId`, `stripePriceId` |
+| `listings/{id}` | `vendorId`, `type`, `price`, `quantityRemaining` (transaction-safe), `category` ("bakery"\|"rice"\|"noodles"\|"drinks"\|"snacks"\|"other"), `imageUrl` (Firebase Storage URL), `status`, `stripeProductId`, `stripePriceId` |
 | `orders/{id}` | `status` ("pending"→"paid"→"picked_up"), `qrCode` (UUID v4), `stripeSessionId` |
 
 ---
