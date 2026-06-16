@@ -30,3 +30,7 @@ dist-ssr
 
 # Superpowers brainstorm sessions (local only)
 .superpowers/
+
+# Firebase Cloud Functions build output and dependencies
+functions/lib/
+functions/node_modules/

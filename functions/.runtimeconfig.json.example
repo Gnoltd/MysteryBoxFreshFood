@@ -1,0 +1,9 @@
+{
+  "stripe": {
+    "secret_key": "sk_test_YOUR_KEY_HERE",
+    "webhook_secret": "whsec_YOUR_SECRET_HERE"
+  },
+  "app": {
+    "url": "http://localhost:5173"
+  }
+}
