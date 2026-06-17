@@ -21,20 +21,24 @@ export function subscribeToOrder(orderId: string, callback: (order: Order | null
   )
 }
 
+const REDEEMABLE = ['paid', 'pending_cod', 'pending_bank_transfer']
+
 export async function redeemQRCode(qrCode: string, vendorId: string): Promise<Order> {
   const snap = await getDocs(
     query(collection(db, 'orders'),
       where('qrCode', '==', qrCode),
-      where('vendorId', '==', vendorId),
-      where('status', '==', 'paid'))
+      where('vendorId', '==', vendorId))
   )
   if (snap.empty) throw new Error('Invalid or already used QR code')
 
-  const orderRef = snap.docs[0].ref
+  const validDoc = snap.docs.find(d => REDEEMABLE.includes(d.data().status))
+  if (!validDoc) throw new Error('Invalid or already used QR code')
+
+  const orderRef = validDoc.ref
   return runTransaction(db, async (tx) => {
     const fresh = await tx.get(orderRef)
     if (!fresh.exists()) throw new Error('Invalid or already used QR code')
-    if (fresh.data().status !== 'paid') throw new Error('Invalid or already used QR code')
+    if (!REDEEMABLE.includes(fresh.data().status)) throw new Error('Invalid or already used QR code')
     tx.update(orderRef, { status: 'picked_up' })
     return { id: fresh.id, ...fresh.data(), status: 'picked_up' } as Order
   })

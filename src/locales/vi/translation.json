@@ -41,12 +41,28 @@
     "checkoutFailed": "Thanh toán thất bại",
     "back": "← Quay lại"
   },
+  "payment": {
+    "selectMethod": "Phương thức thanh toán",
+    "cod": "COD",
+    "bankTransfer": "Chuyển khoản",
+    "card": "Thẻ ngân hàng",
+    "processing": "Đang xử lý…",
+    "bankDetails": "Thông tin tài khoản ngân hàng",
+    "bankName": "Ngân hàng",
+    "bankAccount": "Số tài khoản",
+    "bankAccountName": "Tên tài khoản",
+    "noBankInfo": "Cửa hàng chưa cập nhật thông tin ngân hàng",
+    "bankTransferNote": "Chuyển khoản trước rồi xuất trình mã QR khi đến lấy hàng",
+    "codNote": "Thanh toán tiền mặt khi nhận hàng"
+  },
   "order": {
     "title": "Đơn hàng của tôi",
     "noOrders": "Chưa có đơn hàng.",
     "confirmingPayment": "Đang xác nhận thanh toán…",
     "confirmingPaymentSub": "Thường mất vài giây.",
     "showQR": "Hiển thị mã QR khi nhận hàng",
+    "showQRCOD": "Xuất trình mã QR khi thanh toán và nhận hàng",
+    "showQRBank": "Chuyển khoản xong rồi xuất trình mã QR khi nhận hàng",
     "pickedUp": "Đã nhận hàng!",
     "enjoy": "Chúc ngon miệng 🎉",
     "paymentCancelled": "Đã hủy thanh toán",
@@ -91,7 +107,15 @@
     "category": "Danh mục",
     "pickupStart": "Bắt đầu nhận",
     "pickupEnd": "Kết thúc nhận",
-    "image": "Hình ảnh"
+    "image": "Hình ảnh",
+    "bankInfo": "Thông tin tài khoản ngân hàng",
+    "bankInfoSub": "Khách hàng sẽ thấy khi chọn chuyển khoản",
+    "bankName": "Tên ngân hàng",
+    "bankAccount": "Số tài khoản",
+    "bankAccountName": "Tên chủ tài khoản",
+    "saveBankInfo": "Lưu thông tin ngân hàng",
+    "editBankInfo": "Chỉnh sửa",
+    "bankInfoNotSet": "Chưa cài đặt — khách không thể chuyển khoản"
   },
   "categories": {
     "bakery": "Bánh",

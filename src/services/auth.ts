@@ -42,3 +42,12 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
 export async function updateUserLang(uid: string, lang: 'en' | 'vi'): Promise<void> {
   await updateDoc(doc(db, 'users', uid), { lang })
 }
+
+export async function updateVendorBankInfo(
+  uid: string,
+  bankName: string,
+  bankAccount: string,
+  bankAccountName: string
+): Promise<void> {
+  await updateDoc(doc(db, 'users', uid), { bankName, bankAccount, bankAccountName })
+}

@@ -9,11 +9,15 @@ export interface UserProfile {
   storeName?: string
   address?: string
   storeDescription?: string
+  bankName?: string
+  bankAccount?: string
+  bankAccountName?: string
 }
 
 export type ListingCategory = 'bakery' | 'rice' | 'noodles' | 'drinks' | 'snacks' | 'other'
 export type ListingStatus = 'active' | 'sold_out' | 'expired'
-export type OrderStatus = 'pending' | 'paid' | 'picked_up' | 'cancelled'
+export type OrderStatus = 'pending' | 'paid' | 'picked_up' | 'cancelled' | 'pending_cod' | 'pending_bank_transfer'
+export type PaymentMethod = 'stripe' | 'cod' | 'bank_transfer'
 
 export interface Listing {
   id: string
@@ -43,7 +47,8 @@ export interface Order {
   quantity: number
   totalPrice: number
   status: OrderStatus
+  paymentMethod?: PaymentMethod
   qrCode: string
-  stripeSessionId: string
+  stripeSessionId?: string
   createdAt: Timestamp
 }

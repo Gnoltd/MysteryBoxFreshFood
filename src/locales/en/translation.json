@@ -41,12 +41,28 @@
     "checkoutFailed": "Checkout failed",
     "back": "← Back"
   },
+  "payment": {
+    "selectMethod": "Payment method",
+    "cod": "COD",
+    "bankTransfer": "Bank Transfer",
+    "card": "Card",
+    "processing": "Processing…",
+    "bankDetails": "Bank Account Details",
+    "bankName": "Bank",
+    "bankAccount": "Account No.",
+    "bankAccountName": "Account Name",
+    "noBankInfo": "Vendor hasn't set bank details yet",
+    "bankTransferNote": "Transfer the amount then show QR code at pickup",
+    "codNote": "Pay cash when picking up"
+  },
   "order": {
     "title": "My Orders",
     "noOrders": "No orders yet.",
     "confirmingPayment": "Confirming your payment…",
     "confirmingPaymentSub": "This usually takes a few seconds.",
     "showQR": "Show this QR code at pickup",
+    "showQRCOD": "Show this QR code when paying and picking up",
+    "showQRBank": "Transfer payment then show this QR code at pickup",
     "pickedUp": "Picked up!",
     "enjoy": "Enjoy your meal 🎉",
     "paymentCancelled": "Payment cancelled",
@@ -91,7 +107,15 @@
     "category": "Category",
     "pickupStart": "Pickup start",
     "pickupEnd": "Pickup end",
-    "image": "Image"
+    "image": "Image",
+    "bankInfo": "Bank Account Info",
+    "bankInfoSub": "Customers see this when they choose bank transfer",
+    "bankName": "Bank Name",
+    "bankAccount": "Account Number",
+    "bankAccountName": "Account Holder Name",
+    "saveBankInfo": "Save Bank Info",
+    "editBankInfo": "Edit",
+    "bankInfoNotSet": "Not set — customers can't use bank transfer"
   },
   "categories": {
     "bakery": "Bakery",

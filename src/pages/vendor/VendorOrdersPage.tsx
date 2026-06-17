@@ -10,6 +10,17 @@ const STATUS_BADGE: Record<OrderStatus, string> = {
   paid: 'bg-green-900 text-green-300',
   picked_up: 'bg-slate-700 text-slate-300',
   cancelled: 'bg-red-900 text-red-300',
+  pending_cod: 'bg-orange-900 text-orange-300',
+  pending_bank_transfer: 'bg-blue-900 text-blue-300',
+}
+
+const STATUS_LABEL: Record<OrderStatus, string> = {
+  pending: 'PENDING',
+  paid: 'PAID',
+  picked_up: 'PICKED UP',
+  cancelled: 'CANCELLED',
+  pending_cod: 'COD',
+  pending_bank_transfer: 'BANK',
 }
 
 export default function VendorOrdersPage() {
@@ -57,7 +68,7 @@ export default function VendorOrdersPage() {
               </p>
             </div>
             <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${STATUS_BADGE[o.status]}`}>
-              {o.status.replace('_', ' ').toUpperCase()}
+              {STATUS_LABEL[o.status]}
             </span>
           </div>
         ))}
