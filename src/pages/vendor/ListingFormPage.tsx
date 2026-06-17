@@ -81,7 +81,7 @@ export default function ListingFormPage() {
       }
 
       if (isEdit && id) {
-        await updateListing(id, data)
+        await updateListing(id, { ...data, quantityRemaining: parseInt(quantity) })
       } else {
         await createListing({ ...data, quantityRemaining: parseInt(quantity) })
       }
@@ -129,7 +129,7 @@ export default function ListingFormPage() {
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <Label className="text-slate-300">Quantity</Label>
+            <Label className="text-slate-300">Quantity {isEdit && <span className="text-slate-500 text-xs">(sets available stock)</span>}</Label>
             <Input value={quantity} onChange={e => setQuantity(e.target.value)} type="number" required min="1" className="bg-slate-800 border-slate-700 text-white" />
           </div>
           <div className="space-y-1">
