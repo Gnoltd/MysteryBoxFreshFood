@@ -7,6 +7,7 @@ import { updateVendorBankInfo } from '../../services/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { VIETNAMESE_BANKS } from '../../constants/banks'
 import type { Listing, Order } from '../../types'
 
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
@@ -25,7 +26,7 @@ export default function VendorDashboardPage() {
   const [listings, setListings] = useState<Listing[]>([])
   const [orders, setOrders] = useState<Order[]>([])
   const [editingBank, setEditingBank] = useState(false)
-  const [bankName, setBankName] = useState('')
+  const [selectedBin, setSelectedBin] = useState('')
   const [bankAccount, setBankAccount] = useState('')
   const [bankAccountName, setBankAccountName] = useState('')
   const [bankSaving, setBankSaving] = useState(false)
@@ -39,7 +40,7 @@ export default function VendorDashboardPage() {
 
   useEffect(() => {
     if (userProfile) {
-      setBankName(userProfile.bankName ?? '')
+      setSelectedBin(userProfile.bankBin ?? '')
       setBankAccount(userProfile.bankAccount ?? '')
       setBankAccountName(userProfile.bankAccountName ?? '')
     }
@@ -53,16 +54,16 @@ export default function VendorDashboardPage() {
 
   const handleBankSave = async () => {
     if (!currentUser) return
+    const bank = VIETNAMESE_BANKS.find(b => b.bin === selectedBin)
+    if (!bank || !bankAccount) return
     setBankSaving(true)
     try {
-      await updateVendorBankInfo(currentUser.uid, bankName, bankAccount, bankAccountName)
+      await updateVendorBankInfo(currentUser.uid, bank.name, bank.bin, bankAccount, bankAccountName)
       setEditingBank(false)
     } finally {
       setBankSaving(false)
     }
   }
-
-  const hasBankInfo = userProfile?.bankAccount
 
   return (
     <div>
@@ -93,15 +94,12 @@ export default function VendorDashboardPage() {
         {orders.length === 0 && <p className="text-slate-500 text-sm">{t('vendor.noOrders')}</p>}
       </div>
 
-      {/* Bank account info for customers */}
+      {/* Bank account info */}
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-white font-semibold">{t('vendor.bankInfo')}</h2>
           {!editingBank && (
-            <button
-              onClick={() => setEditingBank(true)}
-              className="text-indigo-400 hover:text-indigo-300 text-sm"
-            >
+            <button onClick={() => setEditingBank(true)} className="text-indigo-400 hover:text-indigo-300 text-sm">
               {t('vendor.editBankInfo')}
             </button>
           )}
@@ -109,9 +107,9 @@ export default function VendorDashboardPage() {
         <p className="text-slate-500 text-xs mb-4">{t('vendor.bankInfoSub')}</p>
 
         {!editingBank ? (
-          hasBankInfo ? (
+          userProfile?.bankAccount ? (
             <div className="space-y-2 text-sm">
-              {userProfile?.bankName && (
+              {userProfile.bankName && (
                 <div className="flex justify-between">
                   <span className="text-slate-400">{t('vendor.bankName')}</span>
                   <span className="text-white">{userProfile.bankName}</span>
@@ -119,13 +117,16 @@ export default function VendorDashboardPage() {
               )}
               <div className="flex justify-between">
                 <span className="text-slate-400">{t('vendor.bankAccount')}</span>
-                <span className="text-white font-mono font-bold">{userProfile?.bankAccount}</span>
+                <span className="text-white font-mono font-bold">{userProfile.bankAccount}</span>
               </div>
-              {userProfile?.bankAccountName && (
+              {userProfile.bankAccountName && (
                 <div className="flex justify-between">
                   <span className="text-slate-400">{t('vendor.bankAccountName')}</span>
                   <span className="text-white">{userProfile.bankAccountName}</span>
                 </div>
+              )}
+              {userProfile.bankBin && (
+                <p className="text-green-400 text-xs pt-1">✓ VietQR enabled — customers can pay with one tap</p>
               )}
             </div>
           ) : (
@@ -135,12 +136,16 @@ export default function VendorDashboardPage() {
           <div className="space-y-3">
             <div className="space-y-1">
               <Label className="text-slate-300 text-sm">{t('vendor.bankName')}</Label>
-              <Input
-                value={bankName}
-                onChange={e => setBankName(e.target.value)}
-                placeholder="VD: Vietcombank, BIDV, Techcombank…"
-                className="bg-slate-800 border-slate-700 text-white"
-              />
+              <select
+                value={selectedBin}
+                onChange={e => setSelectedBin(e.target.value)}
+                className="w-full bg-slate-800 border border-slate-700 text-white rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="">— Chọn ngân hàng —</option>
+                {VIETNAMESE_BANKS.map(b => (
+                  <option key={b.bin} value={b.bin}>{b.name}</option>
+                ))}
+              </select>
             </div>
             <div className="space-y-1">
               <Label className="text-slate-300 text-sm">{t('vendor.bankAccount')}</Label>
@@ -163,7 +168,7 @@ export default function VendorDashboardPage() {
             <div className="flex gap-2 pt-1">
               <Button
                 onClick={handleBankSave}
-                disabled={bankSaving || !bankAccount}
+                disabled={bankSaving || !selectedBin || !bankAccount}
                 className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm"
               >
                 {bankSaving ? t('vendor.saving') : t('vendor.saveBankInfo')}

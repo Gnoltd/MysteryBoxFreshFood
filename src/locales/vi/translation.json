@@ -69,7 +69,13 @@
     "cancelledSub": "Hộp của bạn vẫn còn. Thử lại không?",
     "backToBrowse": "Quay lại trang khám phá",
     "backToOrders": "← Đơn của tôi",
-    "paymentPending": "Đang chờ thanh toán — vui lòng hoàn tất thanh toán."
+    "paymentPending": "Đang chờ thanh toán — vui lòng hoàn tất thanh toán.",
+    "bankTransferTitle": "Thanh toán chuyển khoản",
+    "codTitle": "Thanh toán khi nhận hàng (COD)",
+    "scanWithBankApp": "Quét bằng ứng dụng ngân hàng để chuyển tiền",
+    "transferRef": "Nội dung chuyển khoản",
+    "amount": "Số tiền",
+    "changePayment": "Đổi phương thức thanh toán"
   },
   "vendor": {
     "dashboard": "Tổng quan",

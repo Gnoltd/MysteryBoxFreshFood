@@ -46,8 +46,9 @@ export async function updateUserLang(uid: string, lang: 'en' | 'vi'): Promise<vo
 export async function updateVendorBankInfo(
   uid: string,
   bankName: string,
+  bankBin: string,
   bankAccount: string,
   bankAccountName: string
 ): Promise<void> {
-  await updateDoc(doc(db, 'users', uid), { bankName, bankAccount, bankAccountName })
+  await updateDoc(doc(db, 'users', uid), { bankName, bankBin, bankAccount, bankAccountName })
 }

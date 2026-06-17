@@ -69,7 +69,13 @@
     "cancelledSub": "Your box is still available. Ready to try again?",
     "backToBrowse": "Back to Browse",
     "backToOrders": "← My Orders",
-    "paymentPending": "Payment pending — please complete checkout."
+    "paymentPending": "Payment pending — please complete checkout.",
+    "bankTransferTitle": "Bank Transfer Payment",
+    "codTitle": "Cash on Delivery",
+    "scanWithBankApp": "Scan with your banking app to transfer",
+    "transferRef": "Transfer ref",
+    "amount": "Amount",
+    "changePayment": "Change payment method"
   },
   "vendor": {
     "dashboard": "Dashboard",

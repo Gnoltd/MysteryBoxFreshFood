@@ -10,6 +10,7 @@ export interface UserProfile {
   address?: string
   storeDescription?: string
   bankName?: string
+  bankBin?: string
   bankAccount?: string
   bankAccountName?: string
 }
