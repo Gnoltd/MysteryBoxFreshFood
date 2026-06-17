@@ -26,11 +26,15 @@ export default function ListingDetailPage() {
     getListing(id).then(async l => {
       setListing(l)
       if (l) {
-        const profile = await getUserProfile(l.vendorId)
-        setVendorProfile(profile)
+        try {
+          const profile = await getUserProfile(l.vendorId)
+          setVendorProfile(profile)
+        } catch {
+          // vendor profile unreadable — bank transfer info won't show
+        }
       }
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
   }, [id])
 
   const handleBuy = async () => {

@@ -2,7 +2,9 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read: if request.auth != null
+        && (request.auth.uid == uid || resource.data.role == 'vendor');
+      allow write: if request.auth != null && request.auth.uid == uid;
     }
     match /listings/{listingId} {
       allow read: if true;
@@ -17,8 +19,10 @@ service cloud.firestore {
             || request.auth.uid == resource.data.vendorId);
       allow update: if request.auth != null
         && request.auth.uid == resource.data.vendorId
-        && resource.data.status == 'paid'
-        && request.resource.data.status == 'picked_up';
+        && request.resource.data.status == 'picked_up'
+        && (resource.data.status == 'paid'
+            || resource.data.status == 'pending_cod'
+            || resource.data.status == 'pending_bank_transfer');
       allow create, delete: if false;
     }
   }
