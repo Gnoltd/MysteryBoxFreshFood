@@ -18,6 +18,7 @@ import ListingsPage from './pages/vendor/ListingsPage'
 import ListingFormPage from './pages/vendor/ListingFormPage'
 import VendorOrdersPage from './pages/vendor/VendorOrdersPage'
 import QRScanPage from './pages/vendor/QRScanPage'
+import VendorStorePage from './pages/customer/VendorStorePage'
 
 export default function App() {
   return (
@@ -47,6 +48,7 @@ export default function App() {
             <Route path="/vendor/scan" element={<QRScanPage />} />
           </Route>
 
+          <Route path="/store/:vendorId" element={<VendorStorePage />} />
           <Route path="/" element={<Navigate to="/browse" replace />} />
           <Route path="*" element={<Navigate to="/browse" replace />} />
         </Routes>

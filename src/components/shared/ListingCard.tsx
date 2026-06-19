@@ -36,7 +36,16 @@ export function ListingCard({ listing, href }: ListingCardProps) {
             </div>
             <span className="text-slate-400 text-xs">{listing.quantityRemaining} left</span>
           </div>
-          <p className="text-slate-500 text-xs mt-1 truncate">Pickup {pickup}</p>
+          <div className="flex items-center justify-between mt-1">
+            <p className="text-slate-500 text-xs truncate">Pickup {pickup}</p>
+            <Link
+              to={`/store/${listing.vendorId}`}
+              onClick={e => e.stopPropagation()}
+              className="text-indigo-500 hover:text-indigo-400 text-xs shrink-0 ml-2"
+            >
+              ↗
+            </Link>
+          </div>
         </div>
       </div>
     </Link>
