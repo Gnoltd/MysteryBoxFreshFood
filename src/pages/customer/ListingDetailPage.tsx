@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getListing } from '../../services/listings'
 import { initiateCheckout } from '../../services/stripe'
 import { initiateLocalOrder } from '../../services/localPayment'
 import { getUserProfile } from '../../services/auth'
+import { getReviewsForListing } from '../../services/reviews'
+import { StarRating } from '../../components/shared/StarRating'
 import { Button } from '@/components/ui/button'
-import type { Listing, UserProfile } from '../../types'
+import type { Listing, UserProfile, Review } from '../../types'
 
 type PayMethod = 'cod' | 'bank_transfer' | 'stripe'
 
@@ -20,6 +22,7 @@ export default function ListingDetailPage() {
   const [payMethod, setPayMethod] = useState<PayMethod>('cod')
   const [buyLoading, setBuyLoading] = useState(false)
   const [error, setError] = useState('')
+  const [reviews, setReviews] = useState<Review[]>([])
 
   useEffect(() => {
     if (!id) return
@@ -35,6 +38,11 @@ export default function ListingDetailPage() {
       }
       setLoading(false)
     }).catch(() => setLoading(false))
+  }, [id])
+
+  useEffect(() => {
+    if (!id) return
+    getReviewsForListing(id).then(setReviews).catch(() => {})
   }, [id])
 
   const handleBuy = async () => {
@@ -61,6 +69,10 @@ export default function ListingDetailPage() {
   const pickupStart = new Date(listing.pickupStart.seconds * 1000).toLocaleString('vi-VN')
   const pickupEnd = new Date(listing.pickupEnd.seconds * 1000).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
   const isSoldOut = listing.status === 'sold_out' || listing.quantityRemaining === 0
+
+  const avgRating = reviews.length
+    ? Math.round((reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) * 10) / 10
+    : 0
 
   const payOptions: { method: PayMethod; label: string; icon: string }[] = [
     { method: 'cod', label: t('payment.cod'), icon: '💵' },
@@ -110,6 +122,38 @@ export default function ListingDetailPage() {
               <p className="text-slate-400">{t('listing.type')}</p>
               <p className="text-white font-medium">{listing.type === 'mystery_box' ? t('listing.mysteryBox') : t('listing.singleItem')}</p>
             </div>
+          </div>
+
+          {/* Vendor store link (D4) */}
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-slate-400">{t('auth.vendor')}</span>
+            <Link
+              to={`/store/${listing.vendorId}`}
+              className="text-indigo-400 hover:text-indigo-300 text-sm"
+            >
+              {t('store.view_store')} →
+            </Link>
+          </div>
+
+          {/* Reviews section (D2) */}
+          <div className="border-t border-slate-800 pt-4">
+            <div className="flex items-center gap-2 mb-3">
+              {avgRating > 0 ? (
+                <>
+                  <StarRating value={Math.round(avgRating)} size="sm" />
+                  <span className="text-white font-medium text-sm">{avgRating}</span>
+                  <span className="text-slate-500 text-xs">{t('review.out_of_5')} ({reviews.length} {t('review.avg_rating')})</span>
+                </>
+              ) : (
+                <span className="text-slate-500 text-sm">{t('review.no_reviews')}</span>
+              )}
+            </div>
+            {reviews.map(r => (
+              <div key={r.id} className="bg-slate-800 rounded-lg p-3 mb-2">
+                <StarRating value={r.rating} size="sm" />
+                {r.comment && <p className="text-slate-300 text-sm mt-1">{r.comment}</p>}
+              </div>
+            ))}
           </div>
 
           {!isSoldOut && (
