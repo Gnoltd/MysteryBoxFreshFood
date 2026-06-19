@@ -130,5 +130,43 @@
     "drinks": "Drinks",
     "snacks": "Snacks",
     "other": "Other"
+  },
+  "analytics": {
+    "tab": "Analytics",
+    "overview": "Overview",
+    "revenue_chart": "Revenue (last 7 days)",
+    "orders_by_category": "Orders by Category",
+    "top_listing": "Top Listing This Week",
+    "no_data": "No data yet"
+  },
+  "review": {
+    "leave_review": "Leave a Review",
+    "rating": "Rating",
+    "comment_placeholder": "Share your experience (optional, max 300 chars)",
+    "submit": "Submit Review",
+    "submitting": "Submitting…",
+    "thanks": "Thanks for your review!",
+    "avg_rating": "avg rating",
+    "no_reviews": "No reviews yet",
+    "out_of_5": "/ 5"
+  },
+  "filter": {
+    "search_placeholder": "Search listings…",
+    "price_min": "Min price",
+    "price_max": "Max price",
+    "available_now": "Available now",
+    "sort": "Sort",
+    "sort_price_asc": "Price: low to high",
+    "sort_price_desc": "Price: high to low",
+    "sort_newest": "Newest",
+    "clear_all": "Clear all",
+    "active_filters": "Active filters"
+  },
+  "store": {
+    "active_listings": "Active Listings",
+    "no_listings": "No active listings right now",
+    "view_store": "View store",
+    "rating": "Rating",
+    "no_rating_yet": "No ratings yet"
   }
 }

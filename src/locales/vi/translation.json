@@ -130,5 +130,43 @@
     "drinks": "Đồ uống",
     "snacks": "Đồ ăn vặt",
     "other": "Khác"
+  },
+  "analytics": {
+    "tab": "Phân tích",
+    "overview": "Tổng quan",
+    "revenue_chart": "Doanh thu (7 ngày qua)",
+    "orders_by_category": "Đơn hàng theo danh mục",
+    "top_listing": "Sản phẩm nổi bật tuần này",
+    "no_data": "Chưa có dữ liệu"
+  },
+  "review": {
+    "leave_review": "Viết đánh giá",
+    "rating": "Đánh giá",
+    "comment_placeholder": "Chia sẻ trải nghiệm của bạn (tùy chọn, tối đa 300 ký tự)",
+    "submit": "Gửi đánh giá",
+    "submitting": "Đang gửi…",
+    "thanks": "Cảm ơn đánh giá của bạn!",
+    "avg_rating": "đánh giá TB",
+    "no_reviews": "Chưa có đánh giá",
+    "out_of_5": "/ 5"
+  },
+  "filter": {
+    "search_placeholder": "Tìm kiếm sản phẩm…",
+    "price_min": "Giá tối thiểu",
+    "price_max": "Giá tối đa",
+    "available_now": "Đang nhận hàng",
+    "sort": "Sắp xếp",
+    "sort_price_asc": "Giá: thấp đến cao",
+    "sort_price_desc": "Giá: cao đến thấp",
+    "sort_newest": "Mới nhất",
+    "clear_all": "Xóa tất cả",
+    "active_filters": "Bộ lọc đang dùng"
+  },
+  "store": {
+    "active_listings": "Sản phẩm đang bán",
+    "no_listings": "Hiện không có sản phẩm nào",
+    "view_store": "Xem cửa hàng",
+    "rating": "Đánh giá",
+    "no_rating_yet": "Chưa có đánh giá"
   }
 }
