@@ -53,3 +53,14 @@ export interface Order {
   stripeSessionId?: string
   createdAt: Timestamp
 }
+
+export interface Review {
+  id: string
+  orderId: string
+  listingId: string
+  vendorId: string
+  customerId: string
+  rating: number
+  comment: string
+  createdAt: Timestamp
+}
