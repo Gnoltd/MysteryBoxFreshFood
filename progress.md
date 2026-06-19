@@ -1,10 +1,12 @@
 # MysteryBox — Progress
 
-## Current Phase: Implementation Complete
+## Current Phase: Extensions Complete
 
-**Last updated:** 2026-06-17  
+**Last updated:** 2026-06-19  
 **Spec:** `docs/superpowers/specs/2026-06-17-mysterybox-design.md`  
 **Plan:** `docs/superpowers/plans/2026-06-17-mysterybox-implementation.md`
+**Extensions spec:** `docs/superpowers/specs/2026-06-19-extensions-design.md`  
+**Extensions plan:** `docs/superpowers/plans/2026-06-19-extensions-implementation.md`
 
 ---
 
@@ -86,3 +88,22 @@ Full functional prototype — all features complete:
 - **QR pickup:** Vendor camera scans customer QR; UUID validated against vendorId in Firestore transaction
 - **i18n:** react-i18next, EN/VI toggle, preference saved to Firestore
 - **stripeProductId/stripePriceId omitted** — prototype uses `price_data` at checkout time
+
+---
+
+## Extensions (2026-06-19)
+
+| Feature | Status |
+|---|---|
+| D1 — Vendor Analytics tab (Recharts line + bar charts) | ✅ Complete |
+| D2 — Customer Reviews & Ratings (StarRating, review form, display) | ✅ Complete |
+| D3 — Search + Advanced Filters on BrowsePage | ✅ Complete |
+| D4 — Vendor Public Store Page (`/store/:vendorId`) | ✅ Complete |
+
+**New files:** `src/services/reviews.ts`, `src/utils/filterListings.ts`, `src/utils/analytics.ts`, `src/components/shared/StarRating.tsx`, `src/pages/customer/VendorStorePage.tsx`  
+**New tests:** 22 tests total (filterListings: 10, analytics: 8, StarRating: 4)  
+**New dependency:** `recharts`
+
+### Next Steps
+1. Deploy Firestore rules + indexes: `firebase deploy --only firestore:rules,firestore:indexes`
+2. Build + deploy frontend: `npm run build && firebase deploy --only hosting`
