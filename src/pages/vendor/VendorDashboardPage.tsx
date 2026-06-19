@@ -241,7 +241,7 @@ export default function VendorDashboardPage() {
                     contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: 8 }}
                     labelStyle={{ color: '#94a3b8' }}
                     itemStyle={{ color: '#818cf8' }}
-                    formatter={(v: number) => [`${v.toLocaleString('vi-VN')} đ`, '']}
+                    formatter={(v) => [`${Number(v).toLocaleString('vi-VN')} đ`, '']}
                   />
                   <Line type="monotone" dataKey="revenue" stroke="#818cf8" strokeWidth={2} dot={{ fill: '#818cf8', r: 3 }} />
                 </LineChart>
