@@ -12,6 +12,7 @@ const STATUS_BADGE: Record<Order['status'], string> = {
   cancelled: 'bg-red-900 text-red-300',
   pending_cod: 'bg-orange-900 text-orange-300',
   pending_bank_transfer: 'bg-blue-900 text-blue-300',
+  refunded: 'bg-slate-700 text-slate-400',
 }
 
 const STATUS_LABEL: Record<Order['status'], string> = {
@@ -21,6 +22,7 @@ const STATUS_LABEL: Record<Order['status'], string> = {
   cancelled: 'CANCELLED',
   pending_cod: 'COD',
   pending_bank_transfer: 'BANK',
+  refunded: 'REFUNDED',
 }
 
 export default function OrdersPage() {
