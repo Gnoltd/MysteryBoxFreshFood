@@ -33,7 +33,10 @@ export const stripeWebhook = functions.https.onRequest(async (req, res) => {
       if (!orderSnap.exists || !listingSnap.exists) return
 
       const newQty = listingSnap.data()!.quantityRemaining - parseInt(quantity)
-      t.update(orderRef, { status: 'paid' })
+      t.update(orderRef, {
+        status: 'paid',
+        stripePaymentIntentId: session.payment_intent as string,
+      })
       t.update(listingRef, {
         quantityRemaining: newQty,
         status: newQty <= 0 ? 'sold_out' : 'active',
