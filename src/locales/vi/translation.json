@@ -39,7 +39,12 @@
     "singleItem": "📦 Món đơn lẻ",
     "redirecting": "Đang chuyển đến trang thanh toán…",
     "checkoutFailed": "Thanh toán thất bại",
-    "back": "← Quay lại"
+    "back": "← Quay lại",
+    "packed_at": "Đóng gói lúc {{time}}",
+    "time_left": "Còn {{hours}}h {{minutes}}p",
+    "time_left_min": "Còn {{minutes}}p",
+    "time_left_urgent": "Còn {{minutes}}p — Nhanh lên!",
+    "expired_label": "Hết hạn"
   },
   "payment": {
     "selectMethod": "Phương thức thanh toán",
@@ -75,7 +80,12 @@
     "scanWithBankApp": "Quét bằng ứng dụng ngân hàng để chuyển tiền",
     "transferRef": "Nội dung chuyển khoản",
     "amount": "Số tiền",
-    "changePayment": "Đổi phương thức thanh toán"
+    "changePayment": "Đổi phương thức thanh toán",
+    "share_qr": "Chia sẻ QR để nhận hàng",
+    "download_qr": "Tải QR",
+    "share_qr_note": "Bạn có thể chia sẻ mã QR này cho bạn bè để nhận hàng thay.",
+    "status_refunded": "Đã hoàn tiền",
+    "refund_note": "Đơn hàng đã hết hạn — thanh toán của bạn sẽ được hoàn lại."
   },
   "vendor": {
     "dashboard": "Tổng quan",
@@ -121,7 +131,16 @@
     "bankAccountName": "Tên chủ tài khoản",
     "saveBankInfo": "Lưu thông tin ngân hàng",
     "editBankInfo": "Chỉnh sửa",
-    "bankInfoNotSet": "Chưa cài đặt — khách không thể chuyển khoản"
+    "bankInfoNotSet": "Chưa cài đặt — khách không thể chuyển khoản",
+    "quick_create": "Tạo nhanh",
+    "quick_create_modal": "Đăng sản phẩm nhanh",
+    "volume_low": "Ít",
+    "volume_medium": "Vừa",
+    "volume_high": "Nhiều",
+    "suggested_qty": "Đề xuất: {{count}} hộp",
+    "auto_title": "Mystery Box {{category}} — {{store}}",
+    "pickup_window": "Khung giờ lấy hàng",
+    "packed_at_label": "Đóng hộp lúc (tùy chọn)"
   },
   "categories": {
     "bakery": "Bánh",
