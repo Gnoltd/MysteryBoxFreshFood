@@ -166,7 +166,7 @@ export default function ListingsPage() {
 
             {/* Category */}
             <div>
-              <Label className="text-slate-300 text-sm mb-2 block">Category</Label>
+              <Label className="text-slate-300 text-sm mb-2 block">{t('vendor.category')}</Label>
               <div className="grid grid-cols-3 gap-1">
                 {CATEGORIES.map(cat => (
                   <button
@@ -187,7 +187,7 @@ export default function ListingsPage() {
 
             {/* Volume */}
             <div>
-              <Label className="text-slate-300 text-sm mb-2 block">Surplus volume</Label>
+              <Label className="text-slate-300 text-sm mb-2 block">{t('vendor.surplus_volume')}</Label>
               <div className="grid grid-cols-3 gap-2">
                 {(['low', 'medium', 'high'] as Volume[]).map(vol => (
                   <button
@@ -213,7 +213,7 @@ export default function ListingsPage() {
 
             {/* Qty adjust */}
             <div>
-              <Label className="text-slate-300 text-sm mb-2 block">Quantity</Label>
+              <Label className="text-slate-300 text-sm mb-2 block">{t('vendor.quantity')}</Label>
               <div className="flex items-center gap-3">
                 <button
                   type="button"
@@ -231,7 +231,7 @@ export default function ListingsPage() {
 
             {/* Price */}
             <div>
-              <Label className="text-slate-300 text-sm mb-1 block">Price (VND)</Label>
+              <Label className="text-slate-300 text-sm mb-1 block">{t('vendor.price')}</Label>
               <Input
                 value={qcPrice}
                 onChange={e => setQcPrice(e.target.value)}

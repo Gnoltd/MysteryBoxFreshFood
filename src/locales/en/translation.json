@@ -140,7 +140,8 @@
     "suggested_qty": "Suggested: {{count}} boxes",
     "auto_title": "{{store}} Mystery Box — {{category}}",
     "pickup_window": "Pickup window",
-    "packed_at_label": "Packed at (optional)"
+    "packed_at_label": "Packed at (optional)",
+    "surplus_volume": "Surplus volume"
   },
   "categories": {
     "bakery": "Bakery",

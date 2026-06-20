@@ -140,7 +140,8 @@
     "suggested_qty": "Đề xuất: {{count}} hộp",
     "auto_title": "Mystery Box {{category}} — {{store}}",
     "pickup_window": "Khung giờ lấy hàng",
-    "packed_at_label": "Đóng hộp lúc (tùy chọn)"
+    "packed_at_label": "Đóng hộp lúc (tùy chọn)",
+    "surplus_volume": "Lượng dư thừa"
   },
   "categories": {
     "bakery": "Bánh",
