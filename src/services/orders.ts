@@ -43,3 +43,13 @@ export async function redeemQRCode(qrCode: string, vendorId: string): Promise<Or
     return { id: fresh.id, ...fresh.data(), status: 'picked_up' } as Order
   })
 }
+
+export async function getVendorOrders(vendorId: string): Promise<Order[]> {
+  const q = query(
+    collection(db, 'orders'),
+    where('vendorId', '==', vendorId),
+    orderBy('createdAt', 'desc')
+  )
+  const snap = await getDocs(q)
+  return snap.docs.map(d => ({ id: d.id, ...d.data() } as Order))
+}
