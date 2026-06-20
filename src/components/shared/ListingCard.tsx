@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useCountdown } from '../../hooks/useCountdown'
 import type { Listing } from '../../types'
@@ -10,6 +10,7 @@ interface ListingCardProps {
 
 export function ListingCard({ listing, href }: ListingCardProps) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const discount = Math.round((1 - listing.price / listing.originalPrice) * 100)
   const pickup = new Date(listing.pickupStart.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     + ' – ' + new Date(listing.pickupEnd.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -17,7 +18,7 @@ export function ListingCard({ listing, href }: ListingCardProps) {
   const showBadge = !cdExpired && hoursLeft < 3
 
   return (
-    <Link to={href} className="block group">
+    <div className="block group cursor-pointer" onClick={() => navigate(href)}>
       <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-indigo-500 transition-colors">
         <div className="relative h-40 bg-slate-800">
           {listing.imageUrl
@@ -63,6 +64,6 @@ export function ListingCard({ listing, href }: ListingCardProps) {
           )}
         </div>
       </div>
-    </Link>
+    </div>
   )
 }

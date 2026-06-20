@@ -6,7 +6,7 @@ import { filterListings, hasActiveFilters, DEFAULT_FILTERS } from '../../utils/f
 import type { Listing, ListingCategory } from '../../types'
 import type { FilterState } from '../../utils/filterListings'
 
-const CATEGORY_VALUES: (ListingCategory | 'all')[] = ['all', 'bakery', 'rice', 'noodles', 'drinks', 'snacks', 'other']
+const CATEGORY_VALUES: (ListingCategory | 'all')[] = ['all', 'bakery', 'fruit', 'vegetables', 'dairy', 'meat', 'rice', 'noodles', 'drinks', 'snacks', 'other']
 
 export default function BrowsePage() {
   const { t } = useTranslation()

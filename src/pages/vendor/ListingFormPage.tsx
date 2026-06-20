@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Timestamp } from 'firebase/firestore'
 import type { ListingCategory } from '../../types'
 
-const CATEGORIES: ListingCategory[] = ['bakery', 'rice', 'noodles', 'drinks', 'snacks', 'other']
+const CATEGORIES: ListingCategory[] = ['bakery', 'fruit', 'vegetables', 'dairy', 'meat', 'rice', 'noodles', 'drinks', 'snacks', 'other']
 
 export default function ListingFormPage() {
   const { id } = useParams<{ id?: string }>()
@@ -30,9 +30,20 @@ export default function ListingFormPage() {
   const [pickupEnd, setPickupEnd] = useState('')
   const [packedAt, setPackedAt] = useState('')
   const [imageFile, setImageFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [existingImageUrl, setExistingImageUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!imageFile) {
+      setPreviewUrl(null)
+      return
+    }
+    const url = URL.createObjectURL(imageFile)
+    setPreviewUrl(url)
+    return () => URL.revokeObjectURL(url)
+  }, [imageFile])
 
   useEffect(() => {
     if (!id) return
@@ -172,7 +183,13 @@ export default function ListingFormPage() {
         <div className="space-y-1">
           <Label className="text-slate-300">Image</Label>
           <Input type="file" accept="image/*" onChange={e => setImageFile(e.target.files?.[0] ?? null)} className="bg-slate-800 border-slate-700 text-white" />
-          {existingImageUrl && !imageFile && <img src={existingImageUrl} className="mt-2 h-20 rounded object-cover" alt="Current listing" />}
+          {(previewUrl || (existingImageUrl && !imageFile)) && (
+            <img
+              src={previewUrl ?? existingImageUrl}
+              className="mt-2 h-32 w-full rounded-lg object-cover"
+              alt="Listing preview"
+            />
+          )}
         </div>
 
         {error && <p className="text-red-400 text-sm">{error}</p>}
