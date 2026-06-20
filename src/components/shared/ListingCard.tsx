@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { useCountdown } from '../../hooks/useCountdown'
 import type { Listing } from '../../types'
 
 interface ListingCardProps {
@@ -7,9 +9,12 @@ interface ListingCardProps {
 }
 
 export function ListingCard({ listing, href }: ListingCardProps) {
+  const { t } = useTranslation()
   const discount = Math.round((1 - listing.price / listing.originalPrice) * 100)
   const pickup = new Date(listing.pickupStart.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     + ' – ' + new Date(listing.pickupEnd.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  const { hoursLeft, minutesLeft, urgent, expired: cdExpired } = useCountdown(listing.pickupEnd)
+  const showBadge = !cdExpired && hoursLeft < 3
 
   return (
     <Link to={href} className="block group">
@@ -46,6 +51,16 @@ export function ListingCard({ listing, href }: ListingCardProps) {
               ↗
             </Link>
           </div>
+          {showBadge && (
+            <p className={`text-xs font-medium mt-1 ${urgent ? 'text-red-400' : 'text-indigo-400'}`}>
+              ⏱{' '}
+              {urgent
+                ? t('listing.time_left_urgent', { minutes: minutesLeft })
+                : hoursLeft > 0
+                  ? t('listing.time_left', { hours: hoursLeft, minutes: minutesLeft })
+                  : t('listing.time_left_min', { minutes: minutesLeft })}
+            </p>
+          )}
         </div>
       </div>
     </Link>

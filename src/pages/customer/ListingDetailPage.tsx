@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Timestamp } from 'firebase/firestore'
+import { useCountdown } from '../../hooks/useCountdown'
 import { getListing } from '../../services/listings'
 import { initiateCheckout } from '../../services/stripe'
 import { initiateLocalOrder } from '../../services/localPayment'
@@ -11,6 +13,22 @@ import { Button } from '@/components/ui/button'
 import type { Listing, UserProfile, Review } from '../../types'
 
 type PayMethod = 'cod' | 'bank_transfer' | 'stripe'
+
+function CountdownBadge({ pickupEnd }: { pickupEnd: Timestamp }) {
+  const { t } = useTranslation()
+  const { hoursLeft, minutesLeft, urgent, expired } = useCountdown(pickupEnd)
+  if (expired || hoursLeft >= 3) return null
+  return (
+    <p className={`text-sm font-medium mt-1 ${urgent ? 'text-red-400' : 'text-indigo-400'}`}>
+      ⏱{' '}
+      {urgent
+        ? t('listing.time_left_urgent', { minutes: minutesLeft })
+        : hoursLeft > 0
+          ? t('listing.time_left', { hours: hoursLeft, minutes: minutesLeft })
+          : t('listing.time_left_min', { minutes: minutesLeft })}
+    </p>
+  )
+}
 
 export default function ListingDetailPage() {
   const { t } = useTranslation()
@@ -123,6 +141,17 @@ export default function ListingDetailPage() {
               <p className="text-white font-medium">{listing.type === 'mystery_box' ? t('listing.mysteryBox') : t('listing.singleItem')}</p>
             </div>
           </div>
+
+          <CountdownBadge pickupEnd={listing.pickupEnd} />
+
+          {/* Packed at */}
+          {listing.packedAt && (
+            <p className="text-slate-500 text-xs mt-1">
+              {t('listing.packed_at', {
+                time: new Date(listing.packedAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              })}
+            </p>
+          )}
 
           {/* Vendor store link (D4) */}
           <div className="flex items-center justify-between text-sm">
