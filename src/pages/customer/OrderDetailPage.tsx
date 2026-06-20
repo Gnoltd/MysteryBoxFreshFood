@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { QRCodeSVG } from 'qrcode.react'
+import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react'
 import { subscribeToOrder } from '../../services/orders'
 import { getUserProfile } from '../../services/auth'
 import { changeOrderPayment } from '../../services/localPayment'
@@ -25,6 +25,26 @@ export default function OrderDetailPage() {
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState('')
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
+
+  const qrCanvasRef = useRef<HTMLCanvasElement>(null)
+
+  const handleShareQR = useCallback(async () => {
+    const canvas = qrCanvasRef.current
+    if (!canvas) return
+    const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'))
+    if (!blob) return
+    const file = new File([blob], 'mysterybox-qr.png', { type: 'image/png' })
+    if (navigator.share && navigator.canShare?.({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'MysteryBox QR' })
+    } else {
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'mysterybox-qr.png'
+      a.click()
+      URL.revokeObjectURL(url)
+    }
+  }, [])
 
   useEffect(() => {
     if (!id) return
@@ -185,7 +205,17 @@ export default function OrderDetailPage() {
             <div className="bg-white p-4 rounded-xl inline-block mb-3">
               <QRCodeSVG value={order.qrCode} size={200} />
             </div>
+            <div className="hidden">
+              <QRCodeCanvas ref={qrCanvasRef} value={order.qrCode} size={200} />
+            </div>
             <p className="text-slate-500 text-xs font-mono break-all">{order.qrCode}</p>
+            <button
+              onClick={handleShareQR}
+              className="mt-4 w-full py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors"
+            >
+              {t('order.share_qr')}
+            </button>
+            <p className="text-slate-500 text-xs mt-2 italic">{t('order.share_qr_note')}</p>
           </div>
         )}
 
@@ -195,6 +225,15 @@ export default function OrderDetailPage() {
             <div className="text-5xl mb-3">✅</div>
             <p className="text-white font-bold text-lg">{t('order.pickedUp')}</p>
             <p className="text-slate-400 text-sm mt-1">{t('order.enjoy')}</p>
+          </div>
+        )}
+
+        {/* Refunded */}
+        {order.status === 'refunded' && (
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center">
+            <div className="text-5xl mb-3">💸</div>
+            <p className="text-white font-bold text-lg">{t('order.status_refunded')}</p>
+            <p className="text-slate-400 text-sm mt-1">{t('order.refund_note')}</p>
           </div>
         )}
 
