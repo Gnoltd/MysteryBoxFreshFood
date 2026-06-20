@@ -28,6 +28,7 @@ export default function ListingFormPage() {
   const [type, setType] = useState<'mystery_box' | 'item'>('mystery_box')
   const [pickupStart, setPickupStart] = useState('')
   const [pickupEnd, setPickupEnd] = useState('')
+  const [packedAt, setPackedAt] = useState('')
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [existingImageUrl, setExistingImageUrl] = useState('')
   const [loading, setLoading] = useState(false)
@@ -51,6 +52,7 @@ export default function ListingFormPage() {
       }
       setPickupStart(toDatetimeLocal(l.pickupStart))
       setPickupEnd(toDatetimeLocal(l.pickupEnd))
+      if (l.packedAt) setPackedAt(toDatetimeLocal(l.packedAt))
     })
   }, [id])
 
@@ -77,6 +79,7 @@ export default function ListingFormPage() {
         imageUrl,
         pickupStart: Timestamp.fromDate(new Date(pickupStart)),
         pickupEnd: Timestamp.fromDate(new Date(pickupEnd)),
+        ...(packedAt ? { packedAt: Timestamp.fromDate(new Date(packedAt)) } : {}),
         status: 'active' as const,
       }
 
@@ -154,6 +157,16 @@ export default function ListingFormPage() {
             <Label className="text-slate-300">Pickup end</Label>
             <Input value={pickupEnd} onChange={e => setPickupEnd(e.target.value)} type="datetime-local" required className="bg-slate-800 border-slate-700 text-white" />
           </div>
+        </div>
+
+        <div className="space-y-1">
+          <Label className="text-slate-300">Packed at (optional)</Label>
+          <Input
+            value={packedAt}
+            onChange={e => setPackedAt(e.target.value)}
+            type="datetime-local"
+            className="bg-slate-800 border-slate-700 text-white"
+          />
         </div>
 
         <div className="space-y-1">
