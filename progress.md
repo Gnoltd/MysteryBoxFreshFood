@@ -1,12 +1,16 @@
 # MysteryBox — Progress
 
-## Current Phase: Extensions Complete
+## Current Phase: UX Fixes + AI Box Composer Complete
 
-**Last updated:** 2026-06-19  
+**Last updated:** 2026-06-21  
 **Spec:** `docs/superpowers/specs/2026-06-17-mysterybox-design.md`  
 **Plan:** `docs/superpowers/plans/2026-06-17-mysterybox-implementation.md`
 **Extensions spec:** `docs/superpowers/specs/2026-06-19-extensions-design.md`  
 **Extensions plan:** `docs/superpowers/plans/2026-06-19-extensions-implementation.md`
+**Improvements spec:** `docs/superpowers/specs/2026-06-21-improvements-design.md`  
+**Improvements plan:** `docs/superpowers/plans/2026-06-21-improvements-implementation.md`
+**UX + AI spec:** `docs/superpowers/specs/2026-06-21-ux-fixes-ai-composer-design.md`  
+**UX + AI plan:** `docs/superpowers/plans/2026-06-21-ux-fixes-ai-composer-implementation.md`
 
 ---
 
@@ -104,6 +108,46 @@ Full functional prototype — all features complete:
 **New tests:** 22 tests total (filterListings: 10, analytics: 8, StarRating: 4)  
 **New dependency:** `recharts`
 
-### Next Steps
-1. Deploy Firestore rules + indexes: `firebase deploy --only firestore:rules,firestore:indexes`
-2. Build + deploy frontend: `npm run build && firebase deploy --only hosting`
+---
+
+## Market Improvements (2026-06-21)
+
+| Feature | Status |
+|---|---|
+| E1 — Share QR proxy pickup (Web Share API + PNG download fallback) | ✅ Complete |
+| E2 — Quick Create modal with AI quantity suggestion (suggestQuantity) | ✅ Complete |
+| E3 — Food safety countdown badge (useCountdown hook) | ✅ Complete |
+| E3 — packedAt field on listing form | ✅ Complete |
+| E3 — pickupEnd denormalized onto order in createCheckoutSession | ✅ Complete |
+| E3 — stripePaymentIntentId stored on order in stripeWebhook | ✅ Complete |
+| E3 — autoRefundExpiredOrders scheduled Cloud Function | ✅ Complete |
+| E3 — Firestore composite index (orders: status + pickupEnd) | ✅ Complete |
+| fix — refunded status badge in OrdersPage + VendorOrdersPage | ✅ Complete |
+
+**New files:** `src/utils/quickCreate.ts`, `src/utils/quickCreate.test.ts`, `src/hooks/useCountdown.ts`, `src/hooks/useCountdown.test.ts`, `functions/src/autoRefundExpiredOrders.ts`  
+**New tests:** 12 new (quickCreate: 7, useCountdown: 5) → 34 total  
+**Type additions:** `OrderStatus` += `'refunded'`, `Listing.packedAt?`, `Order.stripePaymentIntentId?`, `Order.pickupEnd?`
+
+---
+
+## UX Fixes + AI Box Composer (2026-06-21)
+
+| Feature | Status |
+|---|---|
+| Fix A — ListingCard nested link bug (card click now navigates correctly) | ✅ Complete |
+| Fix B — Image file preview in listing form (live preview on file select) | ✅ Complete |
+| Fix C — Category expansion: 6 → 10 (added fruit, vegetables, dairy, meat) | ✅ Complete |
+| Feature D — AI Box Composer modal (Gemini-powered, replaces Quick Create) | ✅ Complete |
+| `composeMysteryBox` Cloud Function (Gemini 2.0 Flash Lite) | ✅ Complete |
+| `src/services/ai.ts` service wrapper | ✅ Complete |
+
+**New files:** `src/services/ai.ts`, `functions/src/composeMysteryBox.ts`  
+**Modified:** `ListingCard.tsx`, `ListingFormPage.tsx`, `ListingsPage.tsx`, `BrowsePage.tsx`, `types.ts`, both locale files  
+**AI API:** Google Gemini 2.0 Flash Lite — key stored via `firebase functions:config:set gemini.api_key`  
+**New categories:** `fruit` · `vegetables` · `dairy` · `meat` (alongside existing 6)
+
+### Smoke Tests
+1. Browse → click listing card body → navigates to detail ✓
+2. Vendor → New/Edit listing → pick image file → preview appears immediately ✓
+3. Browse category chips show all 10 categories ✓
+4. Vendor → Listings → "AI Box Composer" → add items → Compose → Gemini returns title/description/price → Publish → listing created ✓
