@@ -79,16 +79,15 @@ const MULTIPLIERS = { low: 0.5, medium: 1.0, high: 1.5 }
 
 function suggestQuantity(
   orders: Order[],        // vendor's paid/picked_up orders, last 14 days
-  category: Category,
   volume: 'low' | 'medium' | 'high'
 ): number {
-  const relevant = orders.filter(o => o.listingCategory === category)
-  const avgDailySold = relevant.length / 14
+  const paid = orders.filter(o => ['paid', 'picked_up'].includes(o.status))
+  const avgDailySold = paid.length / 14
   return Math.max(1, Math.ceil(avgDailySold * MULTIPLIERS[volume]))
 }
 ```
 
-Uses the same order query already made by the D1 analytics tab — no extra Firestore reads if the dashboard is already mounted. If not, a single `getVendorOrders(uid)` call suffices (same service function used by analytics).
+Uses overall vendor order volume (not category-filtered) — orders have no `category` field, that lives on `listings`. The overall daily average is a reliable signal since most vendors sell 1–2 categories. Uses the same order query already made by the D1 analytics tab — no extra Firestore reads if the dashboard is already mounted. If not, a single `getVendorOrders(uid)` call suffices (same service function used by analytics).
 
 ### Auto-generated listing title
 
