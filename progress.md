@@ -1,8 +1,8 @@
 # MysteryBox — Progress
 
-## Current Phase: UX Fixes + AI Box Composer Complete
+## Current Phase: Full Redesign + Subscriptions + Real-Time (Planning Complete)
 
-**Last updated:** 2026-06-21  
+**Last updated:** 2026-06-22  
 **Spec:** `docs/superpowers/specs/2026-06-17-mysterybox-design.md`  
 **Plan:** `docs/superpowers/plans/2026-06-17-mysterybox-implementation.md`
 **Extensions spec:** `docs/superpowers/specs/2026-06-19-extensions-design.md`  
@@ -11,6 +11,12 @@
 **Improvements plan:** `docs/superpowers/plans/2026-06-21-improvements-implementation.md`
 **UX + AI spec:** `docs/superpowers/specs/2026-06-21-ux-fixes-ai-composer-design.md`  
 **UX + AI plan:** `docs/superpowers/plans/2026-06-21-ux-fixes-ai-composer-implementation.md`
+
+**Redesign spec:** `docs/superpowers/specs/2026-06-21-redesign-subscriptions-realtime-design.md`  
+**Redesign Plan 1 (Design System):** `docs/superpowers/plans/2026-06-22-redesign-p1-design-system.md`  
+**Redesign Plan 2 (Customer Pages):** `docs/superpowers/plans/2026-06-22-redesign-p2-customer-pages.md`  
+**Redesign Plan 3 (Subscriptions + Real-Time):** `docs/superpowers/plans/2026-06-22-redesign-p3-subscriptions-realtime.md`  
+**Redesign Plan 4 (Vendor Pages):** `docs/superpowers/plans/2026-06-22-redesign-p4-vendor-pages.md`
 
 ---
 
@@ -151,3 +157,29 @@ Full functional prototype — all features complete:
 2. Vendor → New/Edit listing → pick image file → preview appears immediately ✓
 3. Browse category chips show all 10 categories ✓
 4. Vendor → Listings → "AI Box Composer" → add items → Compose → Gemini returns title/description/price → Publish → listing created ✓
+
+---
+
+## Full Redesign + Subscriptions + Real-Time (2026-06-22)
+
+| Task | Status |
+|---|---|
+| Brainstorming & design | ✅ Complete |
+| Plan Part 1 — Design System + Shared Components | ✅ Ready |
+| Plan Part 2 — Customer Pages Redesign | ✅ Ready |
+| Plan Part 3 — Subscriptions + Real-Time Backend | ✅ Ready |
+| Plan Part 4 — Vendor Pages Redesign | ✅ Ready |
+| Implementation | ⬜ Not started |
+
+**Design files used:** `Design/mysterybox_marketplace/`, `Design/intelligent_vendor_core/`, `Design/mysterybox_browse/`, `Design/mysterybox_login/`, `Design/mysterybox_subscriptions/`, etc.
+
+**New features:**
+- Dark design system tokens (new Tailwind config + CSS utilities)
+- 9 new shared components (GradientButton, GhostButton, MysteryCard, GlassNav, StatusChip, StockBadge, TimerBadge, StockProgressBar, NotificationPanel)
+- Real-time stock via Firestore `onSnapshot` on BrowsePage + ListingDetailPage
+- Live order status tracker on Success/OrderDetail pages
+- Push notifications via Firebase Cloud Messaging (FCM)
+- Follow vendor system (`follows/` collection)
+- Stripe recurring subscriptions (`subscriptions/` collection)
+- New SubscriptionsPage (`/subscriptions`)
+- New Cloud Functions: `savePushToken`, `onListingPublished`, `createStripeSubscription`, `stripeSubscriptionWebhook`, `cancelSubscription`
