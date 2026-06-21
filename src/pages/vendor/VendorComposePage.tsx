@@ -94,6 +94,16 @@ export default function VendorComposePage() {
     [currentOriginalPrice, discount]
   )
 
+  const packingGuide = useMemo(() => {
+    if (numBoxes < 1) return []
+    return Array.from(selectedItems.values()).map(({ item, qty }) => ({
+      name: item.name,
+      icon: CATEGORY_ICONS[item.category],
+      perBox: Math.floor(qty / numBoxes),
+      leftover: qty % numBoxes,
+    }))
+  }, [selectedItems, numBoxes])
+
   useEffect(() => {
     if (composerResult) setEditPrice(String(currentSalePrice))
   }, [currentSalePrice])
@@ -301,6 +311,24 @@ export default function VendorComposePage() {
               <span className="text-green-400 font-medium">{currentSalePrice.toLocaleString('vi-VN')} đ</span>
               {' each'}
             </p>
+
+            {/* Packing guide — vendor only */}
+            <div className="mt-3 pt-3 border-t border-indigo-700/40">
+              <p className="text-indigo-300 text-xs font-medium mb-2">📦 Packing guide (per box)</p>
+              <div className="space-y-1">
+                {packingGuide.map(({ name, icon, perBox, leftover }) => (
+                  <div key={name} className="flex items-center justify-between text-sm">
+                    <span className="text-slate-300">{icon} {name}</span>
+                    <span className="text-white font-medium">
+                      {perBox > 0 ? `×${perBox}` : <span className="text-slate-500">—</span>}
+                      {leftover > 0 && (
+                        <span className="text-amber-400 text-xs ml-1">+{leftover} leftover</span>
+                      )}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </div>
