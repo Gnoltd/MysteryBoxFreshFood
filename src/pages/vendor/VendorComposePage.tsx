@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Timestamp } from 'firebase/firestore'
 import { useAuth } from '../../contexts/AuthContext'
-import { subscribeToInventory, updateInventoryItem, deleteInventoryItem } from '../../services/inventory'
+import { subscribeToInventory, updateInventoryItem } from '../../services/inventory'
 import { composeMysteryBox, suggestPrice } from '../../services/ai'
 import type { ComposeMysteryBoxResult, SuggestPriceResult } from '../../services/ai'
 import { createListing } from '../../services/listings'
@@ -28,9 +28,13 @@ const CATEGORY_ICONS: Record<ListingCategory, string> = {
   rice: '🍚', noodles: '🍜', drinks: '🥤', snacks: '🍿', other: '📦',
 }
 
-function todayAt(hour: number): string {
-  const d = new Date(); d.setHours(hour, 0, 0, 0)
-  return d.toISOString().slice(0, 16)
+function localDatetime(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+function nowPlusHours(h: number): string {
+  return localDatetime(new Date(Date.now() + h * 3600_000))
 }
 
 export default function VendorComposePage() {
@@ -56,8 +60,8 @@ export default function VendorComposePage() {
   const [editDescription, setEditDescription] = useState('')
   const [editCategory, setEditCategory] = useState<ListingCategory>('other')
   const [editPrice, setEditPrice] = useState('')
-  const [pickupStart, setPickupStart] = useState(todayAt(17))
-  const [pickupEnd, setPickupEnd] = useState(todayAt(21))
+  const [pickupStart, setPickupStart] = useState(nowPlusHours(0))
+  const [pickupEnd, setPickupEnd] = useState(nowPlusHours(3))
   const [publishLoading, setPublishLoading] = useState(false)
   const [publishError, setPublishError] = useState('')
 
@@ -183,8 +187,7 @@ export default function VendorComposePage() {
       await Promise.all(
         Array.from(selectedItems.values()).map(({ item, qty }) => {
           const remaining = item.defaultQty - qty
-          if (remaining <= 0) return deleteInventoryItem(currentUser.uid, item.id)
-          return updateInventoryItem(currentUser.uid, item.id, { defaultQty: remaining })
+          return updateInventoryItem(currentUser.uid, item.id, { defaultQty: Math.max(0, remaining) })
         })
       )
 
