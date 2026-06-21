@@ -6,6 +6,8 @@
     "listings": "Sản phẩm",
     "orders": "Đơn hàng",
     "scanQR": "Quét QR",
+    "inventory": "Kho hàng",
+    "compose": "Tạo hộp",
     "signOut": "Đăng xuất"
   },
   "auth": {
@@ -168,7 +170,17 @@
     "item_qty": "Số lượng",
     "item_price": "Giá / đơn vị (VND)",
     "publish_listing": "Đăng sản phẩm",
-    "item_count_warning": "Bạn chỉ có {{n}} sản phẩm — giảm số hộp hoặc tăng số lượng"
+    "item_count_warning": "Bạn chỉ có {{n}} sản phẩm — giảm số hộp hoặc tăng số lượng",
+    "inventory": "Kho hàng",
+    "edit_item": "Chỉnh sửa",
+    "best_before": "Hạn sử dụng",
+    "expires_today": "Hết hạn hôm nay",
+    "expires_soon": "Sắp hết hạn",
+    "expired": "Đã hết hạn",
+    "unit": "Đơn vị",
+    "default_qty": "Số lượng mặc định",
+    "no_inventory": "Chưa có sản phẩm trong kho",
+    "go_to_inventory": "Đến Kho hàng →"
   },
   "categories": {
     "bakery": "Bánh",

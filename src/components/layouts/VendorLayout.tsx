@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { signOut } from '../../services/auth'
 import { LanguageToggle } from '../shared/LanguageToggle'
-import { LayoutDashboard, Package, ShoppingBag, QrCode, LogOut } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingBag, QrCode, LogOut, Archive, Wand2 } from 'lucide-react'
 
 export function VendorLayout() {
   const { t } = useTranslation()
@@ -16,6 +16,8 @@ export function VendorLayout() {
     { to: '/vendor/listings', label: t('nav.listings'), icon: Package, exact: false },
     { to: '/vendor/orders', label: t('nav.orders'), icon: ShoppingBag, exact: false },
     { to: '/vendor/scan', label: t('nav.scanQR'), icon: QrCode, exact: false },
+    { to: '/vendor/inventory', label: t('nav.inventory'), icon: Archive, exact: false },
+    { to: '/vendor/compose',   label: t('nav.compose'),   icon: Wand2,    exact: false },
   ]
 
   const handleSignOut = async () => {

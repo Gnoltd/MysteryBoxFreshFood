@@ -15,6 +15,7 @@ import CheckoutCancelPage from './pages/customer/CheckoutCancelPage'
 import OrdersPage from './pages/customer/OrdersPage'
 import OrderDetailPage from './pages/customer/OrderDetailPage'
 import VendorDashboardPage from './pages/vendor/VendorDashboardPage'
+import VendorInventoryPage from './pages/vendor/VendorInventoryPage'
 import ListingsPage from './pages/vendor/ListingsPage'
 import ListingFormPage from './pages/vendor/ListingFormPage'
 import VendorOrdersPage from './pages/vendor/VendorOrdersPage'
@@ -48,6 +49,7 @@ export default function App() {
             <Route path="/vendor/listings/:id/edit" element={<ListingFormPage />} />
             <Route path="/vendor/orders" element={<VendorOrdersPage />} />
             <Route path="/vendor/scan" element={<QRScanPage />} />
+            <Route path="/vendor/inventory" element={<VendorInventoryPage />} />
           </Route>
 
           <Route path="/store/:vendorId" element={<VendorStorePage />} />
