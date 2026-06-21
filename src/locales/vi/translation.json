@@ -10,7 +10,9 @@
   },
   "auth": {
     "signIn": "Đăng nhập",
+    "signingIn": "Đang đăng nhập…",
     "createAccount": "Tạo tài khoản",
+    "creating": "Đang tạo…",
     "email": "Email",
     "password": "Mật khẩu",
     "displayName": "Tên hiển thị",
@@ -19,8 +21,19 @@
     "register": "Đăng ký",
     "haveAccount": "Đã có tài khoản?",
     "invalidCredentials": "Email hoặc mật khẩu không đúng",
+    "registrationFailed": "Đăng ký thất bại",
     "customer": "Khách hàng",
-    "vendor": "Người bán"
+    "vendor": "Người bán",
+    "or": "hoặc",
+    "continueWithGoogle": "Tiếp tục với Google",
+    "googleError": "Đăng nhập Google thất bại — vui lòng thử lại",
+    "welcomeBack": "Chào mừng trở lại",
+    "joinMysteryBox": "Tham gia MysteryBox",
+    "setupTitle": "Thêm một bước nữa",
+    "setupDescription": "Cho chúng tôi biết bạn sử dụng MysteryBox như thế nào",
+    "setupSubmit": "Bắt đầu",
+    "setupLoading": "Đang thiết lập…",
+    "setupError": "Đã có lỗi xảy ra — vui lòng thử lại"
   },
   "browse": {
     "title": "Khám phá Hộp Dư Thừa",

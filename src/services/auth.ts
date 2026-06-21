@@ -3,6 +3,8 @@ import {
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from 'firebase/auth'
 import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore'
 import { auth, db } from '../firebase'
@@ -32,6 +34,29 @@ export async function signIn(email: string, password: string): Promise<void> {
 
 export async function signOut(): Promise<void> {
   await firebaseSignOut(auth)
+}
+
+export async function signInWithGoogle(): Promise<'new' | 'existing'> {
+  const provider = new GoogleAuthProvider()
+  const cred = await signInWithPopup(auth, provider)
+  const profile = await getUserProfile(cred.user.uid)
+  return profile ? 'existing' : 'new'
+}
+
+export async function createGoogleUserProfile(
+  uid: string,
+  displayName: string,
+  email: string,
+  role: 'vendor' | 'customer',
+  extra?: Partial<UserProfile>
+): Promise<void> {
+  await setDoc(doc(db, 'users', uid), {
+    role,
+    displayName,
+    email,
+    lang: 'en',
+    ...extra,
+  })
 }
 
 export async function getUserProfile(uid: string): Promise<UserProfile | null> {

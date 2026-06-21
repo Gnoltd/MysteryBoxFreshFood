@@ -10,7 +10,9 @@
   },
   "auth": {
     "signIn": "Sign in",
+    "signingIn": "Signing in…",
     "createAccount": "Create account",
+    "creating": "Creating…",
     "email": "Email",
     "password": "Password",
     "displayName": "Display name",
@@ -19,8 +21,19 @@
     "register": "Register",
     "haveAccount": "Have an account?",
     "invalidCredentials": "Invalid email or password",
+    "registrationFailed": "Registration failed",
     "customer": "Customer",
-    "vendor": "Vendor"
+    "vendor": "Vendor",
+    "or": "or",
+    "continueWithGoogle": "Continue with Google",
+    "googleError": "Google sign-in failed — please try again",
+    "welcomeBack": "Welcome back",
+    "joinMysteryBox": "Join MysteryBox",
+    "setupTitle": "One more step",
+    "setupDescription": "Tell us how you'll use MysteryBox",
+    "setupSubmit": "Get started",
+    "setupLoading": "Setting up…",
+    "setupError": "Something went wrong — please try again"
   },
   "browse": {
     "title": "Browse Surplus Boxes",

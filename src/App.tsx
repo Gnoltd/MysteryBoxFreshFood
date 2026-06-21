@@ -7,6 +7,7 @@ import { CustomerLayout } from './components/layouts/CustomerLayout'
 import { VendorLayout } from './components/layouts/VendorLayout'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
+import GoogleSetupPage from './pages/auth/GoogleSetupPage'
 import BrowsePage from './pages/customer/BrowsePage'
 import ListingDetailPage from './pages/customer/ListingDetailPage'
 import CheckoutSuccessPage from './pages/customer/CheckoutSuccessPage'
@@ -28,6 +29,7 @@ export default function App() {
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/auth/setup" element={<GoogleSetupPage />} />
           </Route>
 
           <Route element={<ProtectedRoute><RoleRoute role="customer"><CustomerLayout /></RoleRoute></ProtectedRoute>}>

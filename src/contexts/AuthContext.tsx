@@ -9,18 +9,28 @@ interface AuthContextValue {
   currentUser: User | null
   userProfile: UserProfile | null
   loading: boolean
+  refreshProfile: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue>({
   currentUser: null,
   userProfile: null,
   loading: true,
+  refreshProfile: async () => {},
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
+
+  const refreshProfile = async () => {
+    const user = auth.currentUser
+    if (!user) return
+    const profile = await getUserProfile(user.uid)
+    setUserProfile(profile)
+    if (profile?.lang) i18n.changeLanguage(profile.lang)
+  }
 
   useEffect(() => {
     return onAuthStateChanged(auth, async (user) => {
@@ -40,7 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ currentUser, userProfile, loading }}>
+    <AuthContext.Provider value={{ currentUser, userProfile, loading, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   )
