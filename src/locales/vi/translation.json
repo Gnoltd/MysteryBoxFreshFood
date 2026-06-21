@@ -81,7 +81,7 @@
   },
   "order": {
     "title": "Đơn hàng của tôi",
-    "noOrders": "Chưa có đơn hàng.",
+    "noOrders": "Chưa có đơn — bắt đầu mua sắm nào!",
     "confirmingPayment": "Đang xác nhận thanh toán…",
     "confirmingPaymentSub": "Thường mất vài giây.",
     "showQR": "Hiển thị mã QR khi nhận hàng",
@@ -117,7 +117,6 @@
     "viewAll": "Xem tất cả đơn",
     "cancelled": "Thanh toán bị hủy",
     "cancelledMsg": "Hộp của bạn vẫn còn — quay lại và thử lại.",
-    "noOrders": "Chưa có đơn — bắt đầu mua sắm nào!",
     "box": "Hộp",
     "orderId": "Mã đơn"
   },
@@ -207,7 +206,10 @@
     "total_value": "Tổng giá trị",
     "ai_box_count": "AI gợi ý {{n}} hộp",
     "expiry_alert": "{{n}} sản phẩm sắp hết hạn — tạo hộp thanh lý ngay",
-    "compose_clearance": "Tạo hộp thanh lý →"
+    "compose_clearance": "Tạo hộp thanh lý →",
+    "follow": "Theo dõi",
+    "unfollow": "Bỏ theo dõi",
+    "following": "Đang theo dõi"
   },
   "categories": {
     "bakery": "Bánh",

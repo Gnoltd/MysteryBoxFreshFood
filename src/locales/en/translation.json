@@ -207,7 +207,10 @@
     "total_value": "Total value",
     "ai_box_count": "AI suggests {{n}} boxes",
     "expiry_alert": "{{n}} items expiring soon — create a clearance box now",
-    "compose_clearance": "Compose Clearance Box →"
+    "compose_clearance": "Compose Clearance Box →",
+    "follow": "Follow Vendor",
+    "unfollow": "Unfollow",
+    "following": "Following"
   },
   "categories": {
     "bakery": "Bakery",
