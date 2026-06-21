@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { signIn } from '../../services/auth'
+import { savePushToken } from '../../services/pushNotifications'
 import { GradientButton } from '../../components/shared/GradientButton'
 
 export default function LoginPage() {
@@ -19,6 +20,7 @@ export default function LoginPage() {
     try {
       await signIn(email, password)
       navigate('/browse')
+      savePushToken().catch(() => {})
     } catch {
       setError(t('auth.invalidCredentials'))
     } finally {
