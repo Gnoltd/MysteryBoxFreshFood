@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { subscribeToVendorListings } from '../../services/listings'
 import { subscribeToVendorOrders } from '../../services/orders'
+import { subscribeToInventory } from '../../services/inventory'
+import { getExpiringItems, expiryLabel } from '../../utils/inventoryUtils'
+import type { InventoryItem } from '../../types'
 import { updateVendorBankInfo } from '../../services/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -33,12 +37,17 @@ export default function VendorDashboardPage() {
   const [bankAccountName, setBankAccountName] = useState('')
   const [bankSaving, setBankSaving] = useState(false)
   const [tab, setTab] = useState<'overview' | 'analytics'>('overview')
+  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([])
+  const [alertDismissed, setAlertDismissed] = useState(
+    () => sessionStorage.getItem(`dismissed_expiry_${new Date().toDateString()}`) === '1'
+  )
 
   useEffect(() => {
     if (!currentUser) return
     const u1 = subscribeToVendorListings(currentUser.uid, setListings)
     const u2 = subscribeToVendorOrders(currentUser.uid, setOrders)
-    return () => { u1(); u2() }
+    const u3 = subscribeToInventory(currentUser.uid, setInventoryItems)
+    return () => { u1(); u2(); u3() }
   }, [currentUser])
 
   useEffect(() => {
@@ -54,6 +63,13 @@ export default function VendorDashboardPage() {
   const revenue = orders
     .filter(o => o.status === 'paid' || o.status === 'picked_up')
     .reduce((sum, o) => sum + o.totalPrice, 0)
+
+  const expiringItems = getExpiringItems(inventoryItems, 48)
+
+  const dismissExpiryAlert = () => {
+    sessionStorage.setItem(`dismissed_expiry_${new Date().toDateString()}`, '1')
+    setAlertDismissed(true)
+  }
 
   const handleBankSave = async () => {
     if (!currentUser) return
@@ -95,6 +111,45 @@ export default function VendorDashboardPage() {
 
       {tab === 'overview' && (
         <>
+          {!alertDismissed && expiringItems.length > 0 && (
+            <div className={`border rounded-xl p-4 mb-6 ${
+              expiringItems.some(i => expiryLabel(i) === 'today' || expiryLabel(i) === 'expired')
+                ? 'border-red-500/60 bg-red-950/20'
+                : 'border-amber-500/60 bg-amber-950/20'
+            }`}>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <p className="text-white font-medium mb-2">
+                    ⚠️ {t('vendor.expiry_alert', { n: expiringItems.length })}
+                  </p>
+                  <ul className="space-y-1">
+                    {expiringItems.slice(0, 3).map(item => {
+                      const label = expiryLabel(item)
+                      const labelKey = label === 'expired' ? 'vendor.expired'
+                        : label === 'today' ? 'vendor.expires_today'
+                        : 'vendor.expires_soon'
+                      return (
+                        <li key={item.id} className="text-slate-300 text-sm">
+                          · {item.name} ({t(labelKey)})
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </div>
+                <button onClick={dismissExpiryAlert}
+                  className="text-slate-500 hover:text-white text-xl leading-none">×</button>
+              </div>
+              <div className="mt-3 flex justify-end">
+                <Link
+                  to={`/vendor/compose?preselect=${expiringItems.map(i => i.id).join(',')}`}
+                  className="bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                >
+                  {t('vendor.compose_clearance')}
+                </Link>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             <StatCard label={t('vendor.activeListings')} value={activeListings} />
             <StatCard label={t('vendor.pendingPickups')} value={pendingOrders.length} sub={t('vendor.awaitingQR')} />
