@@ -84,3 +84,39 @@ export interface Review {
   comment: string
   createdAt: Timestamp
 }
+
+export type SubscriptionPlan = 'free' | 'weekly' | 'monthly'
+export type SubscriptionStatus = 'active' | 'cancelled' | 'past_due'
+
+export interface Follow {
+  id: string
+  customerId: string
+  vendorId: string
+  notificationsEnabled: boolean
+  createdAt: Timestamp
+}
+
+export interface Subscription {
+  id: string
+  customerId: string
+  plan: SubscriptionPlan
+  stripeSubscriptionId?: string
+  status: SubscriptionStatus
+  currentPeriodEnd?: Timestamp
+  createdAt: Timestamp
+}
+
+export interface PushToken {
+  fcmToken: string
+  updatedAt: Timestamp
+}
+
+export interface NotificationItem {
+  id: string
+  title: string
+  body: string
+  listingId: string
+  vendorId: string
+  read: boolean
+  createdAt: Timestamp
+}
