@@ -7,12 +7,18 @@ import type { Listing } from '../types'
 
 export function subscribeToActiveListings(callback: (listings: Listing[]) => void): Unsubscribe {
   const q = query(collection(db, 'listings'), where('status', '==', 'active'), orderBy('createdAt', 'desc'))
-  return onSnapshot(q, snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() } as Listing))))
+  return onSnapshot(q,
+    snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() } as Listing))),
+    err => { console.error('subscribeToActiveListings:', err); callback([]) }
+  )
 }
 
 export function subscribeToVendorListings(vendorId: string, callback: (listings: Listing[]) => void): Unsubscribe {
   const q = query(collection(db, 'listings'), where('vendorId', '==', vendorId), orderBy('createdAt', 'desc'))
-  return onSnapshot(q, snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() } as Listing))))
+  return onSnapshot(q,
+    snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() } as Listing))),
+    err => { console.error('subscribeToVendorListings:', err); callback([]) }
+  )
 }
 
 export async function getListing(id: string): Promise<Listing | null> {
