@@ -41,7 +41,9 @@
     "title": "Khám phá Hộp Dư Thừa",
     "all": "Tất cả",
     "noListings": "Hiện không có sản phẩm nào.",
-    "loading": "Đang tải…"
+    "loading": "Đang tải…",
+    "greeting": "Xin chào, {{name}} 👋",
+    "subtitle": "Hôm nay có gì mới?"
   },
   "listing": {
     "buyNow": "Mua ngay",

@@ -41,7 +41,9 @@
     "title": "Browse Surplus Boxes",
     "all": "All",
     "noListings": "No listings available right now.",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "greeting": "Hey, {{name}} 👋",
+    "subtitle": "What's fresh tonight?"
   },
   "listing": {
     "buyNow": "Buy Now",
