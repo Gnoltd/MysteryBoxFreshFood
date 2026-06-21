@@ -20,6 +20,11 @@ export type ListingStatus = 'active' | 'sold_out' | 'expired'
 export type OrderStatus = 'pending' | 'paid' | 'picked_up' | 'cancelled' | 'pending_cod' | 'pending_bank_transfer' | 'refunded'
 export type PaymentMethod = 'stripe' | 'cod' | 'bank_transfer'
 
+export interface BoxItem {
+  name: string
+  qty: number
+}
+
 export interface Listing {
   id: string
   vendorId: string
@@ -37,6 +42,7 @@ export interface Listing {
   status: ListingStatus
   createdAt: Timestamp
   packedAt?: Timestamp
+  boxContents?: BoxItem[]
 }
 
 export interface Order {
@@ -53,6 +59,7 @@ export interface Order {
   stripeSessionId?: string
   stripePaymentIntentId?: string
   pickupEnd?: Timestamp
+  boxContents?: BoxItem[]
   createdAt: Timestamp
 }
 

@@ -65,6 +65,7 @@ export const createCheckoutSession = functions.https.onCall(
     qrCode: uuidv4(),
     stripeSessionId: session.id,
     pickupEnd: listing.pickupEnd,
+    boxContents: listing.boxContents ?? [],
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
   })
 

@@ -60,18 +60,28 @@ export default function VendorOrdersPage() {
         {orders.map(o => (
           <div
             key={o.id}
-            className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-center justify-between"
+            className="bg-slate-900 border border-slate-800 rounded-xl p-4"
           >
-            <div>
-              <p className="text-white font-medium">{o.listingTitle}</p>
-              <p className="text-slate-400 text-sm">
-                {new Date(o.createdAt.seconds * 1000).toLocaleString('vi-VN')} · {o.quantity} box ·{' '}
-                {o.totalPrice.toLocaleString('vi-VN')} đ
-              </p>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-white font-medium">{o.listingTitle}</p>
+                <p className="text-slate-400 text-sm">
+                  {new Date(o.createdAt.seconds * 1000).toLocaleString('vi-VN')} · {o.quantity} box ·{' '}
+                  {o.totalPrice.toLocaleString('vi-VN')} đ
+                  {o.paymentMethod && (
+                    <span className="ml-1 text-slate-500">· {o.paymentMethod.replace('_', ' ')}</span>
+                  )}
+                </p>
+                {o.boxContents && o.boxContents.length > 0 && (
+                  <p className="text-slate-500 text-xs mt-1">
+                    📦 {t('vendor.each_box')}: {o.boxContents.map(b => `${b.qty}× ${b.name}`).join(', ')}
+                  </p>
+                )}
+              </div>
+              <span className={`text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap flex-shrink-0 ${STATUS_BADGE[o.status]}`}>
+                {STATUS_LABEL[o.status]}
+              </span>
             </div>
-            <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${STATUS_BADGE[o.status]}`}>
-              {STATUS_LABEL[o.status]}
-            </span>
           </div>
         ))}
       </div>

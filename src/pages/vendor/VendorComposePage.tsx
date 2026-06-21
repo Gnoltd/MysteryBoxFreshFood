@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Timestamp } from 'firebase/firestore'
 import { useAuth } from '../../contexts/AuthContext'
-import { subscribeToInventory } from '../../services/inventory'
+import { subscribeToInventory, updateInventoryItem, deleteInventoryItem } from '../../services/inventory'
 import { composeMysteryBox, suggestPrice } from '../../services/ai'
 import type { ComposeMysteryBoxResult, SuggestPriceResult } from '../../services/ai'
 import { createListing } from '../../services/listings'
@@ -163,6 +163,10 @@ export default function VendorComposePage() {
     if (!price || price <= 0) return
     setPublishLoading(true); setPublishError('')
     try {
+      const boxContents = packingGuide
+        .filter(p => p.perBox > 0)
+        .map(p => ({ name: p.name, qty: p.perBox }))
+
       await createListing({
         vendorId: currentUser.uid, type: 'mystery_box',
         title: editTitle, description: editDescription, category: editCategory,
@@ -172,7 +176,18 @@ export default function VendorComposePage() {
         pickupStart: Timestamp.fromDate(new Date(pickupStart)),
         pickupEnd: Timestamp.fromDate(new Date(pickupEnd)),
         status: 'active',
+        boxContents,
       })
+
+      // Decrement inventory — delete item if fully used, otherwise reduce qty
+      await Promise.all(
+        Array.from(selectedItems.values()).map(({ item, qty }) => {
+          const remaining = item.defaultQty - qty
+          if (remaining <= 0) return deleteInventoryItem(currentUser.uid, item.id)
+          return updateInventoryItem(currentUser.uid, item.id, { defaultQty: remaining })
+        })
+      )
+
       navigate('/vendor/listings')
     } catch (err: unknown) {
       setPublishError(err instanceof Error ? err.message : t('vendor.ai_error'))

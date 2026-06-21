@@ -45,6 +45,8 @@ export const createLocalOrder = functions.https.onCall(
         status,
         paymentMethod,
         qrCode: uuidv4(),
+        pickupEnd: listing.pickupEnd,
+        boxContents: listing.boxContents ?? [],
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       })
     })

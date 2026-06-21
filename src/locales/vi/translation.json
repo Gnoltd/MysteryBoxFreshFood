@@ -170,6 +170,7 @@
     "item_qty": "Số lượng",
     "item_price": "Giá / đơn vị (VND)",
     "publish_listing": "Đăng sản phẩm",
+    "each_box": "Mỗi hộp",
     "item_count_warning": "Bạn chỉ có {{n}} sản phẩm — giảm số hộp hoặc tăng số lượng",
     "inventory": "Kho hàng",
     "edit_item": "Chỉnh sửa",
