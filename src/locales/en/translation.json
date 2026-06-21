@@ -104,7 +104,22 @@
     "download_qr": "Download QR",
     "share_qr_note": "You can share this QR with a friend to pick up on your behalf.",
     "status_refunded": "Refunded",
-    "refund_note": "This order expired — your payment has been refunded."
+    "refund_note": "This order expired — your payment has been refunded.",
+    "confirmed": "Order Confirmed!",
+    "statusPaid": "Paid",
+    "statusPickedUp": "Picked Up",
+    "status_paid": "Paid",
+    "status_picked_up": "Picked Up",
+    "status_pending": "Pending",
+    "status_cancelled": "Cancelled",
+    "status_pending_cod": "COD Pending",
+    "status_pending_bank_transfer": "Transfer Pending",
+    "viewAll": "View All Orders",
+    "cancelled": "Payment Cancelled",
+    "cancelledMsg": "Your box is still available — go back and try again.",
+    "noOrders": "No orders yet — start browsing!",
+    "box": "Box",
+    "orderId": "Order ID"
   },
   "vendor": {
     "dashboard": "Dashboard",

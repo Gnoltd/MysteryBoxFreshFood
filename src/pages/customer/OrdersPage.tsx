@@ -3,68 +3,66 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { subscribeToCustomerOrders } from '../../services/orders'
+import { StatusChip } from '../../components/shared/StatusChip'
 import type { Order } from '../../types'
 
-const STATUS_BADGE: Record<Order['status'], string> = {
-  pending: 'bg-yellow-900 text-yellow-300',
-  paid: 'bg-green-900 text-green-300',
-  picked_up: 'bg-slate-700 text-slate-300',
-  cancelled: 'bg-red-900 text-red-300',
-  pending_cod: 'bg-orange-900 text-orange-300',
-  pending_bank_transfer: 'bg-blue-900 text-blue-300',
-  refunded: 'bg-slate-700 text-slate-400',
-}
-
-const STATUS_LABEL: Record<Order['status'], string> = {
-  pending: 'PENDING',
-  paid: 'PAID',
-  picked_up: 'PICKED UP',
-  cancelled: 'CANCELLED',
-  pending_cod: 'COD',
-  pending_bank_transfer: 'BANK',
-  refunded: 'REFUNDED',
+const statusVariant = (s: string): 'primary' | 'emerald' | 'rose' | 'slate' => {
+  if (s === 'paid') return 'primary'
+  if (s === 'picked_up') return 'emerald'
+  if (s === 'refunded' || s === 'cancelled') return 'rose'
+  return 'slate'
 }
 
 export default function OrdersPage() {
   const { t } = useTranslation()
-  const { currentUser } = useAuth()
+  const { userProfile } = useAuth()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!currentUser) return
-    const unsub = subscribeToCustomerOrders(currentUser.uid, data => { setOrders(data); setLoading(false) })
+    if (!userProfile) return
+    const unsub = subscribeToCustomerOrders(userProfile.uid, data => {
+      setOrders(data)
+      setLoading(false)
+    })
     return unsub
-  }, [currentUser])
+  }, [userProfile])
 
-  if (loading) return <p className="text-slate-400">{t('browse.loading')}</p>
-  if (orders.length === 0) return (
-    <div className="text-center mt-16">
-      <p className="text-slate-400">{t('order.noOrders')}</p>
-      <Link to="/browse" className="text-indigo-400 hover:underline text-sm mt-2 block">Browse listings →</Link>
-    </div>
-  )
+  if (loading) return <div className="py-20 text-center text-on-surface-variant">{t('browse.loading')}</div>
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-white mb-6">{t('order.title')}</h1>
-      <div className="space-y-3">
-        {orders.map(order => (
-          <Link key={order.id} to={`/orders/${order.id}`} className="block">
-            <div className="bg-slate-900 border border-slate-800 hover:border-indigo-500 rounded-xl p-4 flex items-center justify-between transition-colors">
-              <div>
-                <p className="text-white font-medium">{order.listingTitle}</p>
-                <p className="text-slate-400 text-sm">
-                  {new Date(order.createdAt.seconds * 1000).toLocaleDateString('vi-VN')} · {order.quantity} box · {order.totalPrice.toLocaleString('vi-VN')} đ
+      <h1 className="text-headline-md font-bold text-on-surface mb-6">{t('nav.myOrders')}</h1>
+      {orders.length === 0 ? (
+        <div className="text-center py-20 text-on-surface-variant">
+          <div className="text-5xl mb-4">🛍️</div>
+          <p className="text-body-lg">{t('order.noOrders')}</p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-3">
+          {orders.map(order => (
+            <Link
+              key={order.id}
+              to={`/orders/${order.id}`}
+              className="bg-surface-container border border-outline-variant rounded-xl p-4 flex items-center gap-4 hover:border-primary/50 transition-colors"
+            >
+              <div className="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center text-xl shrink-0">🎁</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-on-surface font-semibold text-body-sm truncate">{order.listingTitle}</p>
+                <p className="text-on-surface-variant text-xs mt-0.5">
+                  {new Date(order.createdAt.seconds * 1000).toLocaleDateString()}
                 </p>
               </div>
-              <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${STATUS_BADGE[order.status]}`}>
-                {STATUS_LABEL[order.status]}
-              </span>
-            </div>
-          </Link>
-        ))}
-      </div>
+              <div className="flex flex-col items-end gap-1 shrink-0">
+                <span className="text-primary font-bold text-body-sm">{order.totalPrice.toLocaleString('vi-VN')} đ</span>
+                <StatusChip variant={statusVariant(order.status)}>
+                  {t(`order.status_${order.status}`)}
+                </StatusChip>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

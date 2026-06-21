@@ -104,7 +104,22 @@
     "download_qr": "Tải QR",
     "share_qr_note": "Bạn có thể chia sẻ mã QR này cho bạn bè để nhận hàng thay.",
     "status_refunded": "Đã hoàn tiền",
-    "refund_note": "Đơn hàng đã hết hạn — thanh toán của bạn sẽ được hoàn lại."
+    "refund_note": "Đơn hàng đã hết hạn — thanh toán của bạn sẽ được hoàn lại.",
+    "confirmed": "Đặt hàng thành công!",
+    "statusPaid": "Đã thanh toán",
+    "statusPickedUp": "Đã nhận",
+    "status_paid": "Đã thanh toán",
+    "status_picked_up": "Đã nhận",
+    "status_pending": "Đang chờ",
+    "status_cancelled": "Đã hủy",
+    "status_pending_cod": "Chờ COD",
+    "status_pending_bank_transfer": "Chờ chuyển khoản",
+    "viewAll": "Xem tất cả đơn",
+    "cancelled": "Thanh toán bị hủy",
+    "cancelledMsg": "Hộp của bạn vẫn còn — quay lại và thử lại.",
+    "noOrders": "Chưa có đơn — bắt đầu mua sắm nào!",
+    "box": "Hộp",
+    "orderId": "Mã đơn"
   },
   "vendor": {
     "dashboard": "Tổng quan",
