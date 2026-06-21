@@ -56,6 +56,17 @@ export interface Order {
   createdAt: Timestamp
 }
 
+export interface InventoryItem {
+  id: string
+  name: string
+  category: ListingCategory
+  unitPrice: number
+  unit: string
+  defaultQty: number
+  bestBefore: Timestamp | null
+  createdAt: Timestamp
+}
+
 export interface Review {
   id: string
   orderId: string
