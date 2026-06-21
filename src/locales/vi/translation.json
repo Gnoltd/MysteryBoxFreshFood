@@ -180,7 +180,14 @@
     "unit": "Đơn vị",
     "default_qty": "Số lượng mặc định",
     "no_inventory": "Chưa có sản phẩm trong kho",
-    "go_to_inventory": "Đến Kho hàng →"
+    "go_to_inventory": "Đến Kho hàng →",
+    "compose_page_title": "Tạo hộp bí ẩn",
+    "suggest_price": "Gợi ý giá",
+    "price_suggestion": "AI gợi ý giảm {{discount}}% — {{reason}}",
+    "total_value": "Tổng giá trị",
+    "ai_box_count": "AI gợi ý {{n}} hộp",
+    "expiry_alert": "{{n}} sản phẩm sắp hết hạn — tạo hộp thanh lý ngay",
+    "compose_clearance": "Tạo hộp thanh lý →"
   },
   "categories": {
     "bakery": "Bánh",

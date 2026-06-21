@@ -180,7 +180,14 @@
     "unit": "Unit",
     "default_qty": "Default qty",
     "no_inventory": "No items in your catalog yet",
-    "go_to_inventory": "Go to Inventory →"
+    "go_to_inventory": "Go to Inventory →",
+    "compose_page_title": "Compose Mystery Box",
+    "suggest_price": "Suggest Price",
+    "price_suggestion": "AI recommends {{discount}}% discount — {{reason}}",
+    "total_value": "Total value",
+    "ai_box_count": "AI suggests {{n}} boxes",
+    "expiry_alert": "{{n}} items expiring soon — create a clearance box now",
+    "compose_clearance": "Compose Clearance Box →"
   },
   "categories": {
     "bakery": "Bakery",
