@@ -1,5 +1,5 @@
 import * as functions from 'firebase-functions'
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import Groq from 'groq-sdk'
 
 interface Item {
   name: string
@@ -57,11 +57,7 @@ Respond ONLY with valid JSON:
   "descriptionVi": "<Same in Vietnamese>"
 }`
 
-  const genAI = new GoogleGenerativeAI(functions.config().gemini.api_key)
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash-lite',
-    generationConfig: { responseMimeType: 'application/json' },
-  })
+  const groq = new Groq({ apiKey: functions.config().groq.api_key })
 
   let parsed: {
     category: string
@@ -72,8 +68,12 @@ Respond ONLY with valid JSON:
   }
 
   try {
-    const result = await model.generateContent(prompt)
-    parsed = JSON.parse(result.response.text())
+    const completion = await groq.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'user', content: prompt }],
+      response_format: { type: 'json_object' },
+    })
+    parsed = JSON.parse(completion.choices[0].message.content ?? '{}')
   } catch (e) {
     console.error('composeMysteryBox error:', e)
     throw new functions.https.HttpsError('internal', 'compose_failed')
