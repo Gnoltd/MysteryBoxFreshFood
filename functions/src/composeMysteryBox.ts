@@ -10,8 +10,15 @@ interface Item {
 interface ComposeMysteryBoxInput {
   items: Item[]
   targetDiscount: number
-  numBoxes: number
   storeName: string
+}
+
+function calcBoxCount(totalValue: number, targetDiscount: number) {
+  const optimalPricePerBox = totalValue * (1 - targetDiscount / 100)
+  const numBoxes = Math.max(1, Math.min(20, Math.round(totalValue / optimalPricePerBox)))
+  const originalPrice = Math.round(totalValue / numBoxes / 1000) * 1000
+  const suggestedPrice = Math.round(originalPrice * (1 - targetDiscount / 100) / 1000) * 1000
+  return { numBoxes, originalPrice, suggestedPrice }
 }
 
 export const composeMysteryBox = functions.https.onCall(async (data, context) => {
@@ -19,21 +26,17 @@ export const composeMysteryBox = functions.https.onCall(async (data, context) =>
     throw new functions.https.HttpsError('unauthenticated', 'Must be logged in')
   }
 
-  const { items, targetDiscount, numBoxes, storeName } = data as ComposeMysteryBoxInput
+  const { items, targetDiscount, storeName } = data as ComposeMysteryBoxInput
 
   if (!items || items.length === 0) {
     throw new functions.https.HttpsError('invalid-argument', 'At least one item is required')
-  }
-  if (!numBoxes || numBoxes < 1 || numBoxes > 20) {
-    throw new functions.https.HttpsError('invalid-argument', 'numBoxes must be between 1 and 20')
   }
   if (targetDiscount < 20 || targetDiscount > 90) {
     throw new functions.https.HttpsError('invalid-argument', 'targetDiscount must be between 20 and 90')
   }
 
   const totalValue = items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0)
-  const originalPrice = Math.round(totalValue / numBoxes / 1000) * 1000
-  const suggestedPrice = Math.round(originalPrice * (1 - targetDiscount / 100) / 1000) * 1000
+  const { numBoxes, originalPrice, suggestedPrice } = calcBoxCount(totalValue, targetDiscount)
 
   const itemsText = items
     .map(i => `- ${i.name}: ${i.quantity} units x ${i.unitPrice.toLocaleString('vi-VN')}d`)
@@ -60,11 +63,8 @@ Respond ONLY with valid JSON:
   const groq = new Groq({ apiKey: functions.config().groq.api_key })
 
   let parsed: {
-    category: string
-    titleEn: string
-    titleVi: string
-    descriptionEn: string
-    descriptionVi: string
+    category: string; titleEn: string; titleVi: string
+    descriptionEn: string; descriptionVi: string
   }
 
   try {
@@ -80,6 +80,7 @@ Respond ONLY with valid JSON:
   }
 
   return {
+    numBoxes,
     category: parsed.category,
     titleEn: parsed.titleEn,
     titleVi: parsed.titleVi,
