@@ -1,253 +1,132 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Timestamp } from 'firebase/firestore'
-import { useCountdown } from '../../hooks/useCountdown'
-import { getListing } from '../../services/listings'
-import { initiateCheckout } from '../../services/stripe'
-import { initiateLocalOrder } from '../../services/localPayment'
-import { getUserProfile } from '../../services/auth'
-import { getReviewsForListing } from '../../services/reviews'
-import { StarRating } from '../../components/shared/StarRating'
-import { Button } from '@/components/ui/button'
-import type { Listing, UserProfile, Review } from '../../types'
-
-type PayMethod = 'cod' | 'bank_transfer' | 'stripe'
-
-function CountdownBadge({ pickupEnd }: { pickupEnd: Timestamp }) {
-  const { t } = useTranslation()
-  const { hoursLeft, minutesLeft, urgent, expired } = useCountdown(pickupEnd)
-  if (expired || hoursLeft >= 3) return null
-  return (
-    <p className={`text-sm font-medium mt-1 ${urgent ? 'text-red-400' : 'text-indigo-400'}`}>
-      ⏱{' '}
-      {urgent
-        ? t('listing.time_left_urgent', { minutes: minutesLeft })
-        : hoursLeft > 0
-          ? t('listing.time_left', { hours: hoursLeft, minutes: minutesLeft })
-          : t('listing.time_left_min', { minutes: minutesLeft })}
-    </p>
-  )
-}
+import { onSnapshot, doc } from 'firebase/firestore'
+import { db } from '../../firebase'
+import { createCheckoutSession } from '../../services/stripe'
+import { GradientButton } from '../../components/shared/GradientButton'
+import { GlassNav } from '../../components/shared/GlassNav'
+import { StatusChip } from '../../components/shared/StatusChip'
+import { StockBadge } from '../../components/shared/StockBadge'
+import { TimerBadge } from '../../components/shared/TimerBadge'
+import type { Listing } from '../../types'
+import { Share2, Heart } from 'lucide-react'
 
 export default function ListingDetailPage() {
-  const { t } = useTranslation()
   const { id } = useParams<{ id: string }>()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [listing, setListing] = useState<Listing | null>(null)
-  const [vendorProfile, setVendorProfile] = useState<UserProfile | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [payMethod, setPayMethod] = useState<PayMethod>('cod')
-  const [buyLoading, setBuyLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [reviews, setReviews] = useState<Review[]>([])
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (!id) return
-    getListing(id).then(async l => {
-      setListing(l)
-      if (l) {
-        try {
-          const profile = await getUserProfile(l.vendorId)
-          setVendorProfile(profile)
-        } catch {
-          // vendor profile unreadable — bank transfer info won't show
-        }
-      }
-      setLoading(false)
-    }).catch(() => setLoading(false))
+    const unsub = onSnapshot(doc(db, 'listings', id), snap => {
+      if (snap.exists()) setListing({ id: snap.id, ...snap.data() } as Listing)
+    })
+    return unsub
   }, [id])
 
-  useEffect(() => {
-    if (!id) return
-    getReviewsForListing(id).then(setReviews).catch(() => {})
-  }, [id])
-
-  const handleBuy = async () => {
+  const handleClaim = async () => {
     if (!listing) return
-    setBuyLoading(true)
-    setError('')
+    setLoading(true)
     try {
-      if (payMethod === 'stripe') {
-        await initiateCheckout(listing.id, 1)
-      } else {
-        const { orderId } = await initiateLocalOrder(listing.id, 1, payMethod)
-        navigate(`/orders/${orderId}`)
-      }
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : t('listing.checkoutFailed'))
-      setBuyLoading(false)
+      const url = await createCheckoutSession(listing.id)
+      window.location.href = url
+    } finally {
+      setLoading(false)
     }
   }
 
-  if (loading) return <p className="text-slate-400 p-8">{t('browse.loading')}</p>
-  if (!listing) return <p className="text-slate-400 p-8">Listing not found.</p>
+  const formatTime = (ts: { seconds: number }) =>
+    new Date(ts.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+
+  if (!listing) return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="w-12 h-12 rounded-full gradient-bg animate-pulse" />
+    </div>
+  )
 
   const discount = Math.round((1 - listing.price / listing.originalPrice) * 100)
-  const pickupStart = new Date(listing.pickupStart.seconds * 1000).toLocaleString('vi-VN')
-  const pickupEnd = new Date(listing.pickupEnd.seconds * 1000).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
-  const isSoldOut = listing.status === 'sold_out' || listing.quantityRemaining === 0
-
-  const avgRating = reviews.length
-    ? Math.round((reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) * 10) / 10
-    : 0
-
-  const payOptions: { method: PayMethod; label: string; icon: string }[] = [
-    { method: 'cod', label: t('payment.cod'), icon: '💵' },
-    { method: 'bank_transfer', label: t('payment.bankTransfer'), icon: '🏦' },
-    { method: 'stripe', label: t('payment.card'), icon: '💳' },
-  ]
-
-  const buyLabel = () => {
-    if (isSoldOut) return t('listing.soldOut')
-    if (buyLoading) return payMethod === 'stripe' ? t('listing.redirecting') : t('payment.processing')
-    return `${t('listing.buyNow')} — ${listing.price.toLocaleString('vi-VN')} đ`
-  }
+  const soldOut = listing.status === 'sold_out' || listing.quantityRemaining === 0
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <button onClick={() => navigate(-1)} className="text-slate-400 hover:text-white text-sm mb-4">{t('listing.back')}</button>
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-        <div className="relative h-64 bg-slate-800">
-          {listing.imageUrl
-            ? <img src={listing.imageUrl} alt={listing.title} className="w-full h-full object-cover" />
-            : <div className="w-full h-full flex items-center justify-center text-6xl">🎁</div>}
-          <span className="absolute top-3 right-3 bg-indigo-600 text-white text-sm font-bold px-3 py-1 rounded-full">-{discount}%</span>
-        </div>
-        <div className="p-6 space-y-4">
-          <div>
-            <h1 className="text-2xl font-bold text-white">{listing.title}</h1>
-            <p className="text-slate-400 mt-2">{listing.description}</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-2xl font-bold text-indigo-400">{listing.price.toLocaleString('vi-VN')} đ</span>
-            <span className="text-slate-500 text-lg line-through">{listing.originalPrice.toLocaleString('vi-VN')} đ</span>
-          </div>
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div className="bg-slate-800 rounded-lg p-3">
-              <p className="text-slate-400">{t('listing.remaining')}</p>
-              <p className="text-white font-medium">{listing.quantityRemaining} boxes</p>
-            </div>
-            <div className="bg-slate-800 rounded-lg p-3">
-              <p className="text-slate-400">{t('listing.pickup')}</p>
-              <p className="text-white font-medium">{pickupStart} – {pickupEnd}</p>
-            </div>
-            <div className="bg-slate-800 rounded-lg p-3">
-              <p className="text-slate-400">{t('listing.category')}</p>
-              <p className="text-white font-medium capitalize">{listing.category}</p>
-            </div>
-            <div className="bg-slate-800 rounded-lg p-3">
-              <p className="text-slate-400">{t('listing.type')}</p>
-              <p className="text-white font-medium">{listing.type === 'mystery_box' ? t('listing.mysteryBox') : t('listing.singleItem')}</p>
-            </div>
+    <div className="min-h-screen bg-background pb-32">
+      <GlassNav
+        backHref="/browse"
+        backLabel={t('nav.browse')}
+        actions={
+          <>
+            <button className="p-2 hover:text-on-surface transition-colors"><Share2 size={20} /></button>
+            <button className="p-2 hover:text-on-surface transition-colors"><Heart size={20} /></button>
+          </>
+        }
+      />
+
+      <div className="pt-16 max-w-5xl mx-auto px-6 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Image */}
+          <div className="relative h-64 md:h-[480px] rounded-xl overflow-hidden border border-outline-variant">
+            {listing.imageUrl
+              ? <img src={listing.imageUrl} alt={listing.title} className="w-full h-full object-cover" />
+              : <div className="w-full h-full bg-surface-container flex items-center justify-center text-6xl">🎁</div>}
+            <span className="absolute top-4 left-4 bg-tertiary-container/20 backdrop-blur-sm border border-tertiary/50 text-tertiary text-label-caps font-bold px-3 py-1 rounded-full">
+              -{discount}%
+            </span>
           </div>
 
-          <CountdownBadge pickupEnd={listing.pickupEnd} />
-
-          {/* Packed at */}
-          {listing.packedAt && (
-            <p className="text-slate-500 text-xs mt-1">
-              {t('listing.packed_at', {
-                time: new Date(listing.packedAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-              })}
-            </p>
-          )}
-
-          {/* Vendor store link (D4) */}
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-slate-400">{t('auth.vendor')}</span>
-            <Link
-              to={`/store/${listing.vendorId}`}
-              className="text-indigo-400 hover:text-indigo-300 text-sm"
-            >
-              {t('store.view_store')} →
-            </Link>
-          </div>
-
-          {/* Reviews section (D2) */}
-          <div className="border-t border-slate-800 pt-4">
-            <div className="flex items-center gap-2 mb-3">
-              {avgRating > 0 ? (
-                <>
-                  <StarRating value={Math.round(avgRating)} size="sm" />
-                  <span className="text-white font-medium text-sm">{avgRating}</span>
-                  <span className="text-slate-500 text-xs">{t('review.out_of_5')} ({reviews.length} {t('review.avg_rating')})</span>
-                </>
-              ) : (
-                <span className="text-slate-500 text-sm">{t('review.no_reviews')}</span>
-              )}
-            </div>
-            {reviews.map(r => (
-              <div key={r.id} className="bg-slate-800 rounded-lg p-3 mb-2">
-                <StarRating value={r.rating} size="sm" />
-                {r.comment && <p className="text-slate-300 text-sm mt-1">{r.comment}</p>}
-              </div>
-            ))}
-          </div>
-
-          {!isSoldOut && (
+          {/* Details */}
+          <div className="flex flex-col gap-5">
             <div>
-              <p className="text-slate-400 text-sm mb-2">{t('payment.selectMethod')}</p>
-              <div className="grid grid-cols-3 gap-2">
-                {payOptions.map(opt => (
-                  <button
-                    key={opt.method}
-                    onClick={() => setPayMethod(opt.method)}
-                    className={`p-3 rounded-lg border text-sm font-medium transition-colors ${
-                      payMethod === opt.method
-                        ? 'border-indigo-500 bg-indigo-950 text-white'
-                        : 'border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-500'
-                    }`}
-                  >
-                    <div className="text-xl mb-1">{opt.icon}</div>
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
+              <h1 className="text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface">{listing.title}</h1>
+              <p className="text-on-surface-variant text-body-lg mt-2">{listing.description}</p>
             </div>
-          )}
 
-          {payMethod === 'bank_transfer' && !isSoldOut && (
-            <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 space-y-2 text-sm">
-              <p className="text-slate-300 font-medium">{t('payment.bankDetails')}</p>
-              {vendorProfile?.bankAccount ? (
-                <>
-                  {vendorProfile.bankName && (
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">{t('payment.bankName')}</span>
-                      <span className="text-white font-medium">{vendorProfile.bankName}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">{t('payment.bankAccount')}</span>
-                    <span className="text-white font-mono font-bold">{vendorProfile.bankAccount}</span>
-                  </div>
-                  {vendorProfile.bankAccountName && (
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">{t('payment.bankAccountName')}</span>
-                      <span className="text-white font-medium">{vendorProfile.bankAccountName}</span>
-                    </div>
-                  )}
-                  <p className="text-slate-500 text-xs pt-1">{t('payment.bankTransferNote')}</p>
-                </>
-              ) : (
-                <p className="text-yellow-400 text-xs">{t('payment.noBankInfo')}</p>
+            {/* Price */}
+            <div className="flex items-end gap-3">
+              <span className="text-primary font-bold text-headline-md">{listing.price.toLocaleString('vi-VN')} đ</span>
+              <span className="text-outline text-body-lg line-through mb-0.5">{listing.originalPrice.toLocaleString('vi-VN')} đ</span>
+            </div>
+
+            {/* Timer banner */}
+            <div className="bg-primary/10 border border-primary/30 rounded-xl p-3 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-primary">
+                <TimerBadge pickupEnd={listing.pickupEnd} />
+              </div>
+              {listing.packedAt && (
+                <span className="text-on-surface-variant text-xs">
+                  {t('listing.packedAt')} {formatTime(listing.packedAt)}
+                </span>
               )}
             </div>
-          )}
 
-          {payMethod === 'cod' && !isSoldOut && (
-            <p className="text-slate-500 text-sm">{t('payment.codNote')}</p>
-          )}
+            {/* Info grid */}
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { label: t('listing.remaining'), value: <StockBadge quantity={listing.quantityRemaining} /> },
+                { label: t('listing.pickup'),    value: `${formatTime(listing.pickupStart)} – ${formatTime(listing.pickupEnd)}` },
+                { label: t('listing.category'),  value: <StatusChip variant="slate">{listing.category}</StatusChip> },
+              ].map(({ label, value }) => (
+                <div key={label} className="bg-surface-container border border-outline-variant rounded-xl p-3 flex flex-col gap-1">
+                  <span className="text-label-caps text-on-surface-variant uppercase tracking-wider">{label}</span>
+                  <span className="text-mono-stat font-semibold text-on-surface">{value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
 
-          {error && <p className="text-red-400 text-sm">{error}</p>}
-          <Button
-            onClick={handleBuy}
-            disabled={isSoldOut || buyLoading}
-            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3 text-base disabled:opacity-50"
+      {/* Sticky bottom CTA */}
+      <div className="fixed bottom-0 left-0 right-0 glass-panel border-t border-outline-variant px-6 py-4">
+        <div className="max-w-5xl mx-auto">
+          <GradientButton
+            onClick={handleClaim}
+            disabled={soldOut || loading}
+            className="w-full"
           >
-            {buyLabel()}
-          </Button>
+            {soldOut ? t('listing.soldOut') : loading ? t('listing.claiming') : `${t('listing.buyNow')} — ${listing.price.toLocaleString('vi-VN')} đ`}
+          </GradientButton>
         </div>
       </div>
     </div>

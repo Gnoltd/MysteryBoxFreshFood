@@ -61,7 +61,9 @@
     "time_left": "{{hours}}h {{minutes}}m left",
     "time_left_min": "{{minutes}}m left",
     "time_left_urgent": "{{minutes}}m left — Hurry!",
-    "expired_label": "Expired"
+    "expired_label": "Expired",
+    "packedAt": "Packed at",
+    "claiming": "Redirecting…"
   },
   "payment": {
     "selectMethod": "Payment method",

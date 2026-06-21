@@ -61,7 +61,9 @@
     "time_left": "Còn {{hours}}h {{minutes}}p",
     "time_left_min": "Còn {{minutes}}p",
     "time_left_urgent": "Còn {{minutes}}p — Nhanh lên!",
-    "expired_label": "Hết hạn"
+    "expired_label": "Hết hạn",
+    "packedAt": "Đóng gói lúc",
+    "claiming": "Đang chuyển hướng…"
   },
   "payment": {
     "selectMethod": "Phương thức thanh toán",
