@@ -14,8 +14,10 @@ interface ComposeMysteryBoxInput {
 }
 
 function calcBoxCount(totalValue: number, targetDiscount: number) {
-  const optimalPricePerBox = totalValue * (1 - targetDiscount / 100)
-  const numBoxes = Math.max(1, Math.min(20, Math.round(totalValue / optimalPricePerBox)))
+  // Target ~80,000 đ sale price per box; derive how many boxes fit the surplus
+  const TARGET_SALE_PRICE = 80_000
+  const targetValuePerBox = TARGET_SALE_PRICE / (1 - targetDiscount / 100)
+  const numBoxes = Math.max(1, Math.min(20, Math.round(totalValue / targetValuePerBox)))
   const originalPrice = Math.round(totalValue / numBoxes / 1000) * 1000
   const suggestedPrice = Math.round(originalPrice * (1 - targetDiscount / 100) / 1000) * 1000
   return { numBoxes, originalPrice, suggestedPrice }
