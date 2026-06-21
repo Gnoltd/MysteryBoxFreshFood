@@ -74,7 +74,8 @@ Respond ONLY with valid JSON:
   try {
     const result = await model.generateContent(prompt)
     parsed = JSON.parse(result.response.text())
-  } catch {
+  } catch (e) {
+    console.error('composeMysteryBox error:', e)
     throw new functions.https.HttpsError('internal', 'compose_failed')
   }
 

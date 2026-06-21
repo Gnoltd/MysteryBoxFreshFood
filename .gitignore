@@ -35,5 +35,8 @@ dist-ssr
 functions/lib/
 functions/node_modules/
 
+# Firebase CLI cache
+.firebase/
+
 # Claude Code local session data
 .claude/
