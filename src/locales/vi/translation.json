@@ -46,7 +46,18 @@
     "noListings": "Hiện không có sản phẩm nào.",
     "loading": "Đang tải…",
     "greeting": "Xin chào, {{name}} 👋",
-    "subtitle": "Hôm nay có gì mới?"
+    "subtitle": "Hôm nay có gì mới?",
+    "filters": "Bộ lọc",
+    "searchPlaceholder": "Tìm kiếm...",
+    "priceRange": "Khoảng giá (đ)",
+    "min": "Tối thiểu",
+    "max": "Tối đa",
+    "availableOnly": "Còn hàng",
+    "sortBy": "Sắp xếp",
+    "sortNewest": "Mới nhất",
+    "sortPriceAsc": "Giá: Thấp đến Cao",
+    "sortPriceDesc": "Giá: Cao đến Thấp",
+    "sortDiscount": "Giảm giá nhiều nhất"
   },
   "listing": {
     "buyNow": "Mua ngay",

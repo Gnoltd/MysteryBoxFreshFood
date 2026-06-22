@@ -46,7 +46,18 @@
     "noListings": "No listings available right now.",
     "loading": "Loading…",
     "greeting": "Hey, {{name}} 👋",
-    "subtitle": "What's fresh tonight?"
+    "subtitle": "What's fresh tonight?",
+    "filters": "Filters",
+    "searchPlaceholder": "Search listings...",
+    "priceRange": "Price Range (đ)",
+    "min": "Min",
+    "max": "Max",
+    "availableOnly": "Available now",
+    "sortBy": "Sort by",
+    "sortNewest": "Newest",
+    "sortPriceAsc": "Price: Low to High",
+    "sortPriceDesc": "Price: High to Low",
+    "sortDiscount": "Biggest Discount"
   },
   "listing": {
     "buyNow": "Buy Now",
