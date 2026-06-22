@@ -371,7 +371,7 @@ export default function VendorComposePage() {
               className="w-full accent-primary"
             />
             <p className="text-outline text-xs mt-1 text-right">
-              Boxes sell at {100 - discount}% of original value
+              {t('vendor.boxes_sell_at', { pct: 100 - discount })}
             </p>
           </div>
 
@@ -391,7 +391,7 @@ export default function VendorComposePage() {
                 onClick={() => { setDiscount(suggestResult.recommendedDiscount); setSuggestResult(null) }}
                 className="text-amber-400 hover:bg-amber-950/40 px-2 py-1 rounded text-xs font-bold border border-amber-600/30 transition-colors whitespace-nowrap shrink-0"
               >
-                Apply
+                {t('vendor.apply')}
               </button>
             </div>
           )}
@@ -463,7 +463,7 @@ export default function VendorComposePage() {
             {/* Packing guide */}
             <div className="border-t border-outline-variant pt-4">
               <h4 className="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant mb-3 flex items-center gap-1">
-                <Package size={12} /> Packing guide per box
+                <Package size={12} /> {t('vendor.packing_guide')}
               </h4>
               <ul className="space-y-2">
                 {packingGuide.map(({ name, icon, perBox, leftover }) => (
@@ -569,7 +569,7 @@ export default function VendorComposePage() {
                   />
                 </div>
                 {parseInt(editPrice) <= 0 && (
-                  <p className="text-red-400 text-xs mt-1">Price must be &gt; 0</p>
+                  <p className="text-red-400 text-xs mt-1">{t('vendor.price_positive')}</p>
                 )}
               </div>
 
@@ -580,7 +580,7 @@ export default function VendorComposePage() {
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <p className="text-[10px] text-outline uppercase font-bold mb-1">Start</p>
+                    <p className="text-[10px] text-outline uppercase font-bold mb-1">{t('vendor.pickup_start_label')}</p>
                     <Input
                       value={pickupStart}
                       onChange={e => setPickupStart(e.target.value)}
@@ -589,7 +589,7 @@ export default function VendorComposePage() {
                     />
                   </div>
                   <div>
-                    <p className="text-[10px] text-outline uppercase font-bold mb-1">End</p>
+                    <p className="text-[10px] text-outline uppercase font-bold mb-1">{t('vendor.pickup_end_label')}</p>
                     <Input
                       value={pickupEnd}
                       onChange={e => setPickupEnd(e.target.value)}

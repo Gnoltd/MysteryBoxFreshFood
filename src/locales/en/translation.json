@@ -263,7 +263,13 @@
     "editor_empty_subtitle": "Select items from the catalog and click Compose with AI to populate this form.",
     "editable": "editable",
     "ai_result": "AI Result",
-    "selected_items": "{{count}} items selected"
+    "selected_items": "{{count}} items selected",
+    "boxes_sell_at": "Boxes sell at {{pct}}% of original value",
+    "apply": "Apply",
+    "packing_guide": "Packing guide per box",
+    "pickup_start_label": "Start",
+    "pickup_end_label": "End",
+    "price_positive": "Price must be > 0"
   },
   "categories": {
     "bakery": "Bakery",

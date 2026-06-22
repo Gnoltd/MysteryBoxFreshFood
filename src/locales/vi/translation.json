@@ -262,7 +262,13 @@
     "editor_empty_subtitle": "Chọn sản phẩm từ danh mục và nhấn Compose với AI để điền form này.",
     "editable": "có thể chỉnh sửa",
     "ai_result": "Kết quả AI",
-    "selected_items": "{{count}} sản phẩm được chọn"
+    "selected_items": "{{count}} sản phẩm được chọn",
+    "boxes_sell_at": "Hộp bán với giá {{pct}}% giá trị gốc",
+    "apply": "Áp dụng",
+    "packing_guide": "Hướng dẫn đóng gói mỗi hộp",
+    "pickup_start_label": "Bắt đầu",
+    "pickup_end_label": "Kết thúc",
+    "price_positive": "Giá phải lớn hơn 0"
   },
   "categories": {
     "bakery": "Bánh",
