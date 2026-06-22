@@ -28,6 +28,7 @@ export interface BoxItem {
 export interface Listing {
   id: string
   vendorId: string
+  vendorName?: string
   type: 'mystery_box' | 'item'
   title: string
   description: string
