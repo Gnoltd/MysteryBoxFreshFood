@@ -222,6 +222,28 @@ export default function QRScanPage() {
                     {result.totalPrice.toLocaleString('vi-VN')} đ
                   </span>
                 </div>
+                {/* Payment method — critical for COD */}
+                <div className="flex justify-between items-center pt-2 border-t border-outline-variant/50">
+                  <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+                    {t('vendor.payment', 'Payment')}
+                  </span>
+                  {result.paymentMethod === 'cod' ? (
+                    <span className="flex items-center gap-1.5 bg-[rgba(251,191,36,0.15)] border border-[rgba(251,191,36,0.4)] text-[#fbbf24] text-xs font-bold px-3 py-1 rounded-full">
+                      <span className="material-symbols-outlined text-sm">payments</span>
+                      Collect Cash
+                    </span>
+                  ) : result.paymentMethod === 'bank_transfer' ? (
+                    <span className="flex items-center gap-1.5 bg-[rgba(99,102,241,0.15)] border border-[rgba(99,102,241,0.4)] text-[#818cf8] text-xs font-bold px-3 py-1 rounded-full">
+                      <span className="material-symbols-outlined text-sm">account_balance</span>
+                      Bank Transfer
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1.5 bg-[rgba(16,185,129,0.15)] border border-[rgba(16,185,129,0.4)] text-[rgb(16,185,129)] text-xs font-bold px-3 py-1 rounded-full">
+                      <span className="material-symbols-outlined text-sm">credit_card</span>
+                      Paid Online
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 

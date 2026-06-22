@@ -24,23 +24,21 @@ export function subscribeToOrder(orderId: string, callback: (order: Order | null
 const REDEEMABLE = ['paid', 'pending_cod', 'pending_bank_transfer']
 
 export async function redeemQRCode(qrCode: string, vendorId: string): Promise<Order> {
-  // Query by qrCode only to avoid requiring a composite Firestore index
   const snap = await getDocs(
-    query(collection(db, 'orders'), where('qrCode', '==', qrCode.trim()))
+    query(collection(db, 'orders'),
+      where('qrCode', '==', qrCode.trim()),
+      where('vendorId', '==', vendorId))
   )
-  if (snap.empty) throw new Error('QR code not found')
+  if (snap.empty) throw new Error('QR code not found or belongs to another vendor')
 
-  const orderDoc = snap.docs[0]
-  const data = orderDoc.data()
-
-  if (data.vendorId !== vendorId) throw new Error('This QR code belongs to a different vendor')
-  if (!REDEEMABLE.includes(data.status)) throw new Error('Order has already been picked up')
+  const validDoc = snap.docs.find(d => REDEEMABLE.includes(d.data().status))
+  if (!validDoc) throw new Error('Order has already been picked up')
 
   return runTransaction(db, async (tx) => {
-    const fresh = await tx.get(orderDoc.ref)
+    const fresh = await tx.get(validDoc.ref)
     if (!fresh.exists()) throw new Error('Order not found')
     if (!REDEEMABLE.includes(fresh.data().status)) throw new Error('Order has already been picked up')
-    tx.update(orderDoc.ref, { status: 'picked_up' })
+    tx.update(validDoc.ref, { status: 'picked_up' })
     return { id: fresh.id, ...fresh.data(), status: 'picked_up' } as Order
   })
 }
