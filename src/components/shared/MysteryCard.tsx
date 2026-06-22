@@ -59,7 +59,7 @@ export function MysteryCard({ listing, onClick }: MysteryCardProps) {
 
         {/* Category icon top-left */}
         <span className="absolute top-2 left-2 bg-surface-container/80 backdrop-blur-sm rounded-full p-1.5">
-          <img src={categoryIcon} alt={listing.category} className="w-4 h-4 object-contain" />
+          <img src={categoryIcon} alt={listing.category} className="w-7 h-7 object-contain" />
         </span>
 
         {/* Pickup timer badge overlay */}
