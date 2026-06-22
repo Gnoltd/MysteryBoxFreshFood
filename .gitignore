@@ -27,6 +27,7 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+.env.seed
 
 # Superpowers brainstorm sessions (local only)
 .superpowers/
