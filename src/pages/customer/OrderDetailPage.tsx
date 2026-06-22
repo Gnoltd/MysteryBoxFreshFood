@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { onSnapshot, doc } from 'firebase/firestore'
 import { db } from '../../firebase'
-import { QRCodeSVG } from 'qrcode.react'
+import { QRCodeCanvas } from 'qrcode.react'
 import { StatusChip } from '../../components/shared/StatusChip'
 import { useAuth } from '../../contexts/AuthContext'
 import { ArrowLeft, Share2, Download, Star } from 'lucide-react'
@@ -22,6 +22,8 @@ export default function OrderDetailPage() {
   const [rating, setRating] = useState(0)
   const [hoverRating, setHoverRating] = useState(0)
   const [comment, setComment] = useState('')
+  const [copied, setCopied] = useState(false)
+  const qrRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!id) return
@@ -49,6 +51,27 @@ export default function OrderDetailPage() {
     : null
 
   const canRate = order.status === 'picked_up'
+
+  const handleShare = async () => {
+    const url = window.location.href
+    if (navigator.share) {
+      await navigator.share({ title: order.listingTitle, text: `Order ${orderRef}`, url })
+    } else {
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  const handleSaveQR = () => {
+    const canvas = qrRef.current?.querySelector('canvas') as HTMLCanvasElement | null
+    if (!canvas) return
+    const url = canvas.toDataURL('image/png')
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `qr-${order.id.slice(0, 8)}.png`
+    a.click()
+  }
 
   return (
     <div className="min-h-screen bg-background pb-16">
@@ -115,17 +138,23 @@ export default function OrderDetailPage() {
           </div>
 
           {/* QR code on white bg */}
-          <div className="bg-white p-4 rounded-xl">
-            <QRCodeSVG value={order.qrCode} size={180} bgColor="#ffffff" fgColor="#000000" />
+          <div ref={qrRef} className="bg-white p-4 rounded-xl">
+            <QRCodeCanvas value={order.qrCode} size={180} bgColor="#ffffff" fgColor="#000000" />
           </div>
 
           <p className="text-primary font-mono text-body-sm tracking-wider">{order.qrCode.slice(0, 16).toUpperCase()}</p>
 
           <div className="flex gap-3 w-full">
-            <button className="flex-1 flex items-center justify-center gap-2 border border-outline-variant text-on-surface-variant rounded-lg py-2.5 text-body-sm hover:border-primary hover:text-on-surface transition-colors">
-              <Share2 size={15} /> {t('order.share')}
+            <button
+              onClick={handleShare}
+              className="flex-1 flex items-center justify-center gap-2 border border-outline-variant text-on-surface-variant rounded-lg py-2.5 text-body-sm hover:border-primary hover:text-on-surface transition-colors"
+            >
+              <Share2 size={15} /> {copied ? t('order.copied', 'Copied!') : t('order.share')}
             </button>
-            <button className="flex-1 flex items-center justify-center gap-2 gradient-bg text-white rounded-lg py-2.5 text-body-sm font-semibold hover:opacity-90 transition-opacity">
+            <button
+              onClick={handleSaveQR}
+              className="flex-1 flex items-center justify-center gap-2 gradient-bg text-white rounded-lg py-2.5 text-body-sm font-semibold hover:opacity-90 transition-opacity"
+            >
               <Download size={15} /> {t('order.saveQR')}
             </button>
           </div>
