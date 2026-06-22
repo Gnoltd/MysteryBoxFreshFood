@@ -117,40 +117,40 @@ export default function ListingFormPage() {
         <div className="grid grid-cols-2 gap-2">
           {(['mystery_box', 'item'] as const).map(tp => (
             <button key={tp} type="button" onClick={() => setType(tp)}
-              className={`py-2 rounded-xl border text-sm font-medium ${type === tp ? 'border-primary bg-indigo-600/20 text-indigo-300' : 'border-outline-variant text-on-surface-variant'}`}>
+              className={`py-2 rounded-xl border text-sm font-medium ${type === tp ? 'border-primary bg-primary/10 text-primary' : 'border-outline-variant text-on-surface-variant'}`}>
               {tp === 'mystery_box' ? '🎁 Mystery Box' : '📦 Single Item'}
             </button>
           ))}
         </div>
 
         <div className="space-y-1">
-          <Label className="text-slate-300">Title</Label>
+          <Label className="text-on-surface-variant">Title</Label>
           <Input value={title} onChange={e => setTitle(e.target.value)} required className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" placeholder="Bánh mì mystery box" />
         </div>
 
         <div className="space-y-1">
-          <Label className="text-slate-300">Description</Label>
+          <Label className="text-on-surface-variant">Description</Label>
           <Textarea value={description} onChange={e => setDescription(e.target.value)} required className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" placeholder="What's inside…" />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <Label className="text-slate-300">Price (VND)</Label>
+            <Label className="text-on-surface-variant">Price (VND)</Label>
             <Input value={price} onChange={e => setPrice(e.target.value)} type="number" required min="1000" className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" placeholder="35000" />
           </div>
           <div className="space-y-1">
-            <Label className="text-slate-300">Original Price (VND)</Label>
+            <Label className="text-on-surface-variant">Original Price (VND)</Label>
             <Input value={originalPrice} onChange={e => setOriginalPrice(e.target.value)} type="number" required min="1000" className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" placeholder="90000" />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <Label className="text-slate-300">Quantity {isEdit && <span className="text-outline text-xs">(sets available stock)</span>}</Label>
+            <Label className="text-on-surface-variant">Quantity {isEdit && <span className="text-outline text-xs">(sets available stock)</span>}</Label>
             <Input value={quantity} onChange={e => setQuantity(e.target.value)} type="number" required min="1" className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
           </div>
           <div className="space-y-1">
-            <Label className="text-slate-300">Category</Label>
+            <Label className="text-on-surface-variant">Category</Label>
             <Select value={category} onValueChange={v => setCategory(v as ListingCategory)}>
               <SelectTrigger className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl">
                 <SelectValue />
@@ -164,17 +164,17 @@ export default function ListingFormPage() {
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <Label className="text-slate-300">Pickup start</Label>
+            <Label className="text-on-surface-variant">Pickup start</Label>
             <Input value={pickupStart} onChange={e => setPickupStart(e.target.value)} type="datetime-local" required className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
           </div>
           <div className="space-y-1">
-            <Label className="text-slate-300">Pickup end</Label>
+            <Label className="text-on-surface-variant">Pickup end</Label>
             <Input value={pickupEnd} onChange={e => setPickupEnd(e.target.value)} type="datetime-local" required className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
           </div>
         </div>
 
         <div className="space-y-1">
-          <Label className="text-slate-300">Packed at (optional)</Label>
+          <Label className="text-on-surface-variant">Packed at (optional)</Label>
           <Input
             value={packedAt}
             onChange={e => setPackedAt(e.target.value)}
@@ -184,7 +184,7 @@ export default function ListingFormPage() {
         </div>
 
         <div className="space-y-1">
-          <Label className="text-slate-300">Image</Label>
+          <Label className="text-on-surface-variant">Image</Label>
           <Input type="file" accept="image/*" onChange={e => setImageFile(e.target.files?.[0] ?? null)} className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
           {(previewUrl || (existingImageUrl && !imageFile)) && (
             <img

@@ -225,7 +225,7 @@ export default function VendorComposePage() {
             return (
               <div key={item.id} onClick={() => toggleItem(item)}
                 className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer border transition-colors ${
-                  selected ? 'border-primary bg-indigo-950/40'
+                  selected ? 'border-primary bg-primary/10'
                   : expiring ? 'border-amber-500/40 bg-surface-container-high/60'
                   : 'border-outline-variant bg-surface-container-high/40 hover:bg-surface-container-high'
                 }`}>
@@ -296,7 +296,7 @@ export default function VendorComposePage() {
 
         <div className="flex gap-2">
           <Button onClick={handleSuggestPrice} disabled={suggestLoading} variant="outline"
-            className="border-primary text-primary hover:text-indigo-300 hover:bg-indigo-950/40">
+            className="border-primary text-primary hover:text-on-surface hover:bg-primary/10">
             {suggestLoading ? '…' : t('vendor.suggest_price')}
           </Button>
           <button
@@ -310,7 +310,7 @@ export default function VendorComposePage() {
         {composerError && <p className="text-red-400 text-sm">{composerError}</p>}
 
         {composerResult && (
-          <div className="bg-indigo-950/40 border border-indigo-600/40 rounded-xl p-4 space-y-3">
+          <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 space-y-3">
             <p className="text-primary text-xs font-medium uppercase tracking-wide">
               🤖 {t('vendor.ai_box_count', { n: numBoxes })}
             </p>
@@ -336,7 +336,7 @@ export default function VendorComposePage() {
             </p>
 
             {/* Packing guide — vendor only */}
-            <div className="mt-3 pt-3 border-t border-indigo-700/40">
+            <div className="mt-3 pt-3 border-t border-primary/20">
               <p className="text-primary text-xs font-medium mb-2">📦 Packing guide (per box)</p>
               <div className="space-y-1">
                 {packingGuide.map(({ name, icon, perBox, leftover }) => (
