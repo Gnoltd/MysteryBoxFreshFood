@@ -1,16 +1,35 @@
-import { useState } from 'react'
-import { Link, Outlet, useLocation } from 'react-router-dom'
+import { useState, useRef, useEffect } from 'react'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
+import { signOut } from '../../services/auth'
 import { LanguageToggle } from '../shared/LanguageToggle'
 import { NotificationPanel } from '../shared/NotificationPanel'
-import { Bell } from 'lucide-react'
+import { Bell, LogOut } from 'lucide-react'
 import { useUnreadCount } from '../../hooks/useUnreadCount'
 
 export function CustomerLayout() {
   const { t } = useTranslation()
   const { userProfile } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
+  const [avatarOpen, setAvatarOpen] = useState(false)
+  const avatarRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (avatarRef.current && !avatarRef.current.contains(e.target as Node)) {
+        setAvatarOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleSignOut = async () => {
+    await signOut()
+    navigate('/login')
+  }
   const [notifOpen, setNotifOpen] = useState(false)
   const unreadCount = useUnreadCount(userProfile?.uid)
 
@@ -64,8 +83,27 @@ export function CustomerLayout() {
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-error-token rounded-full" />
               )}
             </button>
-            <div className="w-8 h-8 rounded-full gradient-bg flex items-center justify-center text-white text-xs font-bold shrink-0 cursor-pointer">
-              {initials}
+            <div ref={avatarRef} className="relative">
+              <button
+                onClick={() => setAvatarOpen(o => !o)}
+                className="w-8 h-8 rounded-full gradient-bg flex items-center justify-center text-white text-xs font-bold shrink-0"
+              >
+                {initials}
+              </button>
+              {avatarOpen && (
+                <div className="absolute right-0 top-10 bg-surface-container border border-outline-variant rounded-xl shadow-lg py-1 min-w-[140px] z-50">
+                  <div className="px-3 py-2 border-b border-outline-variant">
+                    <p className="text-on-surface text-body-sm font-semibold truncate">{userProfile?.displayName}</p>
+                    <p className="text-outline text-xs truncate">{userProfile?.email}</p>
+                  </div>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-body-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors"
+                  >
+                    <LogOut size={14} /> {t('nav.signOut')}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
