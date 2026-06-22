@@ -132,12 +132,6 @@
 }
 .qr-error-glow { animation: qr-error-pulse 2s infinite alternate; }
 
-/* Hide html5-qrcode default UI, keep only the video */
+/* Html5Qrcode video fills the viewfinder container */
 #qr-reader { border: none !important; padding: 0 !important; }
-#qr-reader__dashboard { display: none !important; }
-#qr-reader__header_message { display: none !important; }
-#qr-reader select { display: none !important; }
-#qr-reader button { display: none !important; }
 #qr-reader video { width: 100% !important; height: 100% !important; object-fit: cover; }
-#qr-reader__scan_region { border: none !important; }
-#qr-reader__scan_region img { display: none !important; }

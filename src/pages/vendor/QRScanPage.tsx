@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { Html5QrcodeScanner } from 'html5-qrcode'
+import { Html5Qrcode } from 'html5-qrcode'
 import { useAuth } from '../../contexts/AuthContext'
 import { redeemQRCode } from '../../services/orders'
 import type { Order } from '../../types'
@@ -11,7 +11,7 @@ type ScanStatus = 'scanning' | 'success' | 'error'
 export default function QRScanPage() {
   const { t } = useTranslation()
   const { currentUser } = useAuth()
-  const scannerRef = useRef<Html5QrcodeScanner | null>(null)
+  const scannerRef = useRef<Html5Qrcode | null>(null)
   const [status, setStatus] = useState<ScanStatus>('scanning')
   const [result, setResult] = useState<Order | null>(null)
   const [errorMsg, setErrorMsg] = useState('')
@@ -21,34 +21,39 @@ export default function QRScanPage() {
   const particlesRef = useRef<HTMLDivElement>(null)
   const errorCardRef = useRef<HTMLDivElement>(null)
 
-  // Camera scanner
+  // Camera scanner — uses Html5Qrcode (no UI buttons) so camera starts immediately
   useEffect(() => {
     if (!currentUser || status !== 'scanning') return
 
-    const scanner = new Html5QrcodeScanner(
-      'qr-reader',
-      { fps: 10, qrbox: { width: 220, height: 220 } },
-      false
-    )
-    scannerRef.current = scanner
+    const qrcode = new Html5Qrcode('qr-reader')
+    scannerRef.current = qrcode
+    let done = false
 
-    scanner.render(
+    qrcode.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: { width: 200, height: 200 } },
       async (decodedText) => {
+        if (done) return
+        done = true
         try {
-          await scanner.clear()
+          await qrcode.stop()
           const order = await redeemQRCode(decodedText, currentUser.uid)
           setResult(order)
           setStatus('success')
         } catch (err: unknown) {
-          await scanner.clear().catch(() => {})
           setErrorMsg(err instanceof Error ? err.message : 'Invalid QR code')
           setStatus('error')
         }
       },
       () => {}
-    )
+    ).catch((err: unknown) => {
+      setErrorMsg(err instanceof Error ? err.message : 'Could not access camera')
+      setStatus('error')
+    })
 
-    return () => { scanner.clear().catch(() => {}) }
+    return () => {
+      if (!done) qrcode.stop().catch(() => {})
+    }
   }, [currentUser, status])
 
   // Floating particles on success
