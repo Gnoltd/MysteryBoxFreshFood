@@ -9,7 +9,8 @@
     "inventory": "Inventory",
     "compose": "Compose",
     "signOut": "Sign out",
-    "subscriptions": "Subscriptions"
+    "subscriptions": "Subscriptions",
+    "howItWorks": "How it Works"
   },
   "auth": {
     "signIn": "Sign in",

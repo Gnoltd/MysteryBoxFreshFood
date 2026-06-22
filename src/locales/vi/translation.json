@@ -9,7 +9,8 @@
     "inventory": "Kho hàng",
     "compose": "Tạo hộp",
     "signOut": "Đăng xuất",
-    "subscriptions": "Gói đặt hàng"
+    "subscriptions": "Gói đặt hàng",
+    "howItWorks": "Cách hoạt động"
   },
   "auth": {
     "signIn": "Đăng nhập",
