@@ -7,7 +7,43 @@ import { GradientButton } from '../../components/shared/GradientButton'
 import { GhostButton } from '../../components/shared/GhostButton'
 import { StatusChip } from '../../components/shared/StatusChip'
 import type { Follow, Subscription, SubscriptionPlan } from '../../types'
-import { Bell, BellOff, Trash2 } from 'lucide-react'
+import { Bell, BellOff, Trash2, Leaf, Users, Sparkles } from 'lucide-react'
+
+interface PlanMeta {
+  key: SubscriptionPlan
+  displayName: string
+  price: string
+  popular?: boolean
+  features: string[]
+}
+
+const PLANS: PlanMeta[] = [
+  {
+    key: 'free',
+    displayName: 'Basic',
+    price: 'Free',
+    features: ['subs.featureFollow', 'subs.featureNotify'],
+  },
+  {
+    key: 'monthly',
+    displayName: 'Elite',
+    price: '300.000 đ / ngày',
+    popular: true,
+    features: ['subs.featureFollow', 'subs.featureNotify', 'subs.featurePriority', 'subs.featureWeekly', 'subs.featureVoucher'],
+  },
+  {
+    key: 'weekly',
+    displayName: 'Pro',
+    price: '150.000 đ / ngày',
+    features: ['subs.featureFollow', 'subs.featureNotify', 'subs.featurePriority', 'subs.featureWeekly'],
+  },
+]
+
+const WHY_ITEMS = [
+  { icon: Leaf,     titleKey: 'subs.whySustainTitle',  descKey: 'subs.whySustainDesc' },
+  { icon: Users,    titleKey: 'subs.whyLocalTitle',    descKey: 'subs.whyLocalDesc' },
+  { icon: Sparkles, titleKey: 'subs.whyFreshTitle',    descKey: 'subs.whyFreshDesc' },
+]
 
 export default function SubscriptionsPage() {
   const { t } = useTranslation()
@@ -58,90 +94,62 @@ export default function SubscriptionsPage() {
     }
   }
 
-  const priceMap: Record<SubscriptionPlan, string> = {
-    free:    t('subs.planFreePrice'),
-    weekly:  '49.000 đ / tuần',
-    monthly: '179.000 đ / tháng',
-  }
-
-  const PLANS: Array<{ key: SubscriptionPlan; features: string[] }> = [
-    { key: 'free',    features: ['subs.featureFollow', 'subs.featureNotify'] },
-    { key: 'weekly',  features: ['subs.featureFollow', 'subs.featureNotify', 'subs.featurePriority', 'subs.featureWeekly'] },
-    { key: 'monthly', features: ['subs.featureFollow', 'subs.featureNotify', 'subs.featurePriority', 'subs.featureWeekly', 'subs.featureVoucher'] },
-  ]
-
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Section A: Followed Vendors */}
-      <section className="mb-12">
-        <h2 className="text-headline-md font-bold text-on-surface mb-4">{t('subs.followedVendors')}</h2>
-        {follows.length === 0 ? (
-          <div className="bg-surface-container border border-outline-variant rounded-xl p-8 text-center">
-            <p className="text-on-surface-variant text-body-lg">{t('subs.noFollows')}</p>
+    <div>
+      {/* Hero section */}
+      <section className="relative bg-surface-container border border-outline-variant rounded-2xl overflow-hidden mb-12 px-8 py-12 md:py-16">
+        <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+          <div className="blob w-64 h-64 bg-inverse-primary/10 top-0 left-0" />
+          <div className="blob w-48 h-48 bg-secondary-container/10 bottom-0 right-0" />
+        </div>
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex flex-col gap-4 max-w-lg">
+            <span className="inline-flex items-center gap-2 bg-surface-variant border border-outline-variant rounded-full px-4 py-1.5 text-label-caps text-on-surface uppercase tracking-wider w-fit">
+              ★ {t('subs.vipAccess')}
+            </span>
+            <h1 className="text-headline-lg font-bold text-on-surface">
+              {t('subs.elevate')}{' '}
+              <span className="gradient-text">{t('subs.experience')}</span>
+            </h1>
+            <p className="text-on-surface-variant text-body-lg">{t('subs.heroSubtitle')}</p>
+            <button className="gradient-bg text-white rounded-lg px-6 py-3 font-semibold text-body-lg hover:opacity-90 transition-opacity w-fit">
+              {t('subs.explorePlans')} →
+            </button>
           </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {follows.map(follow => (
-              <div
-                key={follow.id}
-                className="bg-surface-container border border-outline-variant rounded-xl p-4 flex items-center gap-4"
-              >
-                <div className="w-10 h-10 rounded-full gradient-bg flex items-center justify-center text-white font-bold">
-                  {follow.vendorId.slice(0, 1).toUpperCase()}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-on-surface font-semibold text-body-sm truncate">{follow.vendorId}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleToggleNotif(follow)}
-                    className="p-2 rounded-lg hover:bg-surface-container-high transition-colors text-on-surface-variant hover:text-on-surface"
-                    title={follow.notificationsEnabled ? t('subs.muteNotif') : t('subs.enableNotif')}
-                  >
-                    {follow.notificationsEnabled ? <Bell size={18} className="text-primary" /> : <BellOff size={18} />}
-                  </button>
-                  <button
-                    onClick={() => handleUnfollow(follow)}
-                    className="p-2 rounded-lg hover:bg-error-container/20 transition-colors text-on-surface-variant hover:text-error-token"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+          <img
+            src="/Design/a_modern_vibrant_3d_illustration_for_a_food_subscription_service._features_a/screen.png"
+            alt="Subscription box"
+            className="w-48 h-48 md:w-64 md:h-64 object-contain"
+            onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+          />
+        </div>
       </section>
 
-      {/* Section B: Plans */}
-      <section>
-        {/* Hero */}
-        <div className="mb-8 flex flex-col items-center text-center gap-3">
-          <span className="inline-flex items-center gap-2 bg-surface-variant border border-outline-variant rounded-full px-4 py-1.5 text-label-caps text-on-surface uppercase tracking-wider">
-            ★ {t('subs.vipAccess')}
-          </span>
-          <h2 className="text-headline-lg-mobile md:text-headline-lg font-bold">
-            {t('subs.elevate')}{' '}
-            <span className="gradient-text">{t('subs.experience')}</span>
-          </h2>
-          <p className="text-on-surface-variant text-body-lg max-w-md">{t('subs.heroSubtitle')}</p>
-        </div>
-
-        {/* Plan cards */}
+      {/* Plan cards */}
+      <section className="mb-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {PLANS.map(({ key, features }) => {
+          {PLANS.map(({ key, displayName, price, popular, features }) => {
             const isActive = subscription?.plan === key && subscription?.status === 'active'
             return (
               <div
                 key={key}
-                className={`bg-surface-container border rounded-xl p-5 flex flex-col gap-4 ${isActive ? 'gradient-border-box' : 'border-outline-variant'}`}
+                className={`relative bg-surface-container border rounded-xl p-5 flex flex-col gap-4 ${
+                  popular ? 'border-primary gradient-border-box' : isActive ? 'gradient-border-box border-primary' : 'border-outline-variant'
+                }`}
               >
-                {isActive && (
+                {popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span className="gradient-bg text-white text-label-caps font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                      MOST POPULAR
+                    </span>
+                  </div>
+                )}
+                {isActive && !popular && (
                   <StatusChip variant="emerald">{t('subs.active')}</StatusChip>
                 )}
                 <div>
-                  <h3 className="text-headline-md font-bold text-on-surface capitalize">{t(`subs.plan_${key}`)}</h3>
-                  <p className="text-primary font-bold text-mono-stat mt-1">{priceMap[key]}</p>
+                  <h3 className="text-headline-md font-bold text-on-surface">{displayName}</h3>
+                  <p className="text-primary font-bold text-mono-stat mt-1">{price}</p>
                 </div>
                 <ul className="flex flex-col gap-2 flex-1">
                   {features.map(f => (
@@ -170,7 +178,7 @@ export default function SubscriptionsPage() {
                     disabled={loadingPlan === key}
                     className="w-full"
                   >
-                    {loadingPlan === key ? t('subs.subscribing') : t('subs.subscribe')}
+                    {loadingPlan === key ? t('subs.subscribing') : `${t('subs.upgrade')} ${displayName}`}
                   </GradientButton>
                 )}
               </div>
@@ -178,6 +186,52 @@ export default function SubscriptionsPage() {
           })}
         </div>
       </section>
+
+      {/* Why Subscribe */}
+      <section className="mb-12">
+        <h2 className="text-headline-md font-bold text-on-surface text-center mb-6">{t('subs.whyTitle')}</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {WHY_ITEMS.map(({ icon: Icon, titleKey, descKey }) => (
+            <div key={titleKey} className="bg-surface-container border border-outline-variant rounded-xl p-5 flex flex-col gap-3">
+              <div className="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center">
+                <Icon size={20} className="text-white" />
+              </div>
+              <h3 className="text-on-surface font-semibold text-body-lg">{t(titleKey)}</h3>
+              <p className="text-on-surface-variant text-body-sm">{t(descKey)}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Followed Vendors */}
+      {follows.length > 0 && (
+        <section>
+          <h2 className="text-headline-md font-bold text-on-surface mb-4">{t('subs.followedVendors')}</h2>
+          <div className="flex flex-col gap-3">
+            {follows.map(follow => (
+              <div key={follow.id} className="bg-surface-container border border-outline-variant rounded-xl p-4 flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full gradient-bg flex items-center justify-center text-white font-bold">
+                  {follow.vendorId.slice(0, 1).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-on-surface font-semibold text-body-sm truncate">{follow.vendorId}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => handleToggleNotif(follow)}
+                    className="p-2 rounded-lg hover:bg-surface-container-high transition-colors text-on-surface-variant hover:text-on-surface"
+                    title={follow.notificationsEnabled ? t('subs.muteNotif') : t('subs.enableNotif')}>
+                    {follow.notificationsEnabled ? <Bell size={18} className="text-primary" /> : <BellOff size={18} />}
+                  </button>
+                  <button onClick={() => handleUnfollow(follow)}
+                    className="p-2 rounded-lg hover:bg-error-container/20 transition-colors text-on-surface-variant hover:text-error-token">
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   )
 }

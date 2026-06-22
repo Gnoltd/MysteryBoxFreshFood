@@ -343,6 +343,15 @@
     "currentFree": "Gói hiện tại",
     "subscribe": "Đăng ký",
     "subscribing": "Đang chuyển hướng…",
-    "stripeRedirect": "Thanh toán Stripe sẽ có trong bản production."
+    "stripeRedirect": "Thanh toán Stripe sẽ có trong bản production.",
+    "explorePlans": "Xem các gói",
+    "upgrade": "Nâng cấp lên",
+    "whyTitle": "Tại sao đăng ký?",
+    "whySustainTitle": "Bền vững",
+    "whySustainDesc": "Giúp giảm lãng phí thực phẩm bằng cách nhận các hộp dư thừa.",
+    "whyLocalTitle": "Ủng hộ địa phương",
+    "whyLocalDesc": "Hỗ trợ các doanh nghiệp F&B địa phương.",
+    "whyFreshTitle": "Tươi ngon đảm bảo",
+    "whyFreshDesc": "Tất cả hộp được đóng gói tươi mỗi ngày."
   }
 }

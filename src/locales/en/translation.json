@@ -344,6 +344,15 @@
     "currentFree": "Current Plan",
     "subscribe": "Subscribe",
     "subscribing": "Redirecting…",
-    "stripeRedirect": "Stripe payment coming soon in production."
+    "stripeRedirect": "Stripe payment coming soon in production.",
+    "explorePlans": "Explore Plans",
+    "upgrade": "Upgrade to",
+    "whyTitle": "Why Subscribe?",
+    "whySustainTitle": "Sustainability",
+    "whySustainDesc": "Help reduce food waste by claiming surplus boxes before they're discarded.",
+    "whyLocalTitle": "Local Support",
+    "whyLocalDesc": "Support local F&B businesses and keep your community thriving.",
+    "whyFreshTitle": "Freshness Guaranteed",
+    "whyFreshDesc": "All boxes are packed fresh daily and must be collected within the pickup window."
   }
 }
