@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { User, Mail, Lock, Store } from 'lucide-react'
 import { signUp } from '../../services/auth'
 
 export default function RegisterPage() {
@@ -27,9 +28,6 @@ export default function RegisterPage() {
       setLoading(false)
     }
   }
-
-  const inputClass =
-    'w-full bg-surface-container-lowest border border-outline-variant rounded-lg h-12 px-4 text-body-lg text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors'
 
   return (
     <div className="w-full max-w-md relative">
@@ -64,39 +62,48 @@ export default function RegisterPage() {
             <label className="text-label-caps text-on-surface-variant uppercase tracking-wider">
               {t('auth.displayName')}
             </label>
-            <input
-              type="text"
-              required
-              value={displayName}
-              onChange={e => setDisplayName(e.target.value)}
-              className={inputClass}
-            />
+            <div className="relative">
+              <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" />
+              <input
+                type="text"
+                required
+                value={displayName}
+                onChange={e => setDisplayName(e.target.value)}
+                className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg h-12 pl-10 pr-4 text-body-lg text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+              />
+            </div>
           </div>
 
           <div className="flex flex-col gap-1.5">
             <label className="text-label-caps text-on-surface-variant uppercase tracking-wider">
               {t('auth.email')}
             </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className={inputClass}
-            />
+            <div className="relative">
+              <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" />
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg h-12 pl-10 pr-4 text-body-lg text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+              />
+            </div>
           </div>
 
           <div className="flex flex-col gap-1.5">
             <label className="text-label-caps text-on-surface-variant uppercase tracking-wider">
               {t('auth.password')}
             </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className={inputClass}
-            />
+            <div className="relative">
+              <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" />
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg h-12 pl-10 pr-4 text-body-lg text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+              />
+            </div>
           </div>
 
           {/* Role toggle */}
@@ -122,13 +129,16 @@ export default function RegisterPage() {
               <label className="text-label-caps text-on-surface-variant uppercase tracking-wider">
                 {t('auth.storeName')}
               </label>
-              <input
-                type="text"
-                required
-                value={storeName}
-                onChange={e => setStoreName(e.target.value)}
-                className={inputClass}
-              />
+              <div className="relative">
+                <Store size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" />
+                <input
+                  type="text"
+                  required
+                  value={storeName}
+                  onChange={e => setStoreName(e.target.value)}
+                  className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg h-12 pl-10 pr-4 text-body-lg text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                />
+              </div>
             </div>
           )}
 
