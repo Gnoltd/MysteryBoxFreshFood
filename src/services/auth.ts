@@ -6,7 +6,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth'
-import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore'
+import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore'
 import { auth, db } from '../firebase'
 import type { UserProfile } from '../types'
 
@@ -36,11 +36,20 @@ export async function signOut(): Promise<void> {
   await firebaseSignOut(auth)
 }
 
-export async function signInWithGoogle(): Promise<'new' | 'existing'> {
+export async function signInWithGoogle(): Promise<void> {
   const provider = new GoogleAuthProvider()
   const cred = await signInWithPopup(auth, provider)
-  const profile = await getUserProfile(cred.user.uid)
-  return profile ? 'existing' : 'new'
+  const userRef = doc(db, 'users', cred.user.uid)
+  const snap = await getDoc(userRef)
+  if (!snap.exists()) {
+    await setDoc(userRef, {
+      role: 'customer',
+      displayName: cred.user.displayName ?? '',
+      email: cred.user.email ?? '',
+      lang: 'en',
+      createdAt: serverTimestamp(),
+    })
+  }
 }
 
 export async function createGoogleUserProfile(

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, Outlet, useNavigate } from 'react-router-dom'
+import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { signOut } from '../../services/auth'
@@ -12,6 +12,7 @@ export function CustomerLayout() {
   const { t } = useTranslation()
   const { userProfile } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [notifOpen, setNotifOpen] = useState(false)
   const unreadCount = useUnreadCount(userProfile?.uid)
 
@@ -19,6 +20,19 @@ export function CustomerLayout() {
     await signOut()
     navigate('/login')
   }
+
+  const navLink = (to: string, label: string) => (
+    <Link
+      to={to}
+      className={`pb-0.5 transition-colors text-body-sm ${
+        location.pathname === to
+          ? 'text-primary font-bold border-b-2 border-primary'
+          : 'text-on-surface-variant hover:text-primary'
+      }`}
+    >
+      {label}
+    </Link>
+  )
 
   return (
     <div className="min-h-screen bg-background text-on-surface">
@@ -29,10 +43,10 @@ export function CustomerLayout() {
             MysteryBox<span className="font-extrabold">FreshFood</span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-6 text-body-sm">
-            <Link to="/browse" className="text-on-surface-variant hover:text-on-surface transition-colors">{t('nav.browse')}</Link>
-            <Link to="/subscriptions" className="text-on-surface-variant hover:text-on-surface transition-colors">{t('nav.subscriptions')}</Link>
-            <Link to="/orders" className="text-on-surface-variant hover:text-on-surface transition-colors">{t('nav.myOrders')}</Link>
+          <nav className="hidden md:flex items-center gap-6">
+            {navLink('/browse', t('nav.browse'))}
+            {navLink('/subscriptions', t('nav.subscriptions'))}
+            {navLink('/orders', t('nav.myOrders'))}
           </nav>
 
           <div className="flex items-center gap-2 text-on-surface-variant">

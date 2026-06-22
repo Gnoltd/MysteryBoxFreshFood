@@ -5,10 +5,8 @@ import { onSnapshot, collection, query, where, limit } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { QRCodeSVG } from 'qrcode.react'
 import { useAuth } from '../../contexts/AuthContext'
-import { GhostButton } from '../../components/shared/GhostButton'
 import { StatusChip } from '../../components/shared/StatusChip'
 import type { Order } from '../../types'
-import { CheckCircle } from 'lucide-react'
 
 const STATUS_STEPS = ['paid', 'picked_up'] as const
 const STEP_LABELS: Record<string, string> = { paid: 'order.statusPaid', picked_up: 'order.statusPickedUp' }
@@ -35,45 +33,58 @@ export default function CheckoutSuccessPage() {
   }, [userProfile, sessionId])
 
   return (
-    <div className="max-w-md mx-auto py-12 flex flex-col items-center gap-8 text-center">
-      <div className="w-20 h-20 rounded-full gradient-bg flex items-center justify-center">
-        <CheckCircle size={40} className="text-white" />
+    <div className="max-w-[480px] mx-auto py-12 flex flex-col items-center gap-6 text-center">
+      <p className="text-primary text-headline-lg-mobile font-bold">MysteryBox Fresh Food</p>
+
+      <div className="relative w-full bg-surface-container-low border border-outline-variant rounded-xl gradient-border-top p-8 shadow-2xl overflow-hidden flex flex-col items-center gap-6">
+        {/* Top glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-primary/20 blur-3xl pointer-events-none" />
+
+        {/* Icon */}
+        <div className="relative w-24 h-24 rounded-full bg-surface-variant border border-outline-variant flex items-center justify-center text-5xl">
+          ✅
+        </div>
+
+        <div>
+          <h1 className="text-headline-lg-mobile font-bold text-on-surface">{t('order.confirmed')}</h1>
+          <p className="text-on-surface-variant text-body-lg mt-2">{t('order.showQR')}</p>
+        </div>
+
+        {order ? (
+          <>
+            {/* QR code with white background */}
+            <div className="bg-white p-3 rounded-lg">
+              <QRCodeSVG value={order.qrCode} size={180} bgColor="#ffffff" fgColor="#000000" />
+            </div>
+
+            {/* Live status tracker */}
+            <div className="w-full flex items-center gap-2">
+              {STATUS_STEPS.map((step) => {
+                const done = order.status === step || (step === 'paid' && order.status === 'picked_up')
+                const active = order.status === step
+                return (
+                  <div key={step} className="flex-1 flex flex-col items-center gap-1">
+                    <div className={`w-3 h-3 rounded-full transition-all ${done ? 'gradient-bg' : 'bg-outline-variant'} ${active ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}`} />
+                    <span className="text-xs text-on-surface-variant">{t(STEP_LABELS[step])}</span>
+                  </div>
+                )
+              })}
+            </div>
+
+            <StatusChip variant={order.status === 'picked_up' ? 'emerald' : 'primary'}>
+              {t(`order.status_${order.status}`)}
+            </StatusChip>
+          </>
+        ) : (
+          <div className="w-48 h-48 bg-surface-container rounded-xl animate-pulse" />
+        )}
+
+        <Link to="/orders">
+          <button className="gradient-bg text-white rounded-lg px-6 py-3 font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+            {t('order.viewAll')}
+          </button>
+        </Link>
       </div>
-
-      <div>
-        <h1 className="text-headline-lg-mobile font-bold text-on-surface">{t('order.confirmed')}</h1>
-        <p className="text-on-surface-variant text-body-lg mt-2">{t('order.showQR')}</p>
-      </div>
-
-      {order ? (
-        <>
-          <div className="p-4 bg-surface-container border border-outline-variant rounded-xl">
-            <QRCodeSVG value={order.qrCode} size={200} bgColor="transparent" fgColor="#dce1fb" />
-          </div>
-
-          {/* Live status tracker */}
-          <div className="w-full flex items-center gap-2">
-            {STATUS_STEPS.map((step) => {
-              const done = order.status === step || (step === 'paid' && order.status === 'picked_up')
-              const active = order.status === step
-              return (
-                <div key={step} className="flex-1 flex flex-col items-center gap-1">
-                  <div className={`w-3 h-3 rounded-full transition-all ${done ? 'gradient-bg' : 'bg-outline-variant'} ${active ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}`} />
-                  <span className="text-xs text-on-surface-variant">{t(STEP_LABELS[step])}</span>
-                </div>
-              )
-            })}
-          </div>
-
-          <StatusChip variant={order.status === 'picked_up' ? 'emerald' : 'primary'}>
-            {t(`order.status_${order.status}`)}
-          </StatusChip>
-        </>
-      ) : (
-        <div className="w-48 h-48 bg-surface-container rounded-xl animate-pulse" />
-      )}
-
-      <Link to="/orders"><GhostButton>{t('order.viewAll')}</GhostButton></Link>
     </div>
   )
 }

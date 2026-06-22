@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { signUp } from '../../services/auth'
-import { GradientButton } from '../../components/shared/GradientButton'
 
 export default function RegisterPage() {
   const { t } = useTranslation()
@@ -29,65 +28,128 @@ export default function RegisterPage() {
     }
   }
 
-  const inputClass = 'bg-surface-container-lowest border border-outline-variant rounded-xl px-4 py-3 text-body-lg text-on-surface placeholder:text-outline focus:outline-none focus:border-primary transition-colors'
+  const inputClass =
+    'w-full bg-surface-container-lowest border border-outline-variant rounded-lg h-12 px-4 text-body-lg text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors'
 
   return (
-    <div className="w-full max-w-md">
-      <div className="text-center mb-8">
-        <h1 className="gradient-text font-bold text-headline-lg-mobile">
-          MysteryBox<span className="font-extrabold">FreshFood</span>
-        </h1>
-        <p className="text-on-surface-variant text-body-sm mt-2">{t('auth.joinMysteryBox')}</p>
+    <div className="w-full max-w-md relative">
+      {/* Background blobs */}
+      <div className="blob w-64 h-64 bg-inverse-primary/20 -top-16 -right-16" />
+      <div className="blob w-48 h-48 bg-secondary-container/20 -bottom-8 -left-12" />
+
+      {/* Brand */}
+      <div className="text-center mb-8 relative z-10">
+        <h1 className="gradient-text font-bold text-headline-lg-mobile">MysteryBox Fresh Food</h1>
+        <p className="text-on-surface-variant text-body-sm mt-1">F&amp;B Surplus Marketplace</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-surface-container border border-outline-variant rounded-xl p-6 flex flex-col gap-4">
-        <div className="flex flex-col gap-1.5">
-          <label className="text-label-caps text-on-surface-variant uppercase tracking-wider">{t('auth.displayName')}</label>
-          <input type="text" required value={displayName} onChange={e => setDisplayName(e.target.value)} className={inputClass} />
-        </div>
+      {/* Card */}
+      <div className="relative z-10 bg-surface-container/60 backdrop-blur-xl border border-outline-variant rounded-xl shadow-2xl overflow-hidden">
+        {/* Top gradient accent line */}
+        <div className="h-[1px] w-full gradient-bg" />
 
-        <div className="flex flex-col gap-1.5">
-          <label className="text-label-caps text-on-surface-variant uppercase tracking-wider">{t('auth.email')}</label>
-          <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className={inputClass} />
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <label className="text-label-caps text-on-surface-variant uppercase tracking-wider">{t('auth.password')}</label>
-          <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className={inputClass} />
-        </div>
-
-        {/* Role toggle */}
-        <div className="flex gap-3">
-          {(['customer', 'vendor'] as const).map(r => (
-            <button
-              key={r}
-              type="button"
-              onClick={() => setRole(r)}
-              className={`flex-1 py-2.5 rounded-xl border font-semibold text-body-sm transition-colors ${role === r ? 'gradient-bg text-white border-transparent' : 'border-outline-variant text-on-surface-variant hover:border-primary/50'}`}
-            >
-              {t(`auth.${r}`)}
-            </button>
-          ))}
-        </div>
-
-        {role === 'vendor' && (
-          <div className="flex flex-col gap-1.5">
-            <label className="text-label-caps text-on-surface-variant uppercase tracking-wider">{t('auth.storeName')}</label>
-            <input type="text" required value={storeName} onChange={e => setStoreName(e.target.value)} className={inputClass} />
+        <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
+          {/* Icon + heading */}
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-12 h-12 bg-surface-variant border border-outline-variant rounded-lg flex items-center justify-center text-2xl">
+              🍱
+            </div>
+            <div>
+              <h2 className="text-headline-md font-bold text-on-surface">{t('auth.createAccount')}</h2>
+              <p className="text-body-sm text-on-surface-variant">{t('auth.joinMysteryBox')}</p>
+            </div>
           </div>
-        )}
 
-        {error && <p className="text-error-token text-body-sm">{error}</p>}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-label-caps text-on-surface-variant uppercase tracking-wider">
+              {t('auth.displayName')}
+            </label>
+            <input
+              type="text"
+              required
+              value={displayName}
+              onChange={e => setDisplayName(e.target.value)}
+              className={inputClass}
+            />
+          </div>
 
-        <GradientButton type="submit" disabled={loading} className="w-full mt-2">
-          {loading ? t('auth.creating') : t('auth.createAccount')}
-        </GradientButton>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-label-caps text-on-surface-variant uppercase tracking-wider">
+              {t('auth.email')}
+            </label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              className={inputClass}
+            />
+          </div>
 
-        <p className="text-center text-on-surface-variant text-body-sm">
-          {t('auth.haveAccount')}{' '}
-          <Link to="/login" className="text-primary hover:underline">{t('auth.signIn')}</Link>
-        </p>
-      </form>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-label-caps text-on-surface-variant uppercase tracking-wider">
+              {t('auth.password')}
+            </label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className={inputClass}
+            />
+          </div>
+
+          {/* Role toggle */}
+          <div className="bg-surface-container-low border border-outline-variant rounded-lg p-1 flex gap-1">
+            {(['customer', 'vendor'] as const).map(r => (
+              <button
+                key={r}
+                type="button"
+                onClick={() => setRole(r)}
+                className={`flex-1 py-2 rounded-md text-body-sm font-semibold transition-colors ${
+                  role === r
+                    ? 'bg-surface-variant text-on-surface border border-outline'
+                    : 'text-on-surface-variant hover:text-on-surface'
+                }`}
+              >
+                {t(`auth.${r}`)}
+              </button>
+            ))}
+          </div>
+
+          {role === 'vendor' && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-label-caps text-on-surface-variant uppercase tracking-wider">
+                {t('auth.storeName')}
+              </label>
+              <input
+                type="text"
+                required
+                value={storeName}
+                onChange={e => setStoreName(e.target.value)}
+                className={inputClass}
+              />
+            </div>
+          )}
+
+          {error && <p className="text-error-token text-body-sm">{error}</p>}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="gradient-bg text-white rounded-lg h-12 w-full font-semibold text-body-lg shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2"
+          >
+            {loading ? t('auth.creating') : t('auth.createAccount')}
+          </button>
+
+          <p className="text-center text-on-surface-variant text-body-sm">
+            {t('auth.haveAccount')}{' '}
+            <Link to="/login" className="text-primary hover:underline font-semibold">
+              {t('auth.signIn')}
+            </Link>
+          </p>
+        </form>
+      </div>
     </div>
   )
 }

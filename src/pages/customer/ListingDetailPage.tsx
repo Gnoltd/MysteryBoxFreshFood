@@ -1,27 +1,45 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { onSnapshot, doc } from 'firebase/firestore'
+import { onSnapshot, doc, getDoc } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { initiateCheckout } from '../../services/stripe'
+import { initiateLocalOrder } from '../../services/localPayment'
 import { GradientButton } from '../../components/shared/GradientButton'
 import { GlassNav } from '../../components/shared/GlassNav'
 import { StatusChip } from '../../components/shared/StatusChip'
 import { StockBadge } from '../../components/shared/StockBadge'
 import { TimerBadge } from '../../components/shared/TimerBadge'
 import type { Listing } from '../../types'
-import { Share2, Heart } from 'lucide-react'
+import { Share2, Heart, CreditCard, Banknote, Truck } from 'lucide-react'
+
+type PayMethod = 'card' | 'cod' | 'bank_transfer'
+
+interface BankInfo { bankName: string; bankAccount: string; bankAccountName: string }
 
 export default function ListingDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [listing, setListing] = useState<Listing | null>(null)
+  const [payMethod, setPayMethod] = useState<PayMethod>('card')
+  const [bankInfo, setBankInfo] = useState<BankInfo | null>(null)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (!id) return
     const unsub = onSnapshot(doc(db, 'listings', id), snap => {
-      if (snap.exists()) setListing({ id: snap.id, ...snap.data() } as Listing)
+      if (snap.exists()) {
+        const data = { id: snap.id, ...snap.data() } as Listing
+        setListing(data)
+        // fetch vendor bank info
+        getDoc(doc(db, 'users', data.vendorId)).then(vSnap => {
+          if (vSnap.exists()) {
+            const v = vSnap.data()
+            if (v.bankAccount) setBankInfo({ bankName: v.bankName ?? '', bankAccount: v.bankAccount, bankAccountName: v.bankAccountName ?? '' })
+          }
+        })
+      }
     })
     return unsub
   }, [id])
@@ -30,7 +48,12 @@ export default function ListingDetailPage() {
     if (!listing) return
     setLoading(true)
     try {
-      await initiateCheckout(listing.id, 1)
+      if (payMethod === 'card') {
+        await initiateCheckout(listing.id, 1)
+      } else {
+        const { orderId } = await initiateLocalOrder(listing.id, 1, payMethod)
+        navigate(`/orders/${orderId}`)
+      }
     } finally {
       setLoading(false)
     }
@@ -47,6 +70,12 @@ export default function ListingDetailPage() {
 
   const discount = Math.round((1 - listing.price / listing.originalPrice) * 100)
   const soldOut = listing.status === 'sold_out' || listing.quantityRemaining === 0
+
+  const PAY_OPTIONS: Array<{ key: PayMethod; label: string; icon: React.ElementType }> = [
+    { key: 'card',          label: t('payment.card'),        icon: CreditCard },
+    { key: 'cod',           label: t('payment.cod'),         icon: Truck },
+    { key: 'bank_transfer', label: t('payment.bankTransfer'), icon: Banknote },
+  ]
 
   return (
     <div className="min-h-screen bg-background pb-32">
@@ -111,6 +140,58 @@ export default function ListingDetailPage() {
                 </div>
               ))}
             </div>
+
+            {/* Payment method selector */}
+            <div className="bg-surface-container-low rounded-xl border border-surface-container-high p-4 flex flex-col gap-3">
+              <p className="text-label-caps text-on-surface-variant uppercase tracking-wider">{t('payment.selectMethod')}</p>
+              <div className="grid grid-cols-3 gap-2">
+                {PAY_OPTIONS.map(({ key, label, icon: Icon }) => (
+                  <button
+                    key={key}
+                    onClick={() => setPayMethod(key)}
+                    className={`flex flex-col items-center gap-1.5 p-3 rounded-lg border text-body-sm font-semibold transition-colors ${
+                      payMethod === key
+                        ? 'border-primary text-primary bg-surface-container'
+                        : 'border-outline-variant text-on-surface-variant hover:border-primary/50'
+                    }`}
+                  >
+                    <Icon size={18} />
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {/* COD note */}
+              {payMethod === 'cod' && (
+                <div className="bg-surface-container border border-outline-variant rounded-lg p-3 text-body-sm text-on-surface-variant">
+                  {t('payment.codNote')}
+                </div>
+              )}
+
+              {/* Bank transfer details */}
+              {payMethod === 'bank_transfer' && (
+                <div className="bg-surface-container border border-outline-variant rounded-lg p-3 flex flex-col gap-2">
+                  {bankInfo ? (
+                    <>
+                      <p className="text-label-caps text-on-surface-variant uppercase tracking-wider mb-1">{t('payment.bankDetails')}</p>
+                      {[
+                        { label: t('payment.bankName'), value: bankInfo.bankName },
+                        { label: t('payment.bankAccount'), value: bankInfo.bankAccount },
+                        { label: t('payment.bankAccountName'), value: bankInfo.bankAccountName },
+                      ].map(({ label, value }) => (
+                        <div key={label} className="flex justify-between text-body-sm">
+                          <span className="text-on-surface-variant">{label}</span>
+                          <span className="text-on-surface font-semibold">{value}</span>
+                        </div>
+                      ))}
+                      <p className="text-xs text-on-surface-variant mt-1">{t('payment.bankTransferNote')}</p>
+                    </>
+                  ) : (
+                    <p className="text-body-sm text-on-surface-variant">{t('payment.noBankInfo')}</p>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -123,7 +204,11 @@ export default function ListingDetailPage() {
             disabled={soldOut || loading}
             className="w-full"
           >
-            {soldOut ? t('listing.soldOut') : loading ? t('listing.claiming') : `${t('listing.buyNow')} — ${listing.price.toLocaleString('vi-VN')} đ`}
+            {soldOut
+              ? t('listing.soldOut')
+              : loading
+              ? t('listing.claiming')
+              : `${t('listing.buyNow')} — ${listing.price.toLocaleString('vi-VN')} đ`}
           </GradientButton>
         </div>
       </div>

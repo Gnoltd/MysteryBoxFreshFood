@@ -54,4 +54,23 @@
   .gradient-border-box {
     box-shadow: 0 0 0 1px #8083ff;
   }
+  .gradient-border-top {
+    position: relative;
+  }
+  .gradient-border-top::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, #494bd6, #6f00be);
+    border-radius: inherit;
+  }
+  .blob {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(120px);
+    pointer-events: none;
+  }
 }
