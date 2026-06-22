@@ -15,11 +15,14 @@ export function StarRating({ value, onChange, size = 'md' }: StarRatingProps) {
           onClick={() => onChange?.(star)}
           disabled={!onChange}
           aria-label={`${star} star`}
-          className={`${sizeClass} transition-colors ${
-            star <= value ? 'text-yellow-400' : 'text-slate-600'
-          } ${onChange ? 'hover:text-yellow-300 cursor-pointer' : 'cursor-default'} disabled:cursor-default`}
+          className={`transition-opacity ${onChange ? 'hover:opacity-80 cursor-pointer' : 'cursor-default'} disabled:cursor-default`}
+          style={{ opacity: star <= value ? 1 : 0.25, filter: star <= value ? 'none' : 'grayscale(1)' }}
         >
-          ★
+          <img
+            src="/images/icons/star.png"
+            alt={`${star} star`}
+            className={size === 'sm' ? 'w-4 h-4' : size === 'lg' ? 'w-6 h-6' : 'w-5 h-5'}
+          />
         </button>
       ))}
     </div>

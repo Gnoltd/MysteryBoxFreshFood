@@ -64,7 +64,10 @@ export default function GoogleSetupPage() {
                     : 'border-slate-700 text-slate-400 hover:border-slate-500'
                 }`}
               >
-                {r === 'customer' ? `🛒 ${t('auth.customer')}` : `🏪 ${t('auth.vendor')}`}
+                <span className="flex items-center justify-center gap-1.5">
+                  <img src={r === 'customer' ? '/images/icons/customer.png' : '/images/icons/vendor.png'} alt="" className="w-4 h-4 object-contain" />
+                  {r === 'customer' ? t('auth.customer') : t('auth.vendor')}
+                </span>
               </button>
             ))}
           </div>

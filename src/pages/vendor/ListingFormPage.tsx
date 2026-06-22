@@ -118,7 +118,9 @@ export default function ListingFormPage() {
           {(['mystery_box', 'item'] as const).map(tp => (
             <button key={tp} type="button" onClick={() => setType(tp)}
               className={`py-2 rounded-xl border text-sm font-medium ${type === tp ? 'border-primary bg-primary/10 text-primary' : 'border-outline-variant text-on-surface-variant'}`}>
-              {tp === 'mystery_box' ? '🎁 Mystery Box' : '📦 Single Item'}
+              {tp === 'mystery_box'
+                ? <span className="flex items-center justify-center gap-1.5"><img src="/images/icons/mystery-box.png" alt="" className="w-4 h-4 object-contain" /> {t('vendor.mysteryBox')}</span>
+                : <span className="flex items-center justify-center gap-1.5"><img src="/images/icons/single-item.png" alt="" className="w-4 h-4 object-contain" /> {t('vendor.singleItem')}</span>}
             </button>
           ))}
         </div>

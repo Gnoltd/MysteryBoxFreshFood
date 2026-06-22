@@ -79,7 +79,7 @@ export default function VendorStorePage() {
         <div className="bg-surface-container border border-outline-variant rounded-xl p-6 mb-6">
           <h1 className="text-headline-md font-bold text-on-surface mb-1">{vendor.storeName}</h1>
           {vendor.address && (
-            <p className="text-on-surface-variant text-body-sm mb-2">📍 {vendor.address}</p>
+            <p className="text-on-surface-variant text-body-sm mb-2 flex items-center gap-1"><img src="/images/icons/location.png" alt="" className="w-4 h-4 object-contain" /> {vendor.address}</p>
           )}
           {vendor.storeDescription && (
             <p className="text-on-surface-variant text-body-sm mb-3">{vendor.storeDescription}</p>

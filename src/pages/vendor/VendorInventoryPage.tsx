@@ -22,8 +22,13 @@ const ALL_CATEGORIES: ListingCategory[] = [
 ]
 
 const CATEGORY_ICONS: Record<ListingCategory, string> = {
-  bakery: '🥐', fruit: '🍎', vegetables: '🥬', dairy: '🥛', meat: '🥩',
-  drinks: '🥤', other: '📦',
+  bakery: '/images/icons/bakery.png',
+  fruit: '/images/icons/fruit.png',
+  vegetables: '/images/icons/vegetables.png',
+  dairy: '/images/icons/dairy.png',
+  meat: '/images/icons/meat.png',
+  drinks: '/images/icons/drinks.png',
+  other: '/images/icons/other.png',
 }
 
 interface FormState {
@@ -194,7 +199,7 @@ export default function VendorInventoryPage() {
             <div key={item.id} className={`bg-surface-container border rounded-xl p-4 flex items-center gap-4 ${
               label === 'today' ? 'border-red-500/60' : label === 'soon' ? 'border-amber-500/60' : 'border-outline-variant'
             }`}>
-              <span className="text-2xl">{CATEGORY_ICONS[item.category]}</span>
+              <img src={CATEGORY_ICONS[item.category]} alt={item.category} className="w-8 h-8 object-contain" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <p className="text-on-surface font-medium">{item.name}</p>

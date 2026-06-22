@@ -39,7 +39,7 @@ export default function OrdersPage() {
 
       {orders.length === 0 ? (
         <div className="text-center py-20 text-on-surface-variant">
-          <div className="text-5xl mb-4">🛍️</div>
+          <img src="/images/icons/bag.png" alt="" className="w-14 h-14 mx-auto mb-4 object-contain" />
           <p className="text-body-lg">{t('order.noOrders')}</p>
         </div>
       ) : (
@@ -73,7 +73,7 @@ export default function OrdersPage() {
                 {/* Footer: boxes + price */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-on-surface-variant text-body-sm">
-                    <span>📦</span>
+                    <img src="/images/icons/single-item.png" alt="" className="w-4 h-4 object-contain" />
                     <span>×{order.quantity} {t('order.boxes')}</span>
                   </div>
                   <span className="text-primary font-bold text-body-sm">

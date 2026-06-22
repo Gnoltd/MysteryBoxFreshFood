@@ -75,7 +75,7 @@ export default function VendorOrdersPage() {
                 </p>
                 {o.boxContents && o.boxContents.length > 0 && (
                   <p className="text-outline text-xs mt-1">
-                    📦 {t('vendor.each_box')}: {o.boxContents.map(b => `${b.qty}× ${b.name}`).join(', ')}
+                    <img src="/images/icons/single-item.png" alt="" className="w-3 h-3 object-contain inline mr-1" />{t('vendor.each_box')}: {o.boxContents.map(b => `${b.qty}× ${b.name}`).join(', ')}
                   </p>
                 )}
                 <div className="mt-1 hidden md:block">

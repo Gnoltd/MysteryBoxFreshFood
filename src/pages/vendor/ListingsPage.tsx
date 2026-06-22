@@ -95,7 +95,7 @@ export default function ListingsPage() {
                     <div className="flex items-center gap-3">
                       {l.imageUrl
                         ? <img src={l.imageUrl} alt={l.title} className="w-10 h-10 rounded-lg object-cover shrink-0" />
-                        : <div className="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-lg shrink-0">🎁</div>}
+                        : <div className="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center shrink-0"><img src="/images/icons/mystery-box.png" alt="" className="w-6 h-6 object-contain" /></div>}
                       <span className="text-on-surface font-semibold truncate max-w-[160px]">{l.title}</span>
                     </div>
                   </td>

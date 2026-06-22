@@ -7,15 +7,15 @@ import { MysteryCard } from '../../components/shared/MysteryCard'
 import { Search } from 'lucide-react'
 import type { Listing, ListingCategory } from '../../types'
 
-const CATEGORIES: { value: ListingCategory | 'all'; label: string }[] = [
+const CATEGORIES: { value: ListingCategory | 'all'; label: string; icon?: string }[] = [
   { value: 'all',        label: 'All' },
-  { value: 'bakery',     label: '🥐 Bakery' },
-  { value: 'fruit',      label: '🍎 Fruit' },
-  { value: 'vegetables', label: '🥦 Vegetables' },
-  { value: 'dairy',      label: '🧀 Dairy' },
-  { value: 'meat',       label: '🥩 Meat' },
-  { value: 'drinks',     label: '🧃 Drinks' },
-  { value: 'other',      label: '📦 Other' },
+  { value: 'bakery',     label: 'Bakery',     icon: '/images/icons/bakery.png' },
+  { value: 'fruit',      label: 'Fruit',      icon: '/images/icons/fruit.png' },
+  { value: 'vegetables', label: 'Vegetables', icon: '/images/icons/vegetables.png' },
+  { value: 'dairy',      label: 'Dairy',      icon: '/images/icons/dairy.png' },
+  { value: 'meat',       label: 'Meat',       icon: '/images/icons/meat.png' },
+  { value: 'drinks',     label: 'Drinks',     icon: '/images/icons/drinks.png' },
+  { value: 'other',      label: 'Other',      icon: '/images/icons/other.png' },
 ]
 
 type SortKey = 'newest' | 'price_asc' | 'price_desc' | 'discount'
@@ -64,8 +64,9 @@ export default function BrowsePage() {
     <div>
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-headline-lg-mobile font-bold text-on-surface">
+        <h1 className="text-headline-lg-mobile font-bold text-on-surface flex items-center gap-2">
           {t('browse.greeting', { name: userProfile?.displayName?.split(' ')[0] ?? '' })}
+          <img src="/images/icons/wave.png" alt="" className="w-7 h-7 object-contain" />
         </h1>
         <p className="text-on-surface-variant text-body-lg mt-1">{t('browse.subtitle')}</p>
       </div>
@@ -82,7 +83,10 @@ export default function BrowsePage() {
                 : 'bg-surface-container border-outline-variant text-on-surface-variant hover:border-primary/50'
             }`}
           >
-            {cat.label}
+            <span className="flex items-center gap-1.5">
+              {cat.icon && <img src={cat.icon} alt="" className="w-4 h-4 object-contain" />}
+              {cat.label}
+            </span>
           </button>
         ))}
       </div>
@@ -150,7 +154,7 @@ export default function BrowsePage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center py-20 text-on-surface-variant">
-            <div className="text-5xl mb-4">📦</div>
+            <img src="/images/icons/single-item.png" alt="" className="w-14 h-14 mx-auto mb-4 object-contain" />
             <p className="text-body-lg">{t('browse.noListings')}</p>
           </div>
         ) : (

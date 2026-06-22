@@ -73,7 +73,7 @@ export default function QRScanPage() {
       {status === 'success' && result && (
         <div className="absolute inset-0 bg-emerald-500/20 flex items-center justify-center">
           <div className="bg-surface-container border border-emerald-500/50 rounded-xl p-6 text-center">
-            <div className="text-5xl mb-4">✅</div>
+            <img src="/images/icons/success.png" alt="success" className="w-12 h-12 mx-auto mb-4 object-contain" />
             <h2 className="text-on-surface text-xl font-bold">{t('vendor.pickupConfirmed')}</h2>
             <p className="text-on-surface-variant mt-2">{result.listingTitle}</p>
             <p className="text-on-surface-variant text-sm">
@@ -92,7 +92,7 @@ export default function QRScanPage() {
       {status === 'error' && (
         <div className="absolute inset-0 bg-error-container/20 flex items-center justify-center">
           <div className="bg-surface-container border border-error-token/50 rounded-xl p-6 text-center text-error-token">
-            <div className="text-5xl mb-4">❌</div>
+            <img src="/images/icons/failure.png" alt="failure" className="w-12 h-12 mx-auto mb-4 object-contain" />
             <h2 className="text-on-surface text-xl font-bold">{t('vendor.invalidQR')}</h2>
             <p className="text-red-400 mt-2">{errorMsg}</p>
             <button

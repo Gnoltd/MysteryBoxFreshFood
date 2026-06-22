@@ -3,9 +3,14 @@ import { TimerBadge } from './TimerBadge'
 import { StockBadge } from './StockBadge'
 import type { Listing, ListingCategory } from '../../types'
 
-const CATEGORY_EMOJI: Record<ListingCategory, string> = {
-  bakery: '🥐', fruit: '🍎', vegetables: '🥦', dairy: '🧀', meat: '🥩',
-  drinks: '🧃', other: '📦',
+const CATEGORY_ICON: Record<ListingCategory, string> = {
+  bakery: '/images/icons/bakery.png',
+  fruit: '/images/icons/fruit.png',
+  vegetables: '/images/icons/vegetables.png',
+  dairy: '/images/icons/dairy.png',
+  meat: '/images/icons/meat.png',
+  drinks: '/images/icons/drinks.png',
+  other: '/images/icons/other.png',
 }
 
 const CATEGORY_IMAGE: Record<ListingCategory, string> = {
@@ -26,7 +31,7 @@ interface MysteryCardProps {
 export function MysteryCard({ listing, onClick }: MysteryCardProps) {
   const { t } = useTranslation()
   const discount = Math.round((1 - listing.price / listing.originalPrice) * 100)
-  const emoji = CATEGORY_EMOJI[listing.category] ?? '📦'
+  const categoryIcon = CATEGORY_ICON[listing.category]
   const categoryImage = CATEGORY_IMAGE[listing.category]
 
   return (
@@ -52,9 +57,9 @@ export function MysteryCard({ listing, onClick }: MysteryCardProps) {
           -{discount}%
         </span>
 
-        {/* Category emoji top-left */}
-        <span className="absolute top-2 left-2 bg-surface-container/80 backdrop-blur-sm rounded-full px-2 py-0.5 text-sm">
-          {emoji}
+        {/* Category icon top-left */}
+        <span className="absolute top-2 left-2 bg-surface-container/80 backdrop-blur-sm rounded-full p-1.5">
+          <img src={categoryIcon} alt={listing.category} className="w-4 h-4 object-contain" />
         </span>
 
         {/* Pickup timer badge overlay */}

@@ -42,7 +42,7 @@ export default function CheckoutSuccessPage() {
 
         {/* Icon */}
         <div className="relative w-24 h-24 rounded-full bg-surface-variant border border-outline-variant flex items-center justify-center text-5xl">
-          ✅
+          <img src="/images/icons/success.png" alt="success" className="w-12 h-12 object-contain" />
         </div>
 
         <div>

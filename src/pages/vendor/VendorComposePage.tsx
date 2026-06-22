@@ -27,8 +27,13 @@ const ALL_CATEGORIES: ListingCategory[] = [
 ]
 
 const CATEGORY_ICONS: Record<ListingCategory, string> = {
-  bakery: '🥐', fruit: '🍎', vegetables: '🥬', dairy: '🥛', meat: '🥩',
-  drinks: '🥤', other: '📦',
+  bakery: '/images/icons/bakery.png',
+  fruit: '/images/icons/fruit.png',
+  vegetables: '/images/icons/vegetables.png',
+  dairy: '/images/icons/dairy.png',
+  meat: '/images/icons/meat.png',
+  drinks: '/images/icons/drinks.png',
+  other: '/images/icons/other.png',
 }
 
 function localDatetime(d: Date): string {
@@ -279,7 +284,7 @@ export default function VendorComposePage() {
                     <div className="flex items-center gap-2 min-w-0">
                       <input type="checkbox" checked={selected} readOnly
                         className="w-4 h-4 accent-primary pointer-events-none shrink-0" />
-                      <span className="text-lg shrink-0">{CATEGORY_ICONS[item.category]}</span>
+                      <img src={CATEGORY_ICONS[item.category]} alt={item.category} className="w-5 h-5 object-contain shrink-0" />
                       <div className="min-w-0">
                         <p className="text-on-surface text-body-sm font-semibold truncate">{item.name}</p>
                         <p className="text-outline text-xs">{item.unitPrice.toLocaleString('vi-VN')} đ / {item.unit}</p>
@@ -410,7 +415,7 @@ export default function VendorComposePage() {
               disabled={selectedItems.size === 0 || composerLoading}
               className="flex-1 flex items-center justify-center gap-2 py-2 px-3 bg-secondary-container text-on-secondary rounded-xl font-semibold text-body-sm hover:opacity-90 transition-opacity disabled:opacity-50"
             >
-              <span>✨</span>
+              <img src="/images/icons/sparkle.png" alt="" className="w-4 h-4 object-contain" />
               {composerLoading ? t('vendor.ai_composing') : t('vendor.ai_compose_btn')}
             </button>
           </div>
@@ -425,7 +430,7 @@ export default function VendorComposePage() {
           <div className="bg-surface-container border border-outline-variant rounded-xl p-5 shrink-0" style={{ borderTop: '2px solid var(--color-secondary-token, #8083ff)' }}>
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-semibold text-secondary-token flex items-center gap-2 text-body-sm">
-                🤖 {t('vendor.ai_result')}
+                <img src="/images/icons/robot.png" alt="" className="w-4 h-4 object-contain" /> {t('vendor.ai_result')}
               </h3>
               <span className="bg-surface-container-high text-on-surface-variant text-[10px] font-bold uppercase px-2 py-0.5 rounded tracking-wider">ZONE 2</span>
             </div>
@@ -510,7 +515,7 @@ export default function VendorComposePage() {
             {/* Scrollable form */}
             <div className="flex-1 overflow-y-auto p-5 space-y-4 z-10">
               <span className="inline-block bg-secondary-token/10 text-secondary-token border border-secondary-token/20 px-2 py-1 rounded text-xs font-bold">
-                ✨ {t('vendor.ai_suggestion')} ({t('vendor.editable')})
+                <img src="/images/icons/sparkle.png" alt="" className="w-3 h-3 object-contain inline mr-1" />{t('vendor.ai_suggestion')} ({t('vendor.editable')})
               </span>
 
               {/* Category */}
@@ -534,7 +539,7 @@ export default function VendorComposePage() {
               <div>
                 <label className="block text-on-surface-variant text-body-sm font-medium mb-1">{t('vendor.title')}</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary-token text-sm pointer-events-none">✨</span>
+                  <img src="/images/icons/sparkle.png" alt="" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 object-contain pointer-events-none" />
                   <Input
                     value={editTitle}
                     onChange={e => setEditTitle(e.target.value)}

@@ -50,7 +50,7 @@ export default function RegisterPage() {
           {/* Icon + heading */}
           <div className="flex items-center gap-3 mb-2">
             <div className="w-12 h-12 bg-surface-variant border border-outline-variant rounded-lg flex items-center justify-center text-2xl">
-              🍱
+              <img src="/images/icons/app-logo.png" alt="MysteryBox" className="w-8 h-8 object-contain" />
             </div>
             <div>
               <h2 className="text-headline-md font-bold text-on-surface">{t('auth.createAccount')}</h2>
