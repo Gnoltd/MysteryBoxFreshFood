@@ -6,7 +6,8 @@ import { db } from '../../firebase'
 import { QRCodeCanvas } from 'qrcode.react'
 import { StatusChip } from '../../components/shared/StatusChip'
 import { useAuth } from '../../contexts/AuthContext'
-import { ArrowLeft, Share2, Download, Star } from 'lucide-react'
+import { submitReview, getReviewForOrder } from '../../services/reviews'
+import { ArrowLeft, Share2, Download, Star, CheckCircle } from 'lucide-react'
 import type { Order } from '../../types'
 
 const STATUS_STEPS: Array<{ key: string; labelKey: string }> = [
@@ -17,12 +18,14 @@ const STATUS_STEPS: Array<{ key: string; labelKey: string }> = [
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { t } = useTranslation()
-  const { userProfile } = useAuth()
+  const { currentUser, userProfile } = useAuth()
   const [order, setOrder] = useState<Order | null>(null)
   const [rating, setRating] = useState(0)
   const [hoverRating, setHoverRating] = useState(0)
   const [comment, setComment] = useState('')
   const [copied, setCopied] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
   const qrRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -51,6 +54,30 @@ export default function OrderDetailPage() {
     : null
 
   const canRate = order.status === 'picked_up'
+
+  // Check if already reviewed
+  useEffect(() => {
+    if (!order || !canRate) return
+    getReviewForOrder(order.id).then(r => { if (r) { setRating(r.rating); setComment(r.comment); setSubmitted(true) } })
+  }, [order?.id, canRate])
+
+  const handleSubmitRating = async () => {
+    if (!order || !currentUser || rating === 0 || submitting || submitted) return
+    setSubmitting(true)
+    try {
+      await submitReview({
+        orderId: order.id,
+        listingId: order.listingId,
+        vendorId: order.vendorId,
+        customerId: currentUser.uid,
+        rating,
+        comment,
+      })
+      setSubmitted(true)
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   const handleShare = async () => {
     const url = window.location.href
@@ -207,12 +234,20 @@ export default function OrderDetailPage() {
             rows={3}
             className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors disabled:cursor-not-allowed resize-none"
           />
-          <button
-            disabled={!canRate || rating === 0}
-            className="gradient-bg text-white rounded-lg py-2.5 font-semibold text-body-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {t('order.submitRating')}
-          </button>
+          {submitted ? (
+            <div className="flex items-center justify-center gap-2 text-[rgb(16,185,129)] text-body-sm font-semibold py-2">
+              <CheckCircle size={16} />
+              {t('order.ratingSubmitted', 'Review submitted — thank you!')}
+            </div>
+          ) : (
+            <button
+              onClick={handleSubmitRating}
+              disabled={!canRate || rating === 0 || submitting}
+              className="gradient-bg text-white rounded-lg py-2.5 font-semibold text-body-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {submitting ? t('order.submitting', 'Submitting…') : t('order.submitRating')}
+            </button>
+          )}
           {!canRate && (
             <p className="text-on-surface-variant text-xs text-center">{t('order.rateAfterPickup')}</p>
           )}

@@ -29,7 +29,7 @@ export const createCheckoutSession = functions.https.onCall(
     throw new functions.https.HttpsError('failed-precondition', 'Not enough stock')
   }
 
-  const appUrl = functions.config().app?.url ?? 'https://mystery-box-fresh-food.vercel.app'
+  const appUrl = 'https://mystery-box-fresh-food.vercel.app'
   const orderId = db.collection('orders').doc().id
 
   const session = await stripe.checkout.sessions.create({
