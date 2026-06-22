@@ -146,7 +146,9 @@
     "cancelledMsg": "Your box is still available — go back and try again.",
     "noOrders": "No orders yet — start browsing!",
     "box": "Box",
-    "orderId": "Order ID"
+    "orderId": "Order ID",
+    "ordersSubtitle": "Manage your recent marketplace claims and subscriptions.",
+    "boxes": "Boxes"
   },
   "vendor": {
     "dashboard": "Dashboard",
