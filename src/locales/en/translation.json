@@ -148,7 +148,20 @@
     "box": "Box",
     "orderId": "Order ID",
     "ordersSubtitle": "Manage your recent marketplace claims and subscriptions.",
-    "boxes": "Boxes"
+    "boxes": "Boxes",
+    "pickupToday": "Pick up today before {{time}}",
+    "items": "Items",
+    "total": "Total",
+    "pickupQR": "Pickup QR Code",
+    "showVendor": "Show this QR code to the vendor when picking up",
+    "share": "Share",
+    "saveQR": "Save QR",
+    "paymentDetails": "Payment Details",
+    "method": "Method",
+    "rateExperience": "Rate Your Experience",
+    "ratePlaceholder": "Tell us about your experience...",
+    "submitRating": "Submit Rating",
+    "rateAfterPickup": "You can rate after picking up your order"
   },
   "vendor": {
     "dashboard": "Dashboard",

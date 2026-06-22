@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { onSnapshot, doc } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { QRCodeSVG } from 'qrcode.react'
-import { GlassNav } from '../../components/shared/GlassNav'
 import { StatusChip } from '../../components/shared/StatusChip'
+import { useAuth } from '../../contexts/AuthContext'
+import { ArrowLeft, Share2, Download, Star } from 'lucide-react'
 import type { Order } from '../../types'
 
 const STATUS_STEPS: Array<{ key: string; labelKey: string }> = [
@@ -16,7 +17,11 @@ const STATUS_STEPS: Array<{ key: string; labelKey: string }> = [
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { t } = useTranslation()
+  const { userProfile } = useAuth()
   const [order, setOrder] = useState<Order | null>(null)
+  const [rating, setRating] = useState(0)
+  const [hoverRating, setHoverRating] = useState(0)
+  const [comment, setComment] = useState('')
 
   useEffect(() => {
     if (!id) return
@@ -32,20 +37,63 @@ export default function OrderDetailPage() {
     </div>
   )
 
+  const initials = userProfile?.displayName
+    ? userProfile.displayName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
+    : '?'
+
   const statusVariant = order.status === 'picked_up' ? 'emerald' : order.status === 'paid' ? 'primary' : 'rose'
+  const orderRef = '#SVR-' + order.id.slice(0, 6).toUpperCase()
+
+  const pickupTime = order.pickupEnd
+    ? new Date(order.pickupEnd.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    : null
+
+  const canRate = order.status === 'picked_up'
 
   return (
-    <div className="min-h-screen bg-background pb-8">
-      <GlassNav backHref="/orders" backLabel={t('nav.myOrders')} />
-      <div className="pt-20 max-w-md mx-auto px-6 flex flex-col gap-6">
-        <div className="flex flex-col items-center gap-4">
-          <div className="p-4 bg-surface-container border border-outline-variant rounded-xl">
-            <QRCodeSVG value={order.qrCode} size={200} bgColor="transparent" fgColor="#dce1fb" />
-          </div>
+    <div className="min-h-screen bg-background pb-16">
+      {/* Top bar */}
+      <div className="flex items-center justify-between px-4 pt-4 pb-2 max-w-lg mx-auto">
+        <Link to="/orders" className="flex items-center gap-1 text-on-surface-variant text-body-sm hover:text-on-surface transition-colors">
+          <ArrowLeft size={16} /> {t('nav.myOrders')}
+        </Link>
+        <p className="gradient-text font-bold text-body-sm">MysteryBox</p>
+        <div className="w-8 h-8 rounded-full gradient-bg flex items-center justify-center text-white text-xs font-bold">
+          {initials}
+        </div>
+      </div>
+
+      <div className="max-w-lg mx-auto px-4 flex flex-col gap-5 mt-2">
+        {/* Status + order ref */}
+        <div className="flex flex-col items-center gap-2 text-center">
           <StatusChip variant={statusVariant}>{t(`order.status_${order.status}`)}</StatusChip>
+          <p className="text-on-surface-variant text-body-sm">{orderRef}</p>
         </div>
 
-        {/* Live status bar */}
+        {/* Title + subtitle */}
+        <div className="text-center">
+          <h1 className="text-headline-lg-mobile font-bold text-on-surface">{order.listingTitle}</h1>
+          {pickupTime && (
+            <p className="text-on-surface-variant text-body-sm mt-1">
+              {t('order.pickupToday', { time: pickupTime })}
+            </p>
+          )}
+        </div>
+
+        {/* Stat tiles */}
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { label: t('order.items'), value: String(order.quantity) },
+            { label: t('order.total'), value: `${order.totalPrice.toLocaleString('vi-VN')} đ` },
+          ].map(({ label, value }) => (
+            <div key={label} className="bg-surface-container border border-outline-variant rounded-lg p-3 flex flex-col gap-1">
+              <span className="text-label-caps text-on-surface-variant uppercase tracking-wider">{label}</span>
+              <span className="text-mono-stat font-semibold text-on-surface">{value}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Live status tracker */}
         <div className="flex items-center gap-3">
           {STATUS_STEPS.map((step) => {
             const done = order.status === 'picked_up' || step.key === 'paid'
@@ -59,18 +107,86 @@ export default function OrderDetailPage() {
           })}
         </div>
 
-        {/* Info */}
-        <div className="bg-surface-container border border-outline-variant rounded-xl p-4 flex flex-col gap-2">
-          {[
-            { label: t('order.box'),     value: order.listingTitle },
-            { label: t('order.amount'),  value: `${order.totalPrice.toLocaleString('vi-VN')} đ` },
-            { label: t('order.orderId'), value: order.id.slice(0, 8).toUpperCase() },
-          ].map(({ label, value }) => (
-            <div key={label} className="flex justify-between">
-              <span className="text-on-surface-variant text-body-sm">{label}</span>
-              <span className="text-on-surface text-body-sm font-semibold">{value}</span>
+        {/* QR section */}
+        <div className="bg-surface-container border border-outline-variant rounded-xl p-5 flex flex-col items-center gap-4">
+          <div>
+            <p className="text-on-surface font-semibold text-center">{t('order.pickupQR')}</p>
+            <p className="text-on-surface-variant text-body-sm text-center mt-1">{t('order.showVendor')}</p>
+          </div>
+
+          {/* QR code on white bg */}
+          <div className="bg-white p-4 rounded-xl">
+            <QRCodeSVG value={order.qrCode} size={180} bgColor="#ffffff" fgColor="#000000" />
+          </div>
+
+          <p className="text-primary font-mono text-body-sm tracking-wider">{order.qrCode.slice(0, 16).toUpperCase()}</p>
+
+          <div className="flex gap-3 w-full">
+            <button className="flex-1 flex items-center justify-center gap-2 border border-outline-variant text-on-surface-variant rounded-lg py-2.5 text-body-sm hover:border-primary hover:text-on-surface transition-colors">
+              <Share2 size={15} /> {t('order.share')}
+            </button>
+            <button className="flex-1 flex items-center justify-center gap-2 gradient-bg text-white rounded-lg py-2.5 text-body-sm font-semibold hover:opacity-90 transition-opacity">
+              <Download size={15} /> {t('order.saveQR')}
+            </button>
+          </div>
+        </div>
+
+        {/* Payment details */}
+        {order.paymentMethod && (
+          <div className="bg-surface-container border border-outline-variant rounded-xl p-5 flex flex-col gap-3">
+            <p className="text-on-surface font-semibold">{t('order.paymentDetails')}</p>
+            <div className="flex flex-col gap-2">
+              {[
+                { label: t('order.method'), value: t(`payment.${order.paymentMethod}`) },
+                { label: t('order.orderId'), value: order.id.slice(0, 8).toUpperCase() },
+                { label: t('order.amount'), value: `${order.totalPrice.toLocaleString('vi-VN')} đ` },
+              ].map(({ label, value }) => (
+                <div key={label} className="flex justify-between">
+                  <span className="text-on-surface-variant text-body-sm">{label}</span>
+                  <span className="text-on-surface text-body-sm font-semibold">{value}</span>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+        )}
+
+        {/* Rate experience */}
+        <div className={`bg-surface-container border border-outline-variant rounded-xl p-5 flex flex-col gap-4 ${!canRate ? 'opacity-50' : ''}`}>
+          <p className="text-on-surface font-semibold">{t('order.rateExperience')}</p>
+          <div className="flex gap-1">
+            {[1,2,3,4,5].map(star => (
+              <button
+                key={star}
+                disabled={!canRate}
+                onClick={() => canRate && setRating(star)}
+                onMouseEnter={() => canRate && setHoverRating(star)}
+                onMouseLeave={() => setHoverRating(0)}
+                className="transition-transform hover:scale-110 disabled:cursor-not-allowed"
+              >
+                <Star
+                  size={28}
+                  className={star <= (hoverRating || rating) ? 'text-tertiary fill-tertiary' : 'text-outline'}
+                />
+              </button>
+            ))}
+          </div>
+          <textarea
+            disabled={!canRate}
+            value={comment}
+            onChange={e => setComment(e.target.value)}
+            placeholder={t('order.ratePlaceholder')}
+            rows={3}
+            className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors disabled:cursor-not-allowed resize-none"
+          />
+          <button
+            disabled={!canRate || rating === 0}
+            className="gradient-bg text-white rounded-lg py-2.5 font-semibold text-body-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {t('order.submitRating')}
+          </button>
+          {!canRate && (
+            <p className="text-on-surface-variant text-xs text-center">{t('order.rateAfterPickup')}</p>
+          )}
         </div>
       </div>
     </div>

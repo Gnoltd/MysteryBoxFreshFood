@@ -147,7 +147,20 @@
     "box": "Hộp",
     "orderId": "Mã đơn",
     "ordersSubtitle": "Quản lý các đơn hàng gần đây của bạn.",
-    "boxes": "Hộp"
+    "boxes": "Hộp",
+    "pickupToday": "Nhận trước {{time}} hôm nay",
+    "items": "Sản phẩm",
+    "total": "Tổng cộng",
+    "pickupQR": "Mã QR nhận hàng",
+    "showVendor": "Cho nhà bán thấy mã QR này khi nhận hàng",
+    "share": "Chia sẻ",
+    "saveQR": "Lưu QR",
+    "paymentDetails": "Chi tiết thanh toán",
+    "method": "Phương thức",
+    "rateExperience": "Đánh giá trải nghiệm",
+    "ratePlaceholder": "Kể về trải nghiệm của bạn...",
+    "submitRating": "Gửi đánh giá",
+    "rateAfterPickup": "Bạn có thể đánh giá sau khi nhận hàng"
   },
   "vendor": {
     "dashboard": "Tổng quan",
