@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Mail, Lock } from 'lucide-react'
 import { signIn, signInWithGoogle } from '../../services/auth'
 import { savePushToken } from '../../services/pushNotifications'
 
@@ -42,9 +43,6 @@ export default function LoginPage() {
     }
   }
 
-  const inputClass =
-    'w-full bg-[#020617] border border-[#1e293b] rounded h-12 px-4 text-body-lg text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors'
-
   return (
     <div className="w-full max-w-[448px]">
       {/* Brand */}
@@ -63,28 +61,37 @@ export default function LoginPage() {
             <label className="text-label-caps text-on-surface-variant uppercase tracking-wider">
               {t('auth.email')}
             </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className={inputClass}
-              placeholder="you@example.com"
-            />
+            <div className="relative">
+              <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" />
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full bg-[#020617] border border-[#1e293b] rounded h-12 pl-10 pr-4 text-body-lg text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                placeholder="you@example.com"
+              />
+            </div>
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-label-caps text-on-surface-variant uppercase tracking-wider">
-              {t('auth.password')}
-            </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className={inputClass}
-              placeholder="••••••••"
-            />
+            <div className="flex items-center justify-between">
+              <label className="text-label-caps text-on-surface-variant uppercase tracking-wider">
+                {t('auth.password')}
+              </label>
+              <span className="text-primary text-body-sm cursor-pointer hover:underline">{t('auth.forgot')}</span>
+            </div>
+            <div className="relative">
+              <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" />
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="w-full bg-[#020617] border border-[#1e293b] rounded h-12 pl-10 pr-4 text-body-lg text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                placeholder="••••••••"
+              />
+            </div>
           </div>
 
           {error && <p className="text-error-token text-body-sm">{error}</p>}

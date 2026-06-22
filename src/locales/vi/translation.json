@@ -36,7 +36,8 @@
     "setupDescription": "Cho chúng tôi biết bạn sử dụng MysteryBox như thế nào",
     "setupSubmit": "Bắt đầu",
     "setupLoading": "Đang thiết lập…",
-    "setupError": "Đã có lỗi xảy ra — vui lòng thử lại"
+    "setupError": "Đã có lỗi xảy ra — vui lòng thử lại",
+    "forgot": "Quên mật khẩu?"
   },
   "browse": {
     "title": "Khám phá Hộp Dư Thừa",

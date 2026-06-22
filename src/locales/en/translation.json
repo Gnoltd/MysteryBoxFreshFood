@@ -36,7 +36,8 @@
     "setupDescription": "Tell us how you'll use MysteryBox",
     "setupSubmit": "Get started",
     "setupLoading": "Setting up…",
-    "setupError": "Something went wrong — please try again"
+    "setupError": "Something went wrong — please try again",
+    "forgot": "Forgot?"
   },
   "browse": {
     "title": "Browse Surplus Boxes",
