@@ -73,4 +73,7 @@
     filter: blur(120px);
     pointer-events: none;
   }
+  .ai-shadow {
+    box-shadow: 0px 4px 12px rgba(113, 42, 226, 0.15);
+  }
 }
