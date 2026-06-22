@@ -4,10 +4,11 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { subscribeToVendorListings } from '../../services/listings'
 import { getVendorOrders } from '../../services/orders'
+import { updateVendorProfile } from '../../services/auth'
 import { StatusChip } from '../../components/shared/StatusChip'
 import { LineChart, Line, ResponsiveContainer, Tooltip } from 'recharts'
 import type { Listing, Order } from '../../types'
-import { Package, ShoppingBag, TrendingUp, Star, QrCode, Wand2, PlusCircle } from 'lucide-react'
+import { Package, ShoppingBag, TrendingUp, Star, QrCode, Wand2, PlusCircle, Pencil, Check, X } from 'lucide-react'
 
 export default function VendorDashboardPage() {
   const { t } = useTranslation()
@@ -15,12 +16,37 @@ export default function VendorDashboardPage() {
   const [listings, setListings] = useState<Listing[]>([])
   const [orders, setOrders] = useState<Order[]>([])
 
+  // Store profile editing
+  const [editingProfile, setEditingProfile] = useState(false)
+  const [storeName, setStoreName] = useState('')
+  const [address, setAddress] = useState('')
+  const [storeDescription, setStoreDescription] = useState('')
+  const [savingProfile, setSavingProfile] = useState(false)
+
   useEffect(() => {
     if (!userProfile) return
+    setStoreName(userProfile.storeName ?? userProfile.displayName ?? '')
+    setAddress(userProfile.address ?? '')
+    setStoreDescription(userProfile.storeDescription ?? '')
     const unsub = subscribeToVendorListings(userProfile.uid, setListings)
     getVendorOrders(userProfile.uid).then(setOrders)
     return unsub
   }, [userProfile])
+
+  const handleSaveProfile = async () => {
+    if (!userProfile || !storeName.trim()) return
+    setSavingProfile(true)
+    try {
+      await updateVendorProfile(userProfile.uid, {
+        storeName: storeName.trim(),
+        address: address.trim(),
+        storeDescription: storeDescription.trim(),
+      })
+      setEditingProfile(false)
+    } finally {
+      setSavingProfile(false)
+    }
+  }
 
   const revenue = orders
     .filter(o => o.status === 'paid' || o.status === 'picked_up')
@@ -111,6 +137,65 @@ export default function VendorDashboardPage() {
             ))}
           </ul>
         )}
+      </div>
+
+      {/* Store profile settings */}
+      <div className="bg-surface-container border border-outline-variant rounded-xl overflow-hidden">
+        <div className="px-4 py-3 border-b border-outline-variant flex items-center justify-between">
+          <h2 className="text-body-sm font-semibold text-on-surface">{t('dashboard.storeSettings', 'Store Settings')}</h2>
+          {!editingProfile ? (
+            <button onClick={() => setEditingProfile(true)} className="flex items-center gap-1.5 text-primary text-body-sm hover:underline">
+              <Pencil size={13} /> {t('common.edit', 'Edit')}
+            </button>
+          ) : (
+            <div className="flex gap-2">
+              <button onClick={() => { setEditingProfile(false); setStoreName(userProfile?.storeName ?? ''); setAddress(userProfile?.address ?? ''); setStoreDescription(userProfile?.storeDescription ?? '') }}
+                className="flex items-center gap-1 text-on-surface-variant text-body-sm hover:text-on-surface">
+                <X size={14} /> {t('common.cancel', 'Cancel')}
+              </button>
+              <button onClick={handleSaveProfile} disabled={savingProfile || !storeName.trim()}
+                className="flex items-center gap-1 text-primary text-body-sm font-semibold hover:underline disabled:opacity-40">
+                <Check size={14} /> {savingProfile ? t('listing.saving', 'Saving…') : t('common.save', 'Save')}
+              </button>
+            </div>
+          )}
+        </div>
+        <div className="p-4 flex flex-col gap-3">
+          {editingProfile ? (
+            <>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-on-surface-variant">{t('vendor.storeName', 'Store name')} *</label>
+                <input value={storeName} onChange={e => setStoreName(e.target.value)}
+                  className="bg-surface-container-high border border-outline-variant rounded-lg px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-on-surface-variant">{t('vendor.address', 'Address')}</label>
+                <input value={address} onChange={e => setAddress(e.target.value)}
+                  className="bg-surface-container-high border border-outline-variant rounded-lg px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-on-surface-variant">{t('vendor.storeDescription', 'Store description')}</label>
+                <textarea value={storeDescription} onChange={e => setStoreDescription(e.target.value)} rows={3}
+                  className="bg-surface-container-high border border-outline-variant rounded-lg px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors resize-none" />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs text-on-surface-variant">{t('vendor.storeName', 'Store name')}</span>
+                <span className="text-body-sm text-on-surface font-semibold">{userProfile?.storeName ?? '—'}</span>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs text-on-surface-variant">{t('vendor.address', 'Address')}</span>
+                <span className="text-body-sm text-on-surface">{userProfile?.address ?? '—'}</span>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs text-on-surface-variant">{t('vendor.storeDescription', 'Description')}</span>
+                <span className="text-body-sm text-on-surface">{userProfile?.storeDescription ?? '—'}</span>
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   )

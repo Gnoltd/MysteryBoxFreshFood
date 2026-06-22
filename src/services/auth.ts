@@ -77,6 +77,13 @@ export async function updateUserLang(uid: string, lang: 'en' | 'vi'): Promise<vo
   await updateDoc(doc(db, 'users', uid), { lang })
 }
 
+export async function updateVendorProfile(
+  uid: string,
+  data: { storeName: string; address: string; storeDescription: string }
+): Promise<void> {
+  await updateDoc(doc(db, 'users', uid), data)
+}
+
 export async function updateVendorBankInfo(
   uid: string,
   bankName: string,

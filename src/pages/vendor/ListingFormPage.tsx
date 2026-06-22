@@ -70,11 +70,26 @@ export default function ListingFormPage() {
     })
   }, [id])
 
+  const maxPickupEnd = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 16)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!currentUser) return
-    setLoading(true)
     setError('')
+
+    // Enforce fresh-food rule: pickup window must end within 24 h from now
+    const endDate = new Date(pickupEnd)
+    const maxEnd = new Date(Date.now() + 24 * 60 * 60 * 1000)
+    if (endDate > maxEnd) {
+      setError('Pickup end must be within 24 hours from now to ensure freshness.')
+      return
+    }
+    if (new Date(pickupStart) >= endDate) {
+      setError('Pickup start must be before pickup end.')
+      return
+    }
+
+    setLoading(true)
     try {
       let imageUrl = existingImageUrl
       if (imageFile) {
@@ -167,13 +182,22 @@ export default function ListingFormPage() {
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
             <Label className="text-on-surface-variant">Pickup start</Label>
-            <Input value={pickupStart} onChange={e => setPickupStart(e.target.value)} type="datetime-local" required className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
+            <Input value={pickupStart} onChange={e => setPickupStart(e.target.value)} type="datetime-local" required
+              min={new Date().toISOString().slice(0, 16)}
+              max={maxPickupEnd}
+              className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
           </div>
           <div className="space-y-1">
             <Label className="text-on-surface-variant">Pickup end</Label>
-            <Input value={pickupEnd} onChange={e => setPickupEnd(e.target.value)} type="datetime-local" required className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
+            <Input value={pickupEnd} onChange={e => setPickupEnd(e.target.value)} type="datetime-local" required
+              min={new Date().toISOString().slice(0, 16)}
+              max={maxPickupEnd}
+              className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
           </div>
         </div>
+        <p className="text-xs text-on-surface-variant -mt-2">
+          ⏱ Pickup window must end within <span className="text-primary font-semibold">24 hours</span> from now — keeping boxes fresh.
+        </p>
 
         <div className="space-y-1">
           <Label className="text-on-surface-variant">Packed at (optional)</Label>

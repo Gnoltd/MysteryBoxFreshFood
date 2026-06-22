@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { subscribeToActiveListings } from '../../services/listings'
+import { getListingRatings } from '../../services/reviews'
 import { MysteryCard } from '../../components/shared/MysteryCard'
 import { Search } from 'lucide-react'
 import type { Listing, ListingCategory } from '../../types'
@@ -18,25 +19,32 @@ const CATEGORIES: { value: ListingCategory | 'all'; label: string; icon?: string
   { value: 'other',      label: 'Other',      icon: '/images/icons/other.png' },
 ]
 
-type SortKey = 'newest' | 'price_asc' | 'price_desc' | 'discount'
+type SortKey = 'top_rated' | 'newest' | 'price_asc' | 'price_desc' | 'discount'
 
 export default function BrowsePage() {
   const { t } = useTranslation()
   const { userProfile } = useAuth()
   const navigate = useNavigate()
   const [listings, setListings] = useState<Listing[]>([])
+  const [ratings, setRatings] = useState<Record<string, { avg: number; count: number }>>({})
   const [loading, setLoading] = useState(true)
   const [category, setCategory] = useState<ListingCategory | 'all'>('all')
   const [searchText, setSearchText] = useState('')
   const [minPrice, setMinPrice] = useState('')
   const [maxPrice, setMaxPrice] = useState('')
   const [availableOnly, setAvailableOnly] = useState(false)
-  const [sortBy, setSortBy] = useState<SortKey>('newest')
+  const [sortBy, setSortBy] = useState<SortKey>('top_rated')
 
   useEffect(() => {
     const unsub = subscribeToActiveListings(data => {
-      setListings(data)
+      // Filter out listings whose pickup window has already ended
+      const now = Date.now() / 1000
+      const live = data.filter(l => l.pickupEnd.seconds > now)
+      setListings(live)
       setLoading(false)
+      if (live.length > 0) {
+        getListingRatings(live.map(l => l.id)).then(setRatings)
+      }
     })
     return unsub
   }, [])
@@ -51,12 +59,17 @@ export default function BrowsePage() {
     if (maxPrice) result = result.filter(l => l.price <= Number(maxPrice))
     if (availableOnly) result = result.filter(l => l.quantityRemaining > 0 && l.status === 'active')
     return [...result].sort((a, b) => {
+      if (sortBy === 'top_rated') {
+        const ra = ratings[a.id]?.avg ?? 0
+        const rb = ratings[b.id]?.avg ?? 0
+        return rb !== ra ? rb - ra : b.createdAt.seconds - a.createdAt.seconds
+      }
       if (sortBy === 'price_asc') return a.price - b.price
       if (sortBy === 'price_desc') return b.price - a.price
       if (sortBy === 'discount') return (1 - b.price / b.originalPrice) - (1 - a.price / a.originalPrice)
       return b.createdAt.seconds - a.createdAt.seconds
     })
-  }, [listings, category, searchText, minPrice, maxPrice, availableOnly, sortBy])
+  }, [listings, ratings, category, searchText, minPrice, maxPrice, availableOnly, sortBy])
 
   const inputCls = 'w-full bg-surface-dim border border-outline-variant rounded-lg h-10 px-3 text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors'
 
@@ -136,6 +149,7 @@ export default function BrowsePage() {
                 onChange={e => setSortBy(e.target.value as SortKey)}
                 className="w-full bg-surface-dim border border-outline-variant rounded-lg h-10 px-3 text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
               >
+                <option value="top_rated">{t('browse.sortTopRated', 'Top Rated')}</option>
                 <option value="newest">{t('browse.sortNewest')}</option>
                 <option value="price_asc">{t('browse.sortPriceAsc')}</option>
                 <option value="price_desc">{t('browse.sortPriceDesc')}</option>
@@ -163,6 +177,7 @@ export default function BrowsePage() {
               <MysteryCard
                 key={listing.id}
                 listing={listing}
+                rating={ratings[listing.id]}
                 onClick={() => navigate(`/listing/${listing.id}`)}
               />
             ))}

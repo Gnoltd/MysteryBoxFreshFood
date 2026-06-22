@@ -25,10 +25,11 @@ const CATEGORY_IMAGE: Record<ListingCategory, string> = {
 
 interface MysteryCardProps {
   listing: Listing
+  rating?: { avg: number; count: number }
   onClick: () => void
 }
 
-export function MysteryCard({ listing, onClick }: MysteryCardProps) {
+export function MysteryCard({ listing, rating, onClick }: MysteryCardProps) {
   const { t } = useTranslation()
   const discount = Math.round((1 - listing.price / listing.originalPrice) * 100)
   const categoryIcon = CATEGORY_ICON[listing.category]
@@ -78,9 +79,17 @@ export function MysteryCard({ listing, onClick }: MysteryCardProps) {
       {/* Content */}
       <div className="p-3 flex flex-col gap-1.5">
         <p className="font-semibold text-on-surface text-body-sm truncate">{listing.title}</p>
-        {listing.vendorName && (
-          <p className="text-on-surface-variant text-xs truncate">{listing.vendorName}</p>
-        )}
+        <div className="flex items-center justify-between">
+          {listing.vendorName
+            ? <p className="text-on-surface-variant text-xs truncate">{listing.vendorName}</p>
+            : <span />}
+          {rating && rating.count > 0 && (
+            <span className="flex items-center gap-0.5 text-xs text-tertiary font-semibold shrink-0">
+              ★ {rating.avg.toFixed(1)}
+              <span className="text-outline font-normal ml-0.5">({rating.count})</span>
+            </span>
+          )}
+        </div>
         <div className="flex items-center justify-between mt-1">
           <div>
             <span className="text-primary font-bold text-body-sm">{listing.price.toLocaleString('vi-VN')} đ</span>
