@@ -84,7 +84,7 @@ export default function BrowsePage() {
             }`}
           >
             <span className="flex items-center gap-1.5">
-              {cat.icon && <img src={cat.icon} alt="" className="w-7 h-7 object-contain" />}
+              {cat.icon && <img src={cat.icon} alt="" className="w-10 h-10 object-contain" />}
               {cat.label}
             </span>
           </button>
