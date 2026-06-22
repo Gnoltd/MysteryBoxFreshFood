@@ -54,43 +54,54 @@ export default function QRScanPage() {
 
   return (
     <div className="max-w-md mx-auto text-center">
-      <h1 className="text-2xl font-bold text-white mb-2">{t('vendor.scanQR')}</h1>
-      <p className="text-slate-400 text-sm mb-6">{t('vendor.scanInstruction')}</p>
+      <h1 className="text-2xl font-bold text-on-surface mb-2">{t('vendor.scanQR')}</h1>
+      <p className="text-on-surface-variant text-sm mb-6">{t('vendor.scanInstruction')}</p>
 
       {status === 'scanning' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+        <div className="bg-surface-container border border-outline-variant rounded-xl overflow-hidden relative">
           <div id="qr-reader" className="w-full" />
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-56 h-56 rounded-xl" style={{
+              border: '2px solid transparent',
+              backgroundClip: 'padding-box',
+              boxShadow: '0 0 0 2px #8083ff, 0 0 20px rgba(128, 131, 255, 0.3)',
+            }} />
+          </div>
         </div>
       )}
 
       {status === 'success' && result && (
-        <div className="bg-slate-900 border border-green-700 rounded-xl p-8">
-          <div className="text-5xl mb-4">✅</div>
-          <h2 className="text-white text-xl font-bold">{t('vendor.pickupConfirmed')}</h2>
-          <p className="text-slate-400 mt-2">{result.listingTitle}</p>
-          <p className="text-slate-400 text-sm">
-            {result.quantity} box · {result.totalPrice.toLocaleString('vi-VN')} đ
-          </p>
-          <button
-            onClick={handleReset}
-            className="mt-6 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg text-sm font-medium"
-          >
-            {t('vendor.scanAnother')}
-          </button>
+        <div className="absolute inset-0 bg-emerald-500/20 flex items-center justify-center">
+          <div className="bg-surface-container border border-emerald-500/50 rounded-xl p-6 text-center">
+            <div className="text-5xl mb-4">✅</div>
+            <h2 className="text-on-surface text-xl font-bold">{t('vendor.pickupConfirmed')}</h2>
+            <p className="text-on-surface-variant mt-2">{result.listingTitle}</p>
+            <p className="text-on-surface-variant text-sm">
+              {result.quantity} box · {result.totalPrice.toLocaleString('vi-VN')} đ
+            </p>
+            <button
+              onClick={handleReset}
+              className="mt-6 gradient-bg text-on-surface px-6 py-2 rounded-xl text-sm font-medium"
+            >
+              {t('vendor.scanAnother')}
+            </button>
+          </div>
         </div>
       )}
 
       {status === 'error' && (
-        <div className="bg-slate-900 border border-red-700 rounded-xl p-8">
-          <div className="text-5xl mb-4">❌</div>
-          <h2 className="text-white text-xl font-bold">{t('vendor.invalidQR')}</h2>
-          <p className="text-red-400 mt-2">{errorMsg}</p>
-          <button
-            onClick={handleReset}
-            className="mt-6 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg text-sm font-medium"
-          >
-            {t('vendor.tryAgain')}
-          </button>
+        <div className="absolute inset-0 bg-error-container/20 flex items-center justify-center">
+          <div className="bg-surface-container border border-error-token/50 rounded-xl p-6 text-center text-error-token">
+            <div className="text-5xl mb-4">❌</div>
+            <h2 className="text-on-surface text-xl font-bold">{t('vendor.invalidQR')}</h2>
+            <p className="text-red-400 mt-2">{errorMsg}</p>
+            <button
+              onClick={handleReset}
+              className="mt-6 gradient-bg text-on-surface px-6 py-2 rounded-xl text-sm font-medium"
+            >
+              {t('vendor.tryAgain')}
+            </button>
+          </div>
         </div>
       )}
     </div>

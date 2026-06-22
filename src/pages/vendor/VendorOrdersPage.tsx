@@ -3,16 +3,17 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { subscribeToVendorOrders } from '../../services/orders'
+import { TimerBadge } from '../../components/shared/TimerBadge'
 import type { Order, OrderStatus } from '../../types'
 
 const STATUS_BADGE: Record<OrderStatus, string> = {
   pending: 'bg-yellow-900 text-yellow-300',
   paid: 'bg-green-900 text-green-300',
-  picked_up: 'bg-slate-700 text-slate-300',
+  picked_up: 'bg-surface-container text-on-surface-variant',
   cancelled: 'bg-red-900 text-red-300',
   pending_cod: 'bg-orange-900 text-orange-300',
   pending_bank_transfer: 'bg-blue-900 text-blue-300',
-  refunded: 'bg-slate-700 text-slate-400',
+  refunded: 'bg-surface-container text-on-surface-variant',
 }
 
 const STATUS_LABEL: Record<OrderStatus, string> = {
@@ -40,43 +41,48 @@ export default function VendorOrdersPage() {
     return unsub
   }, [currentUser])
 
-  if (loading) return <p className="text-slate-400">{t('browse.loading')}</p>
+  if (loading) return <p className="text-on-surface-variant">{t('browse.loading')}</p>
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">{t('vendor.orders')}</h1>
+        <h1 className="text-2xl font-bold text-on-surface">{t('vendor.orders')}</h1>
         <Link
           to="/vendor/scan"
-          className="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium px-4 py-2 rounded-lg"
+          className="gradient-bg text-on-surface text-sm font-medium px-4 py-2 rounded-xl"
         >
           {t('vendor.scanQRArrow')}
         </Link>
       </div>
 
-      {orders.length === 0 && <p className="text-slate-400">{t('vendor.noOrders')}</p>}
+      {orders.length === 0 && <p className="text-on-surface-variant">{t('vendor.noOrders')}</p>}
 
       <div className="space-y-3">
         {orders.map(o => (
           <div
             key={o.id}
-            className="bg-slate-900 border border-slate-800 rounded-xl p-4"
+            className="bg-surface-container border border-outline-variant rounded-xl p-4"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-white font-medium">{o.listingTitle}</p>
-                <p className="text-slate-400 text-sm">
+                <p className="text-on-surface font-medium">{o.listingTitle}</p>
+                <p className="text-on-surface-variant text-sm">
                   {new Date(o.createdAt.seconds * 1000).toLocaleString('vi-VN')} · {o.quantity} box ·{' '}
                   {o.totalPrice.toLocaleString('vi-VN')} đ
                   {o.paymentMethod && (
-                    <span className="ml-1 text-slate-500">· {o.paymentMethod.replace('_', ' ')}</span>
+                    <span className="ml-1 text-outline">· {o.paymentMethod.replace('_', ' ')}</span>
                   )}
                 </p>
                 {o.boxContents && o.boxContents.length > 0 && (
-                  <p className="text-slate-500 text-xs mt-1">
+                  <p className="text-outline text-xs mt-1">
                     📦 {t('vendor.each_box')}: {o.boxContents.map(b => `${b.qty}× ${b.name}`).join(', ')}
                   </p>
                 )}
+                <div className="mt-1 hidden md:block">
+                  {o.pickupEnd
+                    ? <TimerBadge pickupEnd={o.pickupEnd} />
+                    : <span className="text-on-surface-variant text-xs">—</span>}
+                </div>
               </div>
               <span className={`text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap flex-shrink-0 ${STATUS_BADGE[o.status]}`}>
                 {STATUS_LABEL[o.status]}

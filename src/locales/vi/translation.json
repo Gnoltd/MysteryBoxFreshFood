@@ -8,7 +8,8 @@
     "scanQR": "Quét QR",
     "inventory": "Kho hàng",
     "compose": "Tạo hộp",
-    "signOut": "Đăng xuất"
+    "signOut": "Đăng xuất",
+    "subscriptions": "Gói đặt hàng"
   },
   "auth": {
     "signIn": "Đăng nhập",
@@ -63,7 +64,20 @@
     "time_left_urgent": "Còn {{minutes}}p — Nhanh lên!",
     "expired_label": "Hết hạn",
     "packedAt": "Đóng gói lúc",
-    "claiming": "Đang chuyển hướng…"
+    "claiming": "Đang chuyển hướng…",
+    "new": "Sản phẩm mới",
+    "searchPlaceholder": "Tìm kiếm sản phẩm…",
+    "none": "Chưa có sản phẩm — hãy tạo hộp đầu tiên.",
+    "name": "Tên",
+    "stock": "Tồn kho",
+    "price": "Giá",
+    "status": "Trạng thái",
+    "actions": "Hành động",
+    "active": "Đang bán",
+    "draft": "Nháp",
+    "deleteConfirm": "Xóa sản phẩm này?",
+    "saving": "Đang lưu…",
+    "save": "Lưu sản phẩm"
   },
   "payment": {
     "selectMethod": "Phương thức thanh toán",
@@ -260,5 +274,43 @@
     "view_store": "Xem cửa hàng",
     "rating": "Đánh giá",
     "no_rating_yet": "Chưa có đánh giá"
+  },
+  "dashboard": {
+    "title": "Xin chào, {{store}}",
+    "revenue": "Doanh thu",
+    "activeListings": "Đang bán",
+    "pending": "Chờ nhận hàng",
+    "avgRating": "Đánh giá TB",
+    "revenueChart": "Doanh thu (14 đơn gần nhất)",
+    "quickActions": "Thao tác nhanh",
+    "recentOrders": "Đơn hàng gần đây",
+    "noOrders": "Chưa có đơn hàng."
+  },
+  "subs": {
+    "followedVendors": "Cửa hàng đang theo dõi",
+    "noFollows": "Theo dõi cửa hàng để nhận thông báo khi có sản phẩm mới.",
+    "muteNotif": "Tắt thông báo",
+    "enableNotif": "Bật thông báo",
+    "vipAccess": "Quyền VIP",
+    "elevate": "Nâng tầm",
+    "experience": "Trải nghiệm",
+    "heroSubtitle": "Mở khóa ưu đãi độc quyền, ưu tiên nhận hàng và hộp bí ẩn hàng tuần.",
+    "plan_free": "Miễn phí",
+    "plan_weekly": "Hàng tuần",
+    "plan_monthly": "Hàng tháng",
+    "planFreePrice": "Miễn phí mãi mãi",
+    "featureFollow": "Theo dõi cửa hàng yêu thích",
+    "featureNotify": "Thông báo khi có hộp mới",
+    "featurePriority": "Ưu tiên lấy hàng",
+    "featureWeekly": "Hộp bí ẩn hàng tuần đảm bảo",
+    "featureVoucher": "Voucher giảm giá hàng tháng",
+    "active": "Đang hoạt động",
+    "renewsOn": "Gia hạn",
+    "cancel": "Hủy gói",
+    "cancelling": "Đang hủy…",
+    "currentFree": "Gói hiện tại",
+    "subscribe": "Đăng ký",
+    "subscribing": "Đang chuyển hướng…",
+    "stripeRedirect": "Thanh toán Stripe sẽ có trong bản production."
   }
 }

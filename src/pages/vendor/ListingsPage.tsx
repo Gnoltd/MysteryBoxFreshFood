@@ -1,79 +1,140 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
-import { subscribeToVendorListings, deleteListing } from '../../services/listings'
-import { Button } from '@/components/ui/button'
-import type { Listing } from '../../types'
+import { subscribeToVendorListings, deleteListing, updateListing } from '../../services/listings'
+import { StockProgressBar } from '../../components/shared/StockProgressBar'
+import { StatusChip } from '../../components/shared/StatusChip'
+import { GradientButton } from '../../components/shared/GradientButton'
+import type { Listing, ListingCategory } from '../../types'
+import { Pencil, Trash2, Wand2 } from 'lucide-react'
 
 export default function ListingsPage() {
   const { t } = useTranslation()
-  const { currentUser } = useAuth()
+  const { userProfile } = useAuth()
+  const navigate = useNavigate()
   const [listings, setListings] = useState<Listing[]>([])
-  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [category, setCategory] = useState<ListingCategory | 'all'>('all')
 
   useEffect(() => {
-    if (!currentUser) return
-    return subscribeToVendorListings(currentUser.uid, data => {
-      setListings(data); setLoading(false)
-    })
-  }, [currentUser])
+    if (!userProfile) return
+    return subscribeToVendorListings(userProfile.uid, setListings)
+  }, [userProfile])
+
+  const filtered = listings.filter(l => {
+    const matchSearch = l.title.toLowerCase().includes(search.toLowerCase())
+    const matchCat = category === 'all' || l.category === category
+    return matchSearch && matchCat
+  })
+
+  const handleToggleStatus = async (l: Listing) => {
+    const next = l.status === 'active' ? 'expired' : 'active'
+    await updateListing(l.id, { status: next })
+  }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this listing?')) return
+    if (!confirm(t('listing.deleteConfirm'))) return
     await deleteListing(id)
   }
 
-  const STATUS_COLOR: Record<string, string> = {
-    active: 'text-green-400', sold_out: 'text-orange-400', expired: 'text-slate-500'
-  }
-
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">{t('vendor.myListings')}</h1>
-        <div className="flex gap-2">
-          <Link to="/vendor/compose">
-            <Button className="bg-purple-600 hover:bg-purple-500">{t('vendor.ai_composer')}</Button>
-          </Link>
-          <Link to="/vendor/listings/new">
-            <Button className="bg-indigo-600 hover:bg-indigo-500">{t('vendor.newListing')}</Button>
-          </Link>
-        </div>
+    <div className="flex flex-col gap-6">
+      {/* Toolbar */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <input
+          type="text"
+          placeholder={t('listing.searchPlaceholder')}
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="flex-1 min-w-48 bg-surface-container border border-outline-variant rounded-xl px-4 py-2.5 text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary transition-colors"
+        />
+        <select
+          value={category}
+          onChange={e => setCategory(e.target.value as ListingCategory | 'all')}
+          className="bg-surface-container border border-outline-variant rounded-xl px-4 py-2.5 text-body-sm text-on-surface focus:outline-none focus:border-primary transition-colors"
+        >
+          <option value="all">{t('browse.all')}</option>
+          {(['bakery','fruit','vegetables','dairy','meat','rice','noodles','drinks','snacks','other'] as ListingCategory[]).map(c => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+        <Link to="/vendor/compose">
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-secondary-token/40 bg-secondary-container/10 text-secondary-token text-body-sm font-semibold hover:opacity-80 transition-opacity">
+            <Wand2 size={16} /> {t('nav.compose')}
+          </button>
+        </Link>
+        <Link to="/vendor/listings/new">
+          <GradientButton className="py-2.5">{t('listing.new')}</GradientButton>
+        </Link>
       </div>
 
-      {loading && <p className="text-slate-400">{t('browse.loading')}</p>}
-      {!loading && listings.length === 0 && (
-        <p className="text-slate-400">{t('vendor.noListings')}</p>
-      )}
-
-      <div className="space-y-3">
-        {listings.map(l => (
-          <div key={l.id}
-            className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-center gap-4">
-            <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
-              {l.imageUrl
-                ? <img src={l.imageUrl} className="w-full h-full object-cover rounded-lg" alt={l.title} />
-                : '🎁'}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-white font-medium truncate">{l.title}</p>
-              <p className="text-slate-400 text-sm">
-                {l.price.toLocaleString('vi-VN')} đ · {l.quantityRemaining}/{l.quantityTotal} left ·{' '}
-                <span className={STATUS_COLOR[l.status]}>{l.status.replace('_', ' ')}</span>
-              </p>
-            </div>
-            <div className="flex gap-2 flex-shrink-0">
-              <Link to={`/vendor/listings/${l.id}/edit`}>
-                <Button variant="outline" size="sm"
-                  className="border-slate-700 text-slate-300 hover:text-white">{t('vendor.edit')}</Button>
-              </Link>
-              <Button variant="destructive" size="sm" onClick={() => handleDelete(l.id)}>
-                {t('vendor.delete')}
-              </Button>
-            </div>
-          </div>
-        ))}
+      {/* Table */}
+      <div className="bg-surface-container border border-outline-variant rounded-xl overflow-hidden">
+        {filtered.length === 0 ? (
+          <div className="px-4 py-12 text-center text-on-surface-variant text-body-sm">{t('listing.none')}</div>
+        ) : (
+          <table className="w-full text-body-sm">
+            <thead>
+              <tr className="border-b border-outline-variant text-label-caps text-on-surface-variant uppercase tracking-wider">
+                <th className="px-4 py-3 text-left">{t('listing.name')}</th>
+                <th className="px-4 py-3 text-left hidden md:table-cell">{t('listing.category')}</th>
+                <th className="px-4 py-3 text-left">{t('listing.stock')}</th>
+                <th className="px-4 py-3 text-left hidden sm:table-cell">{t('listing.price')}</th>
+                <th className="px-4 py-3 text-left">{t('listing.status')}</th>
+                <th className="px-4 py-3 text-right">{t('listing.actions')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((l, i) => (
+                <tr
+                  key={l.id}
+                  className={`${i < filtered.length - 1 ? 'border-b border-outline-variant' : ''} ${l.status !== 'active' ? 'opacity-50' : ''} hover:bg-surface-container-high transition-colors`}
+                >
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      {l.imageUrl
+                        ? <img src={l.imageUrl} alt={l.title} className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                        : <div className="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-lg shrink-0">🎁</div>}
+                      <span className="text-on-surface font-semibold truncate max-w-[160px]">{l.title}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 hidden md:table-cell">
+                    <StatusChip variant="slate">{l.category}</StatusChip>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col gap-1 min-w-[80px]">
+                      <span className={`text-body-sm font-semibold ${l.quantityRemaining <= 2 ? 'text-tertiary' : 'text-on-surface'}`}>
+                        {l.quantityRemaining} / {l.quantityTotal}
+                      </span>
+                      <StockProgressBar current={l.quantityRemaining} total={l.quantityTotal} />
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 hidden sm:table-cell text-primary font-semibold">
+                    {l.price.toLocaleString('vi-VN')} đ
+                  </td>
+                  <td className="px-4 py-3">
+                    <button onClick={() => handleToggleStatus(l)}>
+                      <StatusChip variant={l.status === 'active' ? 'emerald' : 'slate'}>
+                        {l.status === 'active' ? t('listing.active') : t('listing.draft')}
+                      </StatusChip>
+                    </button>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-end gap-2">
+                      <button onClick={() => navigate(`/vendor/listings/${l.id}/edit`)} className="p-1.5 rounded-lg hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors">
+                        <Pencil size={15} />
+                      </button>
+                      <button onClick={() => handleDelete(l.id)} className="p-1.5 rounded-lg hover:bg-error-container/20 text-on-surface-variant hover:text-error-token transition-colors">
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   )

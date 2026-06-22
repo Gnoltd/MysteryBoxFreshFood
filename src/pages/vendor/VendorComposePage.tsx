@@ -205,17 +205,17 @@ export default function VendorComposePage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-white">{t('vendor.compose_page_title')}</h1>
+      <h1 className="text-2xl font-bold text-on-surface">{t('vendor.compose_page_title')}</h1>
 
       {/* ZONE 1: Catalog Browser */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-        <h2 className="text-white font-semibold mb-4">{t('vendor.inventory')}</h2>
-        {catalogLoading && <p className="text-slate-400 text-sm">{t('browse.loading')}</p>}
+      <div className="bg-surface-container-highest border border-secondary-token/30 rounded-xl p-5">
+        <h2 className="text-on-surface font-semibold mb-4">{t('vendor.inventory')}</h2>
+        {catalogLoading && <p className="text-on-surface-variant text-sm">{t('browse.loading')}</p>}
         {!catalogLoading && inventoryItems.length === 0 && (
           <div className="text-center py-6">
-            <p className="text-slate-400 mb-3">{t('vendor.no_inventory')}</p>
+            <p className="text-on-surface-variant mb-3">{t('vendor.no_inventory')}</p>
             <Button variant="outline" onClick={() => navigate('/vendor/inventory')}
-              className="border-slate-700 text-slate-300">{t('vendor.go_to_inventory')}</Button>
+              className="border-outline-variant text-on-surface-variant">{t('vendor.go_to_inventory')}</Button>
           </div>
         )}
         <div className="space-y-2">
@@ -224,25 +224,28 @@ export default function VendorComposePage() {
             const expiring = expiryLabel(item) === 'today' || expiryLabel(item) === 'soon'
             return (
               <div key={item.id} onClick={() => toggleItem(item)}
-                className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer border transition-colors ${
-                  selected ? 'border-indigo-500 bg-indigo-950/40'
-                  : expiring ? 'border-amber-500/40 bg-slate-800/60'
-                  : 'border-slate-800 bg-slate-800/40 hover:bg-slate-800'
+                className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer border transition-colors ${
+                  selected ? 'border-primary bg-indigo-950/40'
+                  : expiring ? 'border-amber-500/40 bg-surface-container-high/60'
+                  : 'border-outline-variant bg-surface-container-high/40 hover:bg-surface-container-high'
                 }`}>
-                <input type="checkbox" checked={selected} readOnly
-                  className="accent-indigo-500 w-4 h-4 pointer-events-none" />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary-token">✨</span>
+                  <input type="checkbox" checked={selected} readOnly
+                    className="accent-indigo-500 w-4 h-4 pointer-events-none" />
+                </div>
                 <span className="text-lg">{CATEGORY_ICONS[item.category]}</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm font-medium">{item.name}</p>
-                  <p className="text-slate-400 text-xs">{item.unitPrice.toLocaleString('vi-VN')} đ / {item.unit}</p>
+                  <p className="text-on-surface text-sm font-medium">{item.name}</p>
+                  <p className="text-on-surface-variant text-xs">{item.unitPrice.toLocaleString('vi-VN')} đ / {item.unit}</p>
                 </div>
                 {selected && (
                   <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
                     <button onClick={() => setItemQty(item.id, (selectedItems.get(item.id)?.qty ?? 1) - 1)}
-                      className="w-7 h-7 rounded bg-slate-700 text-white font-bold hover:bg-slate-600">−</button>
-                    <span className="text-white text-sm w-6 text-center">{selectedItems.get(item.id)?.qty ?? 1}</span>
+                      className="w-7 h-7 rounded bg-surface-container text-on-surface font-bold hover:bg-surface-container-high">−</button>
+                    <span className="text-on-surface text-sm w-6 text-center">{selectedItems.get(item.id)?.qty ?? 1}</span>
                     <button onClick={() => setItemQty(item.id, (selectedItems.get(item.id)?.qty ?? 1) + 1)}
-                      className="w-7 h-7 rounded bg-slate-700 text-white font-bold hover:bg-slate-600">+</button>
+                      className="w-7 h-7 rounded bg-surface-container text-on-surface font-bold hover:bg-surface-container-high">+</button>
                   </div>
                 )}
               </div>
@@ -250,11 +253,11 @@ export default function VendorComposePage() {
           })}
         </div>
         {selectedItems.size > 0 && (
-          <div className="mt-3 pt-3 border-t border-slate-700 flex justify-between text-sm">
-            <span className="text-slate-400">
+          <div className="mt-3 pt-3 border-t border-outline-variant flex justify-between text-sm">
+            <span className="text-on-surface-variant">
               {selectedItems.size} {selectedItems.size === 1 ? 'item' : 'items'} selected
             </span>
-            <span className="text-white font-medium">
+            <span className="text-on-surface font-medium">
               {t('vendor.total_value')}: {totalValue.toLocaleString('vi-VN')} đ
             </span>
           </div>
@@ -262,21 +265,21 @@ export default function VendorComposePage() {
       </div>
 
       {/* ZONE 2: Controls */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+      <div className="bg-surface-container-highest border border-secondary-token/30 rounded-xl p-5 space-y-4">
         <div>
-          <Label className="text-slate-300 text-sm mb-2 block">
+          <Label className="text-on-surface-variant text-sm mb-2 block">
             {t('vendor.discount_pct')}: {discount}%
           </Label>
           <input type="range" min="20" max="90" step="5" value={discount}
             onChange={e => setDiscount(Number(e.target.value))}
             className="w-full accent-purple-500" />
-          <p className="text-slate-500 text-xs mt-1">
+          <p className="text-outline text-xs mt-1">
             Boxes sell at {100 - discount}% of original value
           </p>
         </div>
 
         {suggestResult && (
-          <div className="bg-amber-950/40 border border-amber-600/40 rounded-lg p-3 flex items-start justify-between gap-2">
+          <div className="bg-amber-950/40 border border-amber-600/40 rounded-xl p-3 flex items-start justify-between gap-2">
             <p className="text-amber-300 text-sm">
               {t('vendor.price_suggestion', {
                 discount: suggestResult.recommendedDiscount,
@@ -293,38 +296,40 @@ export default function VendorComposePage() {
 
         <div className="flex gap-2">
           <Button onClick={handleSuggestPrice} disabled={suggestLoading} variant="outline"
-            className="border-indigo-600 text-indigo-400 hover:text-indigo-300 hover:bg-indigo-950/40">
+            className="border-primary text-primary hover:text-indigo-300 hover:bg-indigo-950/40">
             {suggestLoading ? '…' : t('vendor.suggest_price')}
           </Button>
-          <Button onClick={handleCompose} disabled={selectedItems.size === 0 || composerLoading}
-            className="flex-1 bg-purple-600 hover:bg-purple-500 disabled:opacity-50">
+          <button
+            onClick={handleCompose}
+            disabled={selectedItems.size === 0 || composerLoading}
+            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-secondary-container text-on-secondary font-semibold hover:opacity-90 transition-opacity flex-1 justify-center disabled:opacity-50">
             {composerLoading ? t('vendor.ai_composing') : t('vendor.ai_compose_btn')}
-          </Button>
+          </button>
         </div>
 
         {composerError && <p className="text-red-400 text-sm">{composerError}</p>}
 
         {composerResult && (
           <div className="bg-indigo-950/40 border border-indigo-600/40 rounded-xl p-4 space-y-3">
-            <p className="text-indigo-300 text-xs font-medium uppercase tracking-wide">
+            <p className="text-primary text-xs font-medium uppercase tracking-wide">
               🤖 {t('vendor.ai_box_count', { n: numBoxes })}
             </p>
             <div className="flex items-center justify-center gap-6 py-1">
               <button onClick={() => setNumBoxes(n => Math.max(1, n - 1))}
-                className="w-12 h-12 rounded-xl bg-slate-700 text-white font-bold text-xl hover:bg-slate-600 active:scale-95 transition-transform">
+                className="w-12 h-12 rounded-xl bg-surface-container text-on-surface font-bold text-xl hover:bg-surface-container-high active:scale-95 transition-transform">
                 −
               </button>
               <div className="text-center">
-                <p className="text-white text-3xl font-bold">{numBoxes}</p>
-                <p className="text-slate-400 text-xs">{t('vendor.num_boxes')}</p>
+                <p className="text-on-surface text-3xl font-bold">{numBoxes}</p>
+                <p className="text-on-surface-variant text-xs">{t('vendor.num_boxes')}</p>
               </div>
               <button onClick={() => setNumBoxes(n => Math.min(20, n + 1))}
-                className="w-12 h-12 rounded-xl bg-slate-700 text-white font-bold text-xl hover:bg-slate-600 active:scale-95 transition-transform">
+                className="w-12 h-12 rounded-xl bg-surface-container text-on-surface font-bold text-xl hover:bg-surface-container-high active:scale-95 transition-transform">
                 +
               </button>
             </div>
-            <p className="text-center text-sm text-slate-400">
-              <span className="text-white font-medium">{currentOriginalPrice.toLocaleString('vi-VN')} đ</span>
+            <p className="text-center text-sm text-on-surface-variant">
+              <span className="text-on-surface font-medium">{currentOriginalPrice.toLocaleString('vi-VN')} đ</span>
               {' → '}
               <span className="text-green-400 font-medium">{currentSalePrice.toLocaleString('vi-VN')} đ</span>
               {' each'}
@@ -332,13 +337,13 @@ export default function VendorComposePage() {
 
             {/* Packing guide — vendor only */}
             <div className="mt-3 pt-3 border-t border-indigo-700/40">
-              <p className="text-indigo-300 text-xs font-medium mb-2">📦 Packing guide (per box)</p>
+              <p className="text-primary text-xs font-medium mb-2">📦 Packing guide (per box)</p>
               <div className="space-y-1">
                 {packingGuide.map(({ name, icon, perBox, leftover }) => (
                   <div key={name} className="flex items-center justify-between text-sm">
-                    <span className="text-slate-300">{icon} {name}</span>
-                    <span className="text-white font-medium">
-                      {perBox > 0 ? `×${perBox}` : <span className="text-slate-500">—</span>}
+                    <span className="text-on-surface-variant">{icon} {name}</span>
+                    <span className="text-on-surface font-medium">
+                      {perBox > 0 ? `×${perBox}` : <span className="text-outline">—</span>}
                       {leftover > 0 && (
                         <span className="text-amber-400 text-xs ml-1">+{leftover} leftover</span>
                       )}
@@ -353,54 +358,55 @@ export default function VendorComposePage() {
 
       {/* ZONE 3: Editable Result */}
       {composerResult && (
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
-          <p className="text-indigo-400 text-xs font-medium uppercase tracking-wide">
+        <div className="bg-surface-container-highest border border-secondary-token/30 rounded-xl p-5 space-y-4">
+          <p className="text-primary text-xs font-medium uppercase tracking-wide">
             {t('vendor.ai_suggestion')}
           </p>
           <div>
-            <Label className="text-slate-300 text-sm mb-1 block">{t('vendor.category')}</Label>
+            <Label className="text-on-surface-variant text-sm mb-1 block">{t('vendor.category')}</Label>
             <Select value={editCategory} onValueChange={v => setEditCategory(v as ListingCategory)}>
-              <SelectTrigger className="bg-slate-800 border-slate-700 text-white"><SelectValue /></SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-700">
+              <SelectTrigger className="bg-surface-container-high border-secondary-token/30 text-on-surface rounded-xl focus:border-secondary-token"><SelectValue /></SelectTrigger>
+              <SelectContent className="bg-surface-container-high border-outline-variant">
                 {ALL_CATEGORIES.map(c => (
-                  <SelectItem key={c} value={c} className="text-white">{t(`categories.${c}`)}</SelectItem>
+                  <SelectItem key={c} value={c} className="text-on-surface">{t(`categories.${c}`)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label className="text-slate-300 text-sm mb-1 block">{t('vendor.title')}</Label>
+            <Label className="text-on-surface-variant text-sm mb-1 block">{t('vendor.title')}</Label>
             <Input value={editTitle} onChange={e => setEditTitle(e.target.value)}
-              className="bg-slate-800 border-slate-700 text-white" />
+              className="w-full bg-surface-container-lowest border border-secondary-token/30 rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-secondary-token transition-colors" />
           </div>
           <div>
-            <Label className="text-slate-300 text-sm mb-1 block">{t('vendor.description')}</Label>
+            <Label className="text-on-surface-variant text-sm mb-1 block">{t('vendor.description')}</Label>
             <Textarea value={editDescription} onChange={e => setEditDescription(e.target.value)}
-              rows={3} className="bg-slate-800 border-slate-700 text-white" />
+              rows={3} className="bg-surface-container-high border-secondary-token/30 text-on-surface rounded-xl focus:border-secondary-token" />
           </div>
           <div>
-            <Label className="text-slate-300 text-sm mb-1 block">{t('vendor.price')}</Label>
+            <Label className="text-on-surface-variant text-sm mb-1 block">{t('vendor.price')}</Label>
             <Input value={editPrice} onChange={e => setEditPrice(e.target.value)}
-              type="number" min="1000" className="bg-slate-800 border-slate-700 text-white" />
+              type="number" min="1000" className="bg-surface-container-high border-secondary-token/30 text-on-surface rounded-xl focus:border-secondary-token" />
             {parseInt(editPrice) <= 0 && (
               <p className="text-red-400 text-xs mt-1">Price must be &gt; 0</p>
             )}
           </div>
           <div>
-            <Label className="text-slate-300 text-sm mb-1 block">{t('vendor.pickup_window')}</Label>
+            <Label className="text-on-surface-variant text-sm mb-1 block">{t('vendor.pickup_window')}</Label>
             <div className="grid grid-cols-2 gap-2">
               <Input value={pickupStart} onChange={e => setPickupStart(e.target.value)}
-                type="datetime-local" className="bg-slate-800 border-slate-700 text-white text-xs" />
+                type="datetime-local" className="bg-surface-container-high border-secondary-token/30 text-on-surface text-xs rounded-xl focus:border-secondary-token" />
               <Input value={pickupEnd} onChange={e => setPickupEnd(e.target.value)}
-                type="datetime-local" className="bg-slate-800 border-slate-700 text-white text-xs" />
+                type="datetime-local" className="bg-surface-container-high border-secondary-token/30 text-on-surface text-xs rounded-xl focus:border-secondary-token" />
             </div>
           </div>
           {publishError && <p className="text-red-400 text-sm">{publishError}</p>}
-          <Button onClick={handlePublish}
+          <button
+            onClick={handlePublish}
             disabled={publishLoading || !editTitle || !parseInt(editPrice) || parseInt(editPrice) <= 0}
-            className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50">
+            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-secondary-container text-on-secondary font-semibold hover:opacity-90 transition-opacity w-full justify-center disabled:opacity-50">
             {publishLoading ? t('vendor.saving') : t('vendor.publish_listing')}
-          </Button>
+          </button>
         </div>
       )}
     </div>

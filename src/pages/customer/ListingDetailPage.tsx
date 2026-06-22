@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { onSnapshot, doc } from 'firebase/firestore'
 import { db } from '../../firebase'
-import { createCheckoutSession } from '../../services/stripe'
+import { initiateCheckout } from '../../services/stripe'
 import { GradientButton } from '../../components/shared/GradientButton'
 import { GlassNav } from '../../components/shared/GlassNav'
 import { StatusChip } from '../../components/shared/StatusChip'
@@ -15,7 +15,6 @@ import { Share2, Heart } from 'lucide-react'
 export default function ListingDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const [listing, setListing] = useState<Listing | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -31,8 +30,7 @@ export default function ListingDetailPage() {
     if (!listing) return
     setLoading(true)
     try {
-      const url = await createCheckoutSession(listing.id)
-      window.location.href = url
+      await initiateCheckout(listing.id, 1)
     } finally {
       setLoading(false)
     }

@@ -3,17 +3,20 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { createListing, getListing, updateListing } from '../../services/listings'
 import { uploadListingImage } from '../../services/storage'
-import { Button } from '@/components/ui/button'
+import { GradientButton } from '../../components/shared/GradientButton'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
 import { Timestamp } from 'firebase/firestore'
 import type { ListingCategory } from '../../types'
+import { useTranslation } from 'react-i18next'
 
 const CATEGORIES: ListingCategory[] = ['bakery', 'fruit', 'vegetables', 'dairy', 'meat', 'rice', 'noodles', 'drinks', 'snacks', 'other']
 
 export default function ListingFormPage() {
+  const { t } = useTranslation()
   const { id } = useParams<{ id?: string }>()
   const isEdit = Boolean(id)
   const { currentUser } = useAuth()
@@ -109,51 +112,51 @@ export default function ListingFormPage() {
 
   return (
     <div className="max-w-xl">
-      <h1 className="text-2xl font-bold text-white mb-6">{isEdit ? 'Edit Listing' : 'New Listing'}</h1>
+      <h1 className="text-2xl font-bold text-on-surface mb-6">{isEdit ? 'Edit Listing' : 'New Listing'}</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-2">
-          {(['mystery_box', 'item'] as const).map(t => (
-            <button key={t} type="button" onClick={() => setType(t)}
-              className={`py-2 rounded-lg border text-sm font-medium ${type === t ? 'border-indigo-500 bg-indigo-600/20 text-indigo-300' : 'border-slate-700 text-slate-400'}`}>
-              {t === 'mystery_box' ? '🎁 Mystery Box' : '📦 Single Item'}
+          {(['mystery_box', 'item'] as const).map(tp => (
+            <button key={tp} type="button" onClick={() => setType(tp)}
+              className={`py-2 rounded-xl border text-sm font-medium ${type === tp ? 'border-primary bg-indigo-600/20 text-indigo-300' : 'border-outline-variant text-on-surface-variant'}`}>
+              {tp === 'mystery_box' ? '🎁 Mystery Box' : '📦 Single Item'}
             </button>
           ))}
         </div>
 
         <div className="space-y-1">
           <Label className="text-slate-300">Title</Label>
-          <Input value={title} onChange={e => setTitle(e.target.value)} required className="bg-slate-800 border-slate-700 text-white" placeholder="Bánh mì mystery box" />
+          <Input value={title} onChange={e => setTitle(e.target.value)} required className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" placeholder="Bánh mì mystery box" />
         </div>
 
         <div className="space-y-1">
           <Label className="text-slate-300">Description</Label>
-          <Textarea value={description} onChange={e => setDescription(e.target.value)} required className="bg-slate-800 border-slate-700 text-white" placeholder="What's inside…" />
+          <Textarea value={description} onChange={e => setDescription(e.target.value)} required className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" placeholder="What's inside…" />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
             <Label className="text-slate-300">Price (VND)</Label>
-            <Input value={price} onChange={e => setPrice(e.target.value)} type="number" required min="1000" className="bg-slate-800 border-slate-700 text-white" placeholder="35000" />
+            <Input value={price} onChange={e => setPrice(e.target.value)} type="number" required min="1000" className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" placeholder="35000" />
           </div>
           <div className="space-y-1">
             <Label className="text-slate-300">Original Price (VND)</Label>
-            <Input value={originalPrice} onChange={e => setOriginalPrice(e.target.value)} type="number" required min="1000" className="bg-slate-800 border-slate-700 text-white" placeholder="90000" />
+            <Input value={originalPrice} onChange={e => setOriginalPrice(e.target.value)} type="number" required min="1000" className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" placeholder="90000" />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <Label className="text-slate-300">Quantity {isEdit && <span className="text-slate-500 text-xs">(sets available stock)</span>}</Label>
-            <Input value={quantity} onChange={e => setQuantity(e.target.value)} type="number" required min="1" className="bg-slate-800 border-slate-700 text-white" />
+            <Label className="text-slate-300">Quantity {isEdit && <span className="text-outline text-xs">(sets available stock)</span>}</Label>
+            <Input value={quantity} onChange={e => setQuantity(e.target.value)} type="number" required min="1" className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
           </div>
           <div className="space-y-1">
             <Label className="text-slate-300">Category</Label>
             <Select value={category} onValueChange={v => setCategory(v as ListingCategory)}>
-              <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+              <SelectTrigger className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-700">
-                {CATEGORIES.map(c => <SelectItem key={c} value={c} className="text-white capitalize">{c}</SelectItem>)}
+              <SelectContent className="bg-surface-container-high border-outline-variant">
+                {CATEGORIES.map(c => <SelectItem key={c} value={c} className="text-on-surface capitalize">{c}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
@@ -162,11 +165,11 @@ export default function ListingFormPage() {
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
             <Label className="text-slate-300">Pickup start</Label>
-            <Input value={pickupStart} onChange={e => setPickupStart(e.target.value)} type="datetime-local" required className="bg-slate-800 border-slate-700 text-white" />
+            <Input value={pickupStart} onChange={e => setPickupStart(e.target.value)} type="datetime-local" required className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
           </div>
           <div className="space-y-1">
             <Label className="text-slate-300">Pickup end</Label>
-            <Input value={pickupEnd} onChange={e => setPickupEnd(e.target.value)} type="datetime-local" required className="bg-slate-800 border-slate-700 text-white" />
+            <Input value={pickupEnd} onChange={e => setPickupEnd(e.target.value)} type="datetime-local" required className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
           </div>
         </div>
 
@@ -176,17 +179,17 @@ export default function ListingFormPage() {
             value={packedAt}
             onChange={e => setPackedAt(e.target.value)}
             type="datetime-local"
-            className="bg-slate-800 border-slate-700 text-white"
+            className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl"
           />
         </div>
 
         <div className="space-y-1">
           <Label className="text-slate-300">Image</Label>
-          <Input type="file" accept="image/*" onChange={e => setImageFile(e.target.files?.[0] ?? null)} className="bg-slate-800 border-slate-700 text-white" />
+          <Input type="file" accept="image/*" onChange={e => setImageFile(e.target.files?.[0] ?? null)} className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
           {(previewUrl || (existingImageUrl && !imageFile)) && (
             <img
               src={previewUrl ?? existingImageUrl}
-              className="mt-2 h-32 w-full rounded-lg object-cover"
+              className="mt-2 h-32 w-full rounded-xl object-cover"
               alt="Listing preview"
             />
           )}
@@ -195,10 +198,10 @@ export default function ListingFormPage() {
         {error && <p className="text-red-400 text-sm">{error}</p>}
 
         <div className="flex gap-3 pt-2">
-          <Button type="submit" disabled={loading} className="bg-indigo-600 hover:bg-indigo-500">
-            {loading ? 'Saving…' : isEdit ? 'Save Changes' : 'Create Listing'}
-          </Button>
-          <Button type="button" variant="outline" onClick={() => navigate('/vendor/listings')} className="border-slate-700 text-slate-300">
+          <GradientButton type="submit" disabled={loading} className="w-full">
+            {loading ? t('listing.saving') : t('listing.save')}
+          </GradientButton>
+          <Button type="button" variant="outline" onClick={() => navigate('/vendor/listings')} className="border-outline-variant text-on-surface-variant">
             Cancel
           </Button>
         </div>

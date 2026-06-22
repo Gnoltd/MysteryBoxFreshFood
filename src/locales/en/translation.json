@@ -8,7 +8,8 @@
     "scanQR": "Scan QR",
     "inventory": "Inventory",
     "compose": "Compose",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "subscriptions": "Subscriptions"
   },
   "auth": {
     "signIn": "Sign in",
@@ -63,7 +64,20 @@
     "time_left_urgent": "{{minutes}}m left — Hurry!",
     "expired_label": "Expired",
     "packedAt": "Packed at",
-    "claiming": "Redirecting…"
+    "claiming": "Redirecting…",
+    "new": "New Listing",
+    "searchPlaceholder": "Search listings…",
+    "none": "No listings yet — create your first box.",
+    "name": "Name",
+    "stock": "Stock",
+    "price": "Price",
+    "status": "Status",
+    "actions": "Actions",
+    "active": "Active",
+    "draft": "Draft",
+    "deleteConfirm": "Delete this listing?",
+    "saving": "Saving…",
+    "save": "Save Listing"
   },
   "payment": {
     "selectMethod": "Payment method",
@@ -261,5 +275,43 @@
     "view_store": "View store",
     "rating": "Rating",
     "no_rating_yet": "No ratings yet"
+  },
+  "dashboard": {
+    "title": "Welcome, {{store}}",
+    "revenue": "Revenue",
+    "activeListings": "Active Listings",
+    "pending": "Pending Pickups",
+    "avgRating": "Avg Rating",
+    "revenueChart": "Revenue (last 14 orders)",
+    "quickActions": "Quick Actions",
+    "recentOrders": "Recent Orders",
+    "noOrders": "No orders yet."
+  },
+  "subs": {
+    "followedVendors": "Vendors You Follow",
+    "noFollows": "Follow vendors to get notified when they list new boxes.",
+    "muteNotif": "Mute notifications",
+    "enableNotif": "Enable notifications",
+    "vipAccess": "VIP Access",
+    "elevate": "Elevate Your",
+    "experience": "Experience",
+    "heroSubtitle": "Unlock exclusive perks, priority pickup, and weekly mystery boxes.",
+    "plan_free": "Free",
+    "plan_weekly": "Weekly",
+    "plan_monthly": "Monthly",
+    "planFreePrice": "Free forever",
+    "featureFollow": "Follow your favourite vendors",
+    "featureNotify": "Push notifications for new boxes",
+    "featurePriority": "Priority pickup slot",
+    "featureWeekly": "Guaranteed weekly box",
+    "featureVoucher": "Monthly discount voucher",
+    "active": "Active",
+    "renewsOn": "Renews",
+    "cancel": "Cancel Plan",
+    "cancelling": "Cancelling…",
+    "currentFree": "Current Plan",
+    "subscribe": "Subscribe",
+    "subscribing": "Redirecting…",
+    "stripeRedirect": "Stripe payment coming soon in production."
   }
 }

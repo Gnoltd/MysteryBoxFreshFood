@@ -7,6 +7,7 @@ import {
   updateInventoryItem, deleteInventoryItem
 } from '../../services/inventory'
 import { expiryLabel } from '../../utils/inventoryUtils'
+import { StockProgressBar } from '../../components/shared/StockProgressBar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -105,38 +106,38 @@ export default function VendorInventoryPage() {
   })
 
   const BADGE: Record<string, { style: string; label: string }> = {
-    expired: { style: 'bg-slate-700 text-slate-400', label: t('vendor.expired') },
-    today:   { style: 'bg-red-900 text-red-300',     label: t('vendor.expires_today') },
-    soon:    { style: 'bg-amber-900 text-amber-300',  label: t('vendor.expires_soon') },
+    expired: { style: 'bg-surface-container text-on-surface-variant', label: t('vendor.expired') },
+    today:   { style: 'bg-red-900 text-red-300',                      label: t('vendor.expires_today') },
+    soon:    { style: 'bg-amber-900 text-amber-300',                   label: t('vendor.expires_soon') },
   }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">{t('vendor.inventory')}</h1>
-        <Button onClick={openAdd} className="bg-indigo-600 hover:bg-indigo-500">
+        <h1 className="text-2xl font-bold text-on-surface">{t('vendor.inventory')}</h1>
+        <Button onClick={openAdd} className="gradient-bg">
           + {t('vendor.add_item')}
         </Button>
       </div>
 
       {showForm && (
-        <div className="bg-slate-900 border border-indigo-600 rounded-xl p-5 mb-4 space-y-4">
-          <h2 className="text-white font-semibold">
+        <div className="bg-surface-container border border-primary rounded-xl p-5 mb-4 space-y-4">
+          <h2 className="text-on-surface font-semibold">
             {editingId ? t('vendor.edit_item') : `+ ${t('vendor.add_item')}`}
           </h2>
           <div className="grid grid-cols-2 gap-3">
             <div className="col-span-2">
-              <Label className="text-slate-300 text-sm mb-1 block">{t('vendor.item_name')}</Label>
+              <Label className="text-on-surface-variant text-sm mb-1 block">{t('vendor.item_name')}</Label>
               <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                className="bg-slate-800 border-slate-700 text-white" placeholder="e.g. Croissant" />
+                className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" placeholder="e.g. Croissant" />
             </div>
             <div>
-              <Label className="text-slate-300 text-sm mb-1 block">{t('vendor.category')}</Label>
+              <Label className="text-on-surface-variant text-sm mb-1 block">{t('vendor.category')}</Label>
               <Select value={form.category} onValueChange={v => setForm(f => ({ ...f, category: v as ListingCategory }))}>
-                <SelectTrigger className="bg-slate-800 border-slate-700 text-white"><SelectValue /></SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-700">
+                <SelectTrigger className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl"><SelectValue /></SelectTrigger>
+                <SelectContent className="bg-surface-container-high border-outline-variant">
                   {ALL_CATEGORIES.map(c => (
-                    <SelectItem key={c} value={c} className="text-white">
+                    <SelectItem key={c} value={c} className="text-on-surface">
                       {CATEGORY_ICONS[c]} {t(`categories.${c}`)}
                     </SelectItem>
                   ))}
@@ -144,44 +145,44 @@ export default function VendorInventoryPage() {
               </Select>
             </div>
             <div>
-              <Label className="text-slate-300 text-sm mb-1 block">{t('vendor.item_price')} (VND)</Label>
+              <Label className="text-on-surface-variant text-sm mb-1 block">{t('vendor.item_price')} (VND)</Label>
               <Input value={form.unitPrice} onChange={e => setForm(f => ({ ...f, unitPrice: e.target.value }))}
-                type="number" min="1000" className="bg-slate-800 border-slate-700 text-white" placeholder="15000" />
+                type="number" min="1000" className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" placeholder="15000" />
             </div>
             <div>
-              <Label className="text-slate-300 text-sm mb-1 block">{t('vendor.unit')}</Label>
+              <Label className="text-on-surface-variant text-sm mb-1 block">{t('vendor.unit')}</Label>
               <Input value={form.unit} onChange={e => setForm(f => ({ ...f, unit: e.target.value }))}
-                className="bg-slate-800 border-slate-700 text-white" placeholder="piece" />
+                className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" placeholder="piece" />
             </div>
             <div>
-              <Label className="text-slate-300 text-sm mb-1 block">{t('vendor.default_qty')}</Label>
+              <Label className="text-on-surface-variant text-sm mb-1 block">{t('vendor.default_qty')}</Label>
               <Input value={form.defaultQty} onChange={e => setForm(f => ({ ...f, defaultQty: e.target.value }))}
-                type="number" min="1" className="bg-slate-800 border-slate-700 text-white" />
+                type="number" min="1" className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
             </div>
             <div className="col-span-2">
-              <Label className="text-slate-300 text-sm mb-1 block">{t('vendor.best_before')} (optional)</Label>
+              <Label className="text-on-surface-variant text-sm mb-1 block">{t('vendor.best_before')} (optional)</Label>
               <Input value={form.bestBefore} onChange={e => setForm(f => ({ ...f, bestBefore: e.target.value }))}
-                type="date" className="bg-slate-800 border-slate-700 text-white" />
+                type="date" className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
             </div>
           </div>
           <div className="flex gap-2">
             <Button onClick={handleSave} disabled={saving || !form.name || !form.unitPrice}
-              className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50">
+              className="gradient-bg disabled:opacity-50">
               {saving ? t('vendor.saving') : t('vendor.save')}
             </Button>
-            <Button variant="outline" onClick={() => setShowForm(false)} className="border-slate-700 text-slate-300">
+            <Button variant="outline" onClick={() => setShowForm(false)} className="border-outline-variant text-on-surface-variant">
               {t('vendor.cancel')}
             </Button>
           </div>
         </div>
       )}
 
-      {loading && <p className="text-slate-400">{t('browse.loading')}</p>}
+      {loading && <p className="text-on-surface-variant">{t('browse.loading')}</p>}
 
       {!loading && items.length === 0 && !showForm && (
         <div className="text-center py-16">
-          <p className="text-slate-400 text-lg mb-4">{t('vendor.no_inventory')}</p>
-          <Button onClick={openAdd} className="bg-indigo-600 hover:bg-indigo-500">
+          <p className="text-on-surface-variant text-lg mb-4">{t('vendor.no_inventory')}</p>
+          <Button onClick={openAdd} className="gradient-bg">
             + {t('vendor.add_item')}
           </Button>
         </div>
@@ -191,26 +192,29 @@ export default function VendorInventoryPage() {
         {sorted.map(item => {
           const label = expiryLabel(item)
           return (
-            <div key={item.id} className={`bg-slate-900 border rounded-xl p-4 flex items-center gap-4 ${
-              label === 'today' ? 'border-red-500/60' : label === 'soon' ? 'border-amber-500/60' : 'border-slate-800'
+            <div key={item.id} className={`bg-surface-container border rounded-xl p-4 flex items-center gap-4 ${
+              label === 'today' ? 'border-red-500/60' : label === 'soon' ? 'border-amber-500/60' : 'border-outline-variant'
             }`}>
               <span className="text-2xl">{CATEGORY_ICONS[item.category]}</span>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <p className="text-white font-medium">{item.name}</p>
+                  <p className="text-on-surface font-medium">{item.name}</p>
                   {label && (
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${BADGE[label].style}`}>
                       {BADGE[label].label}
                     </span>
                   )}
                 </div>
-                <p className="text-slate-400 text-sm">
+                <p className="text-on-surface-variant text-sm">
                   {item.unitPrice.toLocaleString('vi-VN')} đ / {item.unit} · {t('vendor.default_qty')}: {item.defaultQty}
                 </p>
+                <div className="mt-1">
+                  <StockProgressBar current={item.defaultQty} total={(item as InventoryItem & { maxQty?: number }).maxQty ?? 10} />
+                </div>
               </div>
               <div className="flex gap-2 flex-shrink-0">
                 <Button variant="outline" size="sm" onClick={() => openEdit(item)}
-                  className="border-slate-700 text-slate-300 hover:text-white">{t('vendor.edit')}</Button>
+                  className="border-outline-variant text-on-surface-variant hover:text-on-surface">{t('vendor.edit')}</Button>
                 <Button variant="destructive" size="sm" onClick={() => handleDelete(item.id)}>
                   {t('vendor.delete')}
                 </Button>

@@ -22,6 +22,7 @@ import ListingFormPage from './pages/vendor/ListingFormPage'
 import VendorOrdersPage from './pages/vendor/VendorOrdersPage'
 import QRScanPage from './pages/vendor/QRScanPage'
 import VendorStorePage from './pages/customer/VendorStorePage'
+import SubscriptionsPage from './pages/customer/SubscriptionsPage'
 
 export default function App() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
             <Route path="/checkout/cancel" element={<CheckoutCancelPage />} />
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/orders/:id" element={<OrderDetailPage />} />
+            <Route path="/subscriptions" element={<SubscriptionsPage />} />
           </Route>
 
           <Route element={<ProtectedRoute><RoleRoute role="vendor"><VendorLayout /></RoleRoute></ProtectedRoute>}>
