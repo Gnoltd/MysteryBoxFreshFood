@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MysteryBox Fresh Food - Subscriptions</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Custom Utilities based on Style Guidance */
+        .glass-panel {
+            background-color: rgba(12, 19, 36, 0.6); /* surface with opacity */
+            backdrop-filter: blur(12px);
+        }
+        
+        .brand-gradient-text {
+            background: linear-gradient(to right, #c0c1ff, #ddb7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .brand-gradient-bg {
+            background: linear-gradient(to right, #c0c1ff, #ddb7ff);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#8083ff",
+                        "tertiary-fixed": "#ffddb8",
+                        "on-secondary-fixed-variant": "#6900b3",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "inverse-primary": "#494bd6",
+                        "surface-container-high": "#23293c",
+                        "on-surface-variant": "#c7c4d7",
+                        "on-error": "#690005",
+                        "outline": "#908fa0",
+                        "on-primary": "#1000a9",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-surface": "#dce1fb",
+                        "inverse-surface": "#dce1fb",
+                        "error": "#ffb4ab",
+                        "surface-bright": "#33394c",
+                        "on-primary-container": "#0d0096",
+                        "on-background": "#dce1fb",
+                        "surface-variant": "#2e3447",
+                        "surface": "#0c1324",
+                        "outline-variant": "#464554",
+                        "surface-container-highest": "#2e3447",
+                        "on-secondary-container": "#d6a9ff",
+                        "secondary": "#ddb7ff",
+                        "inverse-on-surface": "#2a3043",
+                        "secondary-fixed": "#f0dbff",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary": "#490080",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "secondary-fixed-dim": "#ddb7ff",
+                        "primary": "#c0c1ff",
+                        "on-secondary-fixed": "#2c0051",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "on-primary-fixed": "#07006c",
+                        "tertiary": "#ffb95f",
+                        "surface-tint": "#c0c1ff",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "surface-dim": "#0c1324",
+                        "on-tertiary-container": "#3e2400",
+                        "surface-container": "#191f31",
+                        "tertiary-container": "#ca8100",
+                        "surface-container-low": "#151b2d",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#e1e0ff",
+                        "background": "#0c1324",
+                        "surface-container-lowest": "#070d1f",
+                        "secondary-container": "#6f00be",
+                        "on-tertiary": "#472a00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "8px",
+                        "sm": "12px",
+                        "base": "4px",
+                        "xl": "32px",
+                        "xxl": "48px",
+                        "gutter": "16px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "mono-stat": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "mono-stat": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-lg min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar Component -->
+<nav class="bg-surface dark:bg-surface border-b border-outline-variant w-full sticky top-0 z-50">
+<div class="flex justify-between items-center px-lg w-full max-w-container-max mx-auto h-16">
+<!-- Brand -->
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary fill-icon text-3xl">local_mall</span>
+<span class="text-headline-md font-headline-md font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary hidden sm:block">MysteryBox Fresh Food</span>
+</div>
+<!-- Navigation Links -->
+<div class="hidden md:flex items-center gap-xl">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-200" href="#">Marketplace</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 hover:text-primary transition-colors duration-200" href="#">Subscriptions</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-200" href="#">My Orders</a>
+</div>
+<!-- Trailing Icons & Profile -->
+<div class="flex items-center gap-md text-primary dark:text-primary">
+<button aria-label="Search" class="p-2 hover:bg-surface-variant rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+<button aria-label="Cart" class="p-2 hover:bg-surface-variant rounded-full transition-colors relative">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button aria-label="Notifications" class="p-2 hover:bg-surface-variant rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant overflow-hidden ml-2 cursor-pointer hover:ring-2 hover:ring-primary transition-all">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="A detailed headshot portrait of a modern user in a vibrant tech environment. Soft volumetric lighting highlights their confident expression. Deep slate background with a subtle neon indigo glow. Shot on 85mm lens, high quality, highly detailed." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzZqpJ8aVnHZvPucbHxvYcSJ69mbN-9KV5drjHZfZi6APHafil61rSCJ1DKmcCJc7lx9-qnkjiZHidT8IbRG6kirGOZS83pyIX5kDNTrpr096bwoVo--nFismrqRkMT1bQfDMWutYn64WjmHjyeGN8Ap17K3m774X2B2WSv-8AV9a7vaE13d2DDoDnVL_y07VI43lzRE6Z2H_4Ateektwfs0kN8wHz_ABScIvbMqmIhaWSNKNw-uVsha_lxReEXa_-Val8a6LoK0A"/>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col items-center w-full px-lg md:px-xxl py-xl md:py-xxl gap-xxl max-w-container-max mx-auto">
+<!-- Hero Section -->
+<section class="w-full grid grid-cols-1 md:grid-cols-2 gap-xxl items-center min-h-[60vh]">
+<div class="flex flex-col gap-md lg:pr-xl z-10">
+<div class="inline-flex items-center gap-2 bg-surface-variant border border-outline-variant rounded-full px-4 py-2 w-max mb-2">
+<span class="material-symbols-outlined text-tertiary text-sm fill-icon" data-icon="stars">stars</span>
+<span class="font-label-caps text-label-caps text-on-surface">VIP ACCESS</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface mb-sm">
+                    Elevate Your <br/>
+<span class="brand-gradient-text">Experience</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-md">
+                    Unlock exclusive perks, priority pickup, and daily mystery boxes with a VIP subscription. Join the movement against food waste while enjoying premium selections.
+                </p>
+<div class="flex flex-col sm:flex-row gap-sm mt-md">
+<button class="brand-gradient-bg text-on-primary font-headline-md text-headline-md py-3 px-6 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(192,193,255,0.3)]">
+                        Explore Plans
+                        <span class="material-symbols-outlined" data-icon="arrow_downward">arrow_downward</span>
+</button>
+</div>
+</div>
+<div class="relative w-full aspect-square md:aspect-auto md:h-full flex items-center justify-center">
+<!-- Decorative background elements -->
+<div class="absolute inset-0 bg-primary-container opacity-10 blur-3xl rounded-full"></div>
+<div class="absolute top-1/4 right-1/4 w-32 h-32 bg-secondary opacity-20 blur-2xl rounded-full"></div>
+<!-- 3D Illustration -->
+<img alt="3D illustration of a mystery box full of fresh food with a 'Subscribed' tag floating above it." class="relative z-10 w-full max-w-lg object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlR2L7Jw4njtnWmbLbn0GjTJJYnyW6OshLBwcVy7tuUXjeHfqGUHy5R1ttB3OpXKKHCDAMfEZjXGxLL_-cCAOK8AbzSs2BIoUpywm99C4rYbBTnf6XLsu28QsJL9meKekVUddozfTYQHmm4OgFJFZ3FO5vImcM_seYdppIF9B66qrWQ6wu_q45tBNapzt1Y_W4uDxX1YCTgtWqfzHHXWMwTUZHaKOQSGTI-TNAaXfkzaQzqfjaJXaSlLZOJA7mJK768D64hL7YAaw"/>
+</div>
+</section>
+<!-- Subscription Plans Grid -->
+<section class="w-full flex flex-col gap-lg items-center">
+<div class="text-center mb-xl">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">Choose Your Plan</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Flexible options for every appetite.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg w-full max-w-5xl">
+<!-- Basic Plan -->
+<div class="bg-surface-container border border-outline-variant rounded-xl p-lg flex flex-col h-full hover:border-outline transition-colors relative group">
+<div class="mb-md">
+<h3 class="font-headline-md text-headline-md text-on-surface">Basic</h3>
+<div class="flex items-baseline gap-1 mt-2">
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Free</span>
+</div>
+</div>
+<ul class="flex flex-col gap-sm flex-grow mb-xl">
+<li class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-outline text-sm" data-icon="check_circle">check_circle</span>
+                            Standard pickup access
+                        </li>
+<li class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-outline text-sm" data-icon="check_circle">check_circle</span>
+                            1 box per day limit
+                        </li>
+<li class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-outline text-sm" data-icon="check_circle">check_circle</span>
+                            Standard support
+                        </li>
+</ul>
+<button class="w-full border border-outline-variant text-on-surface font-headline-md text-headline-md py-3 rounded-xl hover:bg-surface-variant transition-colors mt-auto">
+                        Current Plan
+                    </button>
+</div>
+<!-- Elite Plan (Highlighted) -->
+<div class="bg-surface-container-high border border-primary rounded-xl p-lg flex flex-col h-full relative transform md:-translate-y-4 shadow-[0_0_30px_rgba(192,193,255,0.15)] overflow-hidden">
+<!-- Brand gradient top border -->
+<div class="absolute top-0 left-0 right-0 h-1 brand-gradient-bg"></div>
+<!-- Popular badge -->
+<div class="absolute top-4 right-4 bg-primary text-on-primary font-label-caps text-label-caps px-2 py-1 rounded">
+                        MOST POPULAR
+                    </div>
+<div class="mb-md mt-2">
+<h3 class="font-headline-md text-headline-md text-primary">Elite</h3>
+<div class="flex items-baseline gap-1 mt-2">
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">300.000 đ</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">/mo</span>
+</div>
+</div>
+<ul class="flex flex-col gap-sm flex-grow mb-xl">
+<li class="flex items-center gap-2 text-on-surface font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-primary text-sm fill-icon" data-icon="check_circle">check_circle</span>
+                            Unlimited boxes per day
+                        </li>
+<li class="flex items-center gap-2 text-on-surface font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-primary text-sm fill-icon" data-icon="check_circle">check_circle</span>
+                            VIP Support channel
+                        </li>
+<li class="flex items-center gap-2 text-on-surface font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-primary text-sm fill-icon" data-icon="check_circle">check_circle</span>
+                            15% discount on all boxes
+                        </li>
+<li class="flex items-center gap-2 text-on-surface font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-primary text-sm fill-icon" data-icon="check_circle">check_circle</span>
+                            Exclusive "Elite" boxes access
+                        </li>
+<li class="flex items-center gap-2 text-on-surface font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-primary text-sm fill-icon" data-icon="check_circle">check_circle</span>
+                            Priority instant pickup
+                        </li>
+</ul>
+<button class="w-full brand-gradient-bg text-on-primary font-headline-md text-headline-md py-3 rounded-xl hover:opacity-90 transition-opacity mt-auto shadow-lg">
+                        Upgrade to Elite
+                    </button>
+</div>
+<!-- Pro Plan -->
+<div class="bg-surface-container border border-outline-variant rounded-xl p-lg flex flex-col h-full hover:border-outline transition-colors relative group">
+<div class="mb-md">
+<h3 class="font-headline-md text-headline-md text-on-surface">Pro</h3>
+<div class="flex items-baseline gap-1 mt-2">
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">150.000 đ</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">/mo</span>
+</div>
+</div>
+<ul class="flex flex-col gap-sm flex-grow mb-xl">
+<li class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-outline text-sm" data-icon="check_circle">check_circle</span>
+                            Priority pickup access
+                        </li>
+<li class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-outline text-sm" data-icon="check_circle">check_circle</span>
+                            3 boxes per day limit
+                        </li>
+<li class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-outline text-sm" data-icon="check_circle">check_circle</span>
+                            5% discount on all boxes
+                        </li>
+<li class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-outline text-sm" data-icon="check_circle">check_circle</span>
+                            Priority support
+                        </li>
+</ul>
+<button class="w-full border border-primary text-primary font-headline-md text-headline-md py-3 rounded-xl hover:bg-surface-variant transition-colors mt-auto">
+                        Select Pro
+                    </button>
+</div>
+</div>
+</section>
+<!-- Benefits Grid -->
+<section class="w-full flex flex-col gap-lg items-center mt-xl">
+<div class="text-center mb-md">
+<h2 class="font-headline-md text-headline-md text-on-surface">Why Subscribe?</h2>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-md w-full max-w-5xl">
+<!-- Benefit 1 -->
+<div class="bg-surface-container border border-outline-variant rounded-xl p-md flex items-start gap-md hover:border-primary/50 transition-colors">
+<div class="p-3 bg-surface-variant rounded-lg text-tertiary">
+<span class="material-symbols-outlined fill-icon" data-icon="eco">eco</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface mb-1 text-sm">Sustainability</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Maximize your impact. Elite members save an average of 50kg of food waste monthly.</p>
+</div>
+</div>
+<!-- Benefit 2 -->
+<div class="bg-surface-container border border-outline-variant rounded-xl p-md flex items-start gap-md hover:border-primary/50 transition-colors">
+<div class="p-3 bg-surface-variant rounded-lg text-secondary">
+<span class="material-symbols-outlined fill-icon" data-icon="storefront">storefront</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface mb-1 text-sm">Local Support</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Directly support local cafes and restaurants while securing the best deals in town.</p>
+</div>
+</div>
+<!-- Benefit 3 -->
+<div class="bg-surface-container border border-outline-variant rounded-xl p-md flex items-start gap-md hover:border-primary/50 transition-colors">
+<div class="p-3 bg-surface-variant rounded-lg text-primary">
+<span class="material-symbols-outlined fill-icon" data-icon="verified">verified</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface mb-1 text-sm">Freshness Guaranteed</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Get first dibs on the freshest inventory right as it's listed. Beat the rush.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Component -->
+<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant w-full mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center px-lg py-xl w-full max-w-container-max mx-auto gap-md">
+<div class="text-headline-md font-headline-md font-bold text-on-surface mb-md md:mb-0">
+                MysteryBox Fresh Food
+            </div>
+<div class="flex flex-wrap justify-center gap-md md:gap-lg mb-md md:mb-0">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors duration-200 focus:ring-2 focus:ring-primary rounded" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors duration-200 focus:ring-2 focus:ring-primary rounded" href="#">Terms of Service</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors duration-200 focus:ring-2 focus:ring-primary rounded" href="#">Cookie Policy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors duration-200 focus:ring-2 focus:ring-primary rounded" href="#">Sustainability Report</a>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant text-center md:text-right">
+                © 2026 MysteryBox Fresh Food. All rights reserved.
+            </div>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><plasmo-csui id="g0-textarea-recorder"></plasmo-csui><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>SAVOR - Order Detail</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#ca8100",
+                        "surface-container-high": "#23293c",
+                        "secondary-container": "#6f00be",
+                        "inverse-primary": "#494bd6",
+                        "on-tertiary": "#472a00",
+                        "outline": "#908fa0",
+                        "secondary": "#ddb7ff",
+                        "secondary-fixed": "#f0dbff",
+                        "on-secondary-fixed-variant": "#6900b3",
+                        "on-error-container": "#ffdad6",
+                        "background": "#0c1324",
+                        "on-background": "#dce1fb",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#0d0096",
+                        "tertiary": "#ffb95f",
+                        "surface-bright": "#33394c",
+                        "on-tertiary-fixed": "#2a1700",
+                        "inverse-surface": "#dce1fb",
+                        "surface-dim": "#0c1324",
+                        "outline-variant": "#464554",
+                        "surface-variant": "#2e3447",
+                        "on-secondary-container": "#d6a9ff",
+                        "on-tertiary-container": "#3e2400",
+                        "surface-container-lowest": "#070d1f",
+                        "on-surface-variant": "#c7c4d7",
+                        "surface-container": "#191f31",
+                        "surface": "#0c1324",
+                        "tertiary-fixed": "#ffddb8",
+                        "surface-container-low": "#151b2d",
+                        "inverse-on-surface": "#2a3043",
+                        "primary-fixed": "#e1e0ff",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "on-secondary-fixed": "#2c0051",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "secondary-fixed-dim": "#ddb7ff",
+                        "on-secondary": "#490080",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "surface-container-highest": "#2e3447",
+                        "error": "#ffb4ab",
+                        "primary-container": "#8083ff",
+                        "surface-tint": "#c0c1ff",
+                        "on-primary-fixed": "#07006c",
+                        "primary": "#c0c1ff",
+                        "on-primary": "#1000a9",
+                        "on-surface": "#dce1fb",
+                        "on-error": "#690005"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "xxl": "48px",
+                        "container-max": "1280px",
+                        "base": "4px",
+                        "xl": "32px",
+                        "xs": "8px",
+                        "md": "16px",
+                        "sm": "12px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "mono-stat": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-caps": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "mono-stat": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .gradient-border-top {
+            position: relative;
+        }
+        .gradient-border-top::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #494bd6, #6f00be);
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+        }
+    </style>
+<style data-styled="" data-styled-version="4.3.1"></style></head>
+<body class="bg-background text-on-background font-body-lg min-h-screen flex flex-col antialiased">
+<!-- TopNavBar (Nav suppressed as this is a transactional detail view, keeping header only) -->
+<header class="bg-background/80 backdrop-blur-md border-b border-outline-variant fixed top-0 w-full z-50 flex justify-between items-center px-lg h-16 max-w-container-max mx-auto flat no shadows">
+<a class="flex items-center gap-xs text-primary hover:text-secondary transition-colors group" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 0;">arrow_back</span>
+<span class="font-body-lg text-body-lg">My Orders</span>
+</a>
+<div class="font-headline-md text-headline-md font-bold text-primary">MysteryBox Fresh Food</div>
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden border border-outline-variant">
+<img alt="Customer Profile Avatar" class="w-full h-full object-cover" data-alt="A stylized, neon-lit avatar of an urban foodie exploring a night market. The style is cyberpunk-adjacent with deep purples and blues, conveying a high-tech, modern vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkbdd_HVEJZK3bIQSWi7geBoU8gdc76yEzG6SKukRFQSOvngkJPtbue4Fa-a34Nxei2Wgg59sRajtsT3wRlYn_Pt7KnkO3WjEM1ZzTZ6z3ri0wZx-bu3hLw7LfToCjZJ8n2MogC4Ab9Mi8odNjNa_A-erXHJBEz8QCIv_GFq13kQ4yl-hjKqho4cuBeBFByEbh4IPHxbmHBQn27ZsVfCo5D3-WHTt2cgexF5KFGLfcKWv0cuMiZbWUexGuvdnFL-jdQxDIwBbQChY">
+</div>
+</header>
+<main class="flex-grow pt-[80px] pb-xxl px-md md:px-lg max-w-3xl mx-auto w-full">
+<!-- Order Header -->
+<div class="mb-lg">
+<div class="flex items-center gap-sm mb-xs">
+<span class="px-2 py-1 rounded bg-tertiary-container/20 text-tertiary font-label-caps text-label-caps border border-tertiary/30">PENDING PICKUP</span>
+<span class="text-on-surface-variant font-body-sm text-body-sm">Order #SVR-8924A</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg mb-xs">Neon Noodle Bar Mystery Box</h1>
+<p class="text-on-surface-variant font-body-lg text-body-lg">Pick up today between 21:00 - 22:30</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md mb-xl">
+<!-- Stats -->
+<div class="bg-surface-container rounded-lg border border-outline-variant p-md flex flex-col">
+<span class="text-on-surface-variant font-body-sm text-body-sm mb-xs">Items</span>
+<span class="font-mono-stat text-mono-stat text-on-background">2x Boxes</span>
+</div>
+<div class="bg-surface-container rounded-lg border border-outline-variant p-md flex flex-col">
+<span class="text-on-surface-variant font-body-sm text-body-sm mb-xs">Total</span>
+<span class="font-mono-stat text-mono-stat text-primary">$14.50</span>
+</div>
+<div class="bg-surface-container rounded-lg border border-outline-variant p-md flex flex-col">
+<span class="text-on-surface-variant font-body-sm text-body-sm mb-xs">Saved</span>
+<span class="font-mono-stat text-mono-stat text-tertiary">$32.00</span>
+</div>
+</div>
+<!-- Main Content Area -->
+<div class="flex flex-col gap-lg">
+<!-- QR Pickup Card -->
+<div class="bg-surface-container-high rounded-lg border border-outline-variant p-lg gradient-border-top flex flex-col items-center text-center shadow-lg">
+<h2 class="font-headline-md text-headline-md mb-xs">Pickup QR Code</h2>
+<p class="text-on-surface-variant font-body-sm text-body-sm mb-lg">Show this to the vendor to claim your order.</p>
+<div class="bg-white p-2 rounded-lg mb-md inline-block">
+<!-- Placeholder for QR Code generation, normally handled via JS library like qrcode.js -->
+<img alt="Pickup QR Code" class="w-[320px] h-[320px] object-contain" data-alt="A clean, high-contrast, black and white QR code centered on a stark white square background. It looks crisp and scannable, designed for a modern mobile app interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIJU1SZ4J99RuRzMTJr9kSfspFPTDdFdFBqo-az9Wp77Z1MZ4CvEJYRR5bVYAvkEEx4sWR3yaz0nS7vJvLFDrwYS6xK5S5-KnDfnB5W5A8XoP4WKTNHrmMqlDKwSZmfrAPmzvGG-Yo1Vpn1wS2W9ttTgTF-8WysV6hL2RDgRC8Jqxv-XDgNnXHPHcYhcajI4IvJB0BS7Fw8jbcBgR0ttKSFw2SIwuQXHJLSqzhHr1VGJjY5BOJwBCFhHRPehoPOdNleq7th11vL3U">
+</div>
+<div class="bg-surface-variant rounded px-md py-xs mb-lg flex items-center gap-sm border border-outline-variant">
+<span class="text-on-surface-variant font-mono-stat text-sm">UUID:</span>
+<span class="font-mono-stat text-primary tracking-wider">8F92-A3B1-C4D5</span>
+</div>
+<div class="flex gap-sm w-full md:w-auto">
+<button class="flex-1 md:flex-none flex items-center justify-center gap-xs px-md py-sm rounded-lg bg-surface-variant border border-outline-variant text-on-surface hover:bg-surface-container-highest transition-colors font-body-sm">
+<span class="material-symbols-outlined text-[18px]">share</span>
+                        Share
+                    </button>
+<button class="flex-1 md:flex-none flex items-center justify-center gap-xs px-md py-sm rounded-lg bg-gradient-to-r from-inverse-primary to-secondary-container text-white font-body-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                        Save QR
+                    </button>
+</div>
+</div>
+<!-- Payment Detail Card (BANK Example) -->
+<div class="bg-surface-container rounded-lg border border-outline-variant p-lg">
+<div class="flex items-center gap-sm mb-md border-b border-outline-variant pb-sm">
+<span class="material-symbols-outlined text-primary">account_balance</span>
+<h3 class="font-headline-md text-headline-md">Payment Details</h3>
+</div>
+<div class="space-y-md">
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant font-body-sm text-body-sm">Method</span>
+<span class="font-body-lg text-body-lg">Bank Transfer</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant font-body-sm text-body-sm">Account Name</span>
+<span class="font-body-lg text-body-lg">SAVOR Marketplace Escrow</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant font-body-sm text-body-sm">Account No.</span>
+<span class="font-mono-stat text-mono-stat">**** 4920</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant font-body-sm text-body-sm">Reference</span>
+<span class="font-mono-stat text-mono-stat text-tertiary">REF-8924A</span>
+</div>
+<div class="mt-md pt-sm border-t border-outline-variant flex justify-between items-center">
+<span class="font-headline-md text-headline-md">Status</span>
+<span class="px-2 py-1 rounded bg-secondary-container/20 text-secondary font-label-caps text-label-caps border border-secondary/30">CONFIRMED</span>
+</div>
+</div>
+</div>
+<!-- Post-Pickup State Placeholder (Hidden by default, shown for demonstration) -->
+<div class="bg-surface-container rounded-lg border border-outline-variant p-lg opacity-50 mt-xl border-dashed">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-outline">rate_review</span>
+<h3 class="font-headline-md text-headline-md text-outline">Rate Your Experience</h3>
+</div>
+<p class="text-on-surface-variant font-body-sm text-body-sm mb-md">This section becomes active after the vendor scans your QR code.</p>
+<div class="flex gap-xs mb-md pointer-events-none">
+<span class="material-symbols-outlined text-outline text-[32px]">star_border</span>
+<span class="material-symbols-outlined text-outline text-[32px]">star_border</span>
+<span class="material-symbols-outlined text-outline text-[32px]">star_border</span>
+<span class="material-symbols-outlined text-outline text-[32px]">star_border</span>
+<span class="material-symbols-outlined text-outline text-[32px]">star_border</span>
+</div>
+<textarea class="w-full bg-surface-variant border border-outline-variant rounded-lg p-sm text-on-surface-variant font-body-sm placeholder:text-outline-variant focus:ring-1 focus:ring-primary focus:border-primary resize-none h-24 mb-md" disabled="" placeholder="Tell us about the food..."></textarea>
+<button class="w-full py-sm rounded-lg bg-surface-variant text-outline font-body-lg cursor-not-allowed" disabled="">Submit Review</button>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant w-full py-xl px-lg flex flex-col md:flex-row justify-between items-center max-w-container-max mx-auto mt-auto">
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-sm md:mb-0">MysteryBox Fresh Food</div>
+<div class="flex flex-wrap justify-center gap-md mb-sm md:mb-0">
+<a class="text-on-surface-variant font-body-sm text-body-sm hover:text-secondary opacity-80 hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant font-body-sm text-body-sm hover:text-secondary opacity-80 hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="text-on-surface-variant font-body-sm text-body-sm hover:text-secondary opacity-80 hover:opacity-100 transition-opacity" href="#">Vendor Portal</a>
+<a class="text-on-surface-variant font-body-sm text-body-sm hover:text-secondary opacity-80 hover:opacity-100 transition-opacity" href="#">Contact Support</a>
+</div>
+<div class="text-on-surface-variant font-body-sm text-body-sm">© 2026 SAVOR Tech. All rights reserved.</div>
+</footer>
+
+
+</body></html>

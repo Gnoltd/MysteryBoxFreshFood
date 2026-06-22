@@ -1,0 +1,302 @@
+<!DOCTYPE html><html class="dark" lang="en" data-headlessui-focus-visible=""><plasmo-csui id="g0-textarea-recorder"></plasmo-csui><head><style data-styled="" data-styled-version="4.3.1"></style></head><body class="bg-background text-on-background font-body-lg min-h-screen pt-16"><plasmo-csui id="g0-textarea-recorder"></plasmo-csui>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>SAVOR - Browse Listings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#ca8100",
+                        "surface-container-high": "#23293c",
+                        "secondary-container": "#6f00be",
+                        "inverse-primary": "#494bd6",
+                        "on-tertiary": "#472a00",
+                        "outline": "#908fa0",
+                        "secondary": "#ddb7ff",
+                        "secondary-fixed": "#f0dbff",
+                        "on-secondary-fixed-variant": "#6900b3",
+                        "on-error-container": "#ffdad6",
+                        "background": "#0c1324",
+                        "on-background": "#dce1fb",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#0d0096",
+                        "tertiary": "#ffb95f",
+                        "surface-bright": "#33394c",
+                        "on-tertiary-fixed": "#2a1700",
+                        "inverse-surface": "#dce1fb",
+                        "surface-dim": "#0c1324",
+                        "outline-variant": "#464554",
+                        "surface-variant": "#2e3447",
+                        "on-secondary-container": "#d6a9ff",
+                        "on-tertiary-container": "#3e2400",
+                        "surface-container-lowest": "#070d1f",
+                        "on-surface-variant": "#c7c4d7",
+                        "surface-container": "#191f31",
+                        "surface": "#0c1324",
+                        "tertiary-fixed": "#ffddb8",
+                        "surface-container-low": "#151b2d",
+                        "inverse-on-surface": "#2a3043",
+                        "primary-fixed": "#e1e0ff",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "on-secondary-fixed": "#2c0051",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "secondary-fixed-dim": "#ddb7ff",
+                        "on-secondary": "#490080",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "surface-container-highest": "#2e3447",
+                        "error": "#ffb4ab",
+                        "primary-container": "#8083ff",
+                        "surface-tint": "#c0c1ff",
+                        "on-primary-fixed": "#07006c",
+                        "primary": "#c0c1ff",
+                        "on-primary": "#1000a9",
+                        "on-surface": "#dce1fb",
+                        "on-error": "#690005"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "xxl": "48px",
+                        "container-max": "1280px",
+                        "base": "4px",
+                        "xl": "32px",
+                        "xs": "8px",
+                        "md": "16px",
+                        "sm": "12px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "mono-stat": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-caps": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "mono-stat": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to right, #c0c1ff, #ddb7ff);
+        }
+        .gradient-bg {
+            background-image: linear-gradient(to right, #494bd6, #6f00be);
+        }
+        .mystery-border {
+            border-top: 4px solid transparent;
+            border-image: linear-gradient(to right, #494bd6, #6f00be) 1;
+        }
+    </style>
+<style data-styled="" data-styled-version="4.3.1"></style>
+
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-lg h-16 max-w-container-max mx-auto bg-background/80 backdrop-blur-md border-b border-outline-variant flat no shadows">
+<div class="flex items-center gap-lg">
+<span class="font-headline-md text-headline-md font-bold text-primary gradient-text tracking-tight">MysteryBox Fresh Food</span>
+<div class="hidden md:flex gap-md font-body-lg text-body-lg">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 scale-95 duration-200" href="#">Marketplace</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors scale-95 duration-200" href="#">Subscriptions</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors scale-95 duration-200" href="#">My Orders</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors scale-95 duration-200" href="#">How it Works</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg flex items-center gap-xs">
+<span class="material-symbols-outlined">language</span>
+                Language
+            </button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Customer Profile Avatar" class="w-full h-full object-cover" data-alt="A detailed portrait of a modern user avatar, high quality, sleek lighting, dark mode aesthetic, slate and indigo hues." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2_sHA7o25RNmkfPk7i2lS2yY3rFaY7-FcQCo-3WPINPO-Ct1FOmo_V6BEdenE7iXqO96t5iJXTI9SN6Q_IrSFVkUwXGh54dMkE8iVYAqNO4RTLQ2ArcJi5Gv98GUWQLTxMpP_vS3iREOhOVRqnctflojhcAPadVVN-uF3afiwTk8pSqOZGo8bCLPbPZ4ozJ2m7QaGiEomrciNiBLo1_hw6PdTIdoUHKvhQelPuVKp-TFRjYXQwzKC_on-CSz0Qjgbr5X1VCNUqDE">
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="max-w-container-max mx-auto px-lg py-xl">
+<!-- Header & Chips -->
+<header class="mb-xl space-y-md">
+<h1 class="font-headline-lg text-headline-lg hidden md:block">Browse Listings</h1>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:hidden">Browse Listings</h1>
+<div class="flex gap-sm overflow-x-auto pb-2 scrollbar-hide">
+<button class="px-md py-xs rounded-full gradient-bg text-on-background font-label-caps text-label-caps whitespace-nowrap">All</button>
+<button class="px-md py-xs rounded-full bg-surface-variant border border-outline-variant text-on-surface hover:border-primary transition-colors font-label-caps text-label-caps whitespace-nowrap">🥐 Bakery</button>
+<button class="px-md py-xs rounded-full bg-surface-variant border border-outline-variant text-on-surface hover:border-primary transition-colors font-label-caps text-label-caps whitespace-nowrap">🍎 Fruit</button>
+<button class="px-md py-xs rounded-full bg-surface-variant border border-outline-variant text-on-surface hover:border-primary transition-colors font-label-caps text-label-caps whitespace-nowrap">🥕 Vegetables</button>
+<button class="px-md py-xs rounded-full bg-surface-variant border border-outline-variant text-on-surface hover:border-primary transition-colors font-label-caps text-label-caps whitespace-nowrap">🍱 Prepared Meals</button>
+</div>
+</header>
+<div class="flex flex-col md:flex-row gap-lg">
+<!-- Filter Panel -->
+<aside class="w-full md:w-64 shrink-0 space-y-md">
+<div class="bg-surface-container border border-outline-variant rounded-lg p-lg space-y-lg sticky top-24">
+<div class="space-y-sm">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Search</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-surface-dim border border-outline-variant rounded focus:border-primary focus:ring-1 focus:ring-primary pl-10 pr-sm py-sm text-body-sm text-on-surface placeholder:text-outline-variant transition-all" placeholder="Search items..." type="text">
+</div>
+</div>
+<div class="space-y-sm">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Price Range</label>
+<div class="flex gap-sm">
+<input class="w-full bg-surface-dim border border-outline-variant rounded focus:border-primary focus:ring-1 focus:ring-primary px-sm py-sm text-body-sm text-on-surface placeholder:text-outline-variant transition-all" placeholder="Min" type="number">
+<input class="w-full bg-surface-dim border border-outline-variant rounded focus:border-primary focus:ring-1 focus:ring-primary px-sm py-sm text-body-sm text-on-surface placeholder:text-outline-variant transition-all" placeholder="Max" type="number">
+</div>
+</div>
+<div class="space-y-sm">
+<label class="flex items-center gap-sm cursor-pointer group">
+<input class="rounded border-outline-variant bg-surface-dim text-primary focus:ring-primary focus:ring-offset-background" type="checkbox">
+<span class="font-body-sm text-body-sm text-on-surface group-hover:text-primary transition-colors">Available now</span>
+</label>
+</div>
+<div class="space-y-sm">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Sort By</label>
+<select class="w-full bg-surface-dim border border-outline-variant rounded focus:border-primary focus:ring-1 focus:ring-primary px-sm py-sm text-body-sm text-on-surface transition-all appearance-none">
+<option>Closest to me</option>
+<option>Ending soonest</option>
+<option>Price: Low to High</option>
+<option>Highest Discount</option>
+</select>
+</div>
+</div>
+</aside>
+<!-- Grid -->
+<div class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+<!-- Card 1 -->
+<article class="bg-surface-container border border-outline-variant mystery-border rounded-b-lg flex flex-col overflow-hidden hover:border-primary transition-colors group">
+<div class="h-48 w-full relative">
+<img alt="Bakery Items" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A beautifully lit assortment of artisan breads and pastries in a dark, moody bakery setting. Neon purple and indigo accent lights highlight the crusts. High tech culinary vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAxSY3cauI0KvRha1tw74ynGKl3jBgoua1CrYoZ2ORMb-sf4FnD_jBrMdcMcnQ9fU3de54Hz0q8HuqjoFhSIiCi3BvS1yTsEZkvhUxilQhdvBvZ98WHbpUiurs8KJxY1vTA2XDDltrun_7Fc2HsqVsFFljSyxztq00badc6SIMq0ki6exv1zcnwF7jexc1-RRiT_xBALByGkLhVDp0WD5KeL3qrfsvkNBU9jXlCzrnmFmqft06eNxH062MR_7ARErexkZr2oQzK7U">
+<div class="absolute top-sm right-sm bg-error text-on-error font-label-caps text-label-caps px-sm py-xs rounded-full shadow-lg">
+                            -40%
+                        </div>
+<div class="absolute bottom-sm left-sm bg-surface-dim/80 backdrop-blur border border-outline-variant text-on-surface font-label-caps text-label-caps px-sm py-xs rounded-full flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+                            Pickup: 14:00 - 16:00
+                        </div>
+</div>
+<div class="p-md flex flex-col flex-1 gap-sm">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface line-clamp-1">Artisan Bread Bundle</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Neon Bakery</p>
+</div>
+<span class="text-xl">🥐</span>
+</div>
+<div class="mt-auto pt-md flex justify-between items-end border-t border-outline-variant">
+<div>
+<span class="font-mono-stat text-mono-stat text-primary">$5.99</span>
+<span class="font-body-sm text-body-sm text-outline-variant line-through ml-xs">$10.00</span>
+</div>
+<div class="bg-tertiary-container/10 text-tertiary font-label-caps text-label-caps px-sm py-xs rounded border border-tertiary-container/30">
+                                3 Left
+                            </div>
+</div>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-surface-container border border-outline-variant mystery-border rounded-b-lg flex flex-col overflow-hidden hover:border-primary transition-colors group">
+<div class="h-48 w-full relative">
+<img alt="Vegetables" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Fresh, vibrant organic vegetables arranged neatly in a dark, slate-colored crate. Cinematic lighting with deep shadows and subtle neon green and blue glows highlighting the produce freshness." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXA2prhvTjLv2btkk3bYnH6tzIeyxJMteNjL5hctUYo2hwZ6clZs3N4pi1c8xK9hAm47yFhZfBTkc9X41758Kqh6-vi7rWGno5SowJx6Iar84rgCiIE2ZJvOWFi7pz-GVvNv2TOpOqTomRYLat4_DinCz7yS8EmD7xgzNZvsGMHHp1-fXRei6LZ4DT_ep_CV7kmkeUemXR79y2jTsaIiRMp8X6FyuqEX7Wzo6tL-Cmqwja86m5X8wKV2L3F-jdO4fClfXN8QfqVRw">
+<div class="absolute top-sm right-sm bg-error text-on-error font-label-caps text-label-caps px-sm py-xs rounded-full shadow-lg">
+                            -50%
+                        </div>
+<div class="absolute bottom-sm left-sm bg-surface-dim/80 backdrop-blur border border-outline-variant text-on-surface font-label-caps text-label-caps px-sm py-xs rounded-full flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+                            Pickup: Now - 18:00
+                        </div>
+</div>
+<div class="p-md flex flex-col flex-1 gap-sm">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface line-clamp-1">Organic Veggie Box</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Green Roots Farm</p>
+</div>
+<span class="text-xl">🥕</span>
+</div>
+<div class="mt-auto pt-md flex justify-between items-end border-t border-outline-variant">
+<div>
+<span class="font-mono-stat text-mono-stat text-primary">$8.50</span>
+<span class="font-body-sm text-body-sm text-outline-variant line-through ml-xs">$17.00</span>
+</div>
+<div class="bg-tertiary-container/10 text-tertiary font-label-caps text-label-caps px-sm py-xs rounded border border-tertiary-container/30">
+                                1 Left
+                            </div>
+</div>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="bg-surface-container border border-outline-variant mystery-border rounded-b-lg flex flex-col overflow-hidden hover:border-primary transition-colors group">
+<div class="h-48 w-full relative">
+<img alt="Sushi Bento" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A sleek, modern sushi bento box on a dark slate table. Ambient neon purple and indigo reflections in the background. High contrast, sharp details, premium feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyWzwpoGwMXz4yRSgC8139L1RG0wn_91D1WC6o6N5dWrL623J7mMyiHLwiLx0AfDk3baRgu0mJmO_KWs1Zxf68K-PLyrtWNZpnXwLMEDgtap8X7ktXukzFhbUj6v9SWcDAd2bRL76wFac-UEhDqwYsFbSWAEFhbDLX1Pl2ufX2gWSyT21mpddmeERUJGjGWmVUPSpEGQaiUN63yfFyNSIFVpIW9Q-3Bu2eb9WFs6pCqUXrpNCc4xVQcDifICyGooAAv0u4Ff9wZIo">
+<div class="absolute top-sm right-sm bg-error text-on-error font-label-caps text-label-caps px-sm py-xs rounded-full shadow-lg">
+                            -30%
+                        </div>
+<div class="absolute bottom-sm left-sm bg-surface-dim/80 backdrop-blur border border-outline-variant text-on-surface font-label-caps text-label-caps px-sm py-xs rounded-full flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+                            Pickup: 19:00 - 21:00
+                        </div>
+</div>
+<div class="p-md flex flex-col flex-1 gap-sm">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface line-clamp-1">Premium Sushi Bento</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Okinawa Nights</p>
+</div>
+<span class="text-xl">🍱</span>
+</div>
+<div class="mt-auto pt-md flex justify-between items-end border-t border-outline-variant">
+<div>
+<span class="font-mono-stat text-mono-stat text-primary">$12.00</span>
+<span class="font-body-sm text-body-sm text-outline-variant line-through ml-xs">$17.50</span>
+</div>
+<div class="bg-surface-variant text-on-surface-variant font-label-caps text-label-caps px-sm py-xs rounded border border-outline-variant">
+                                5+ Left
+                            </div>
+</div>
+</div>
+</article>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-xl px-lg flex flex-col md:flex-row justify-between items-center max-w-container-max mx-auto bg-surface-container-lowest border-t border-outline-variant mt-xxl">
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-md md:mb-0 gradient-text">MysteryBox Fresh Food</div>
+<div class="flex gap-lg font-body-sm text-body-sm mb-md md:mb-0">
+<a class="text-on-surface-variant hover:text-secondary opacity-80 hover:opacity-100 transition-opacity" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-secondary opacity-80 hover:opacity-100 transition-opacity" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-secondary opacity-80 hover:opacity-100 transition-opacity" href="#">Vendor Portal</a>
+<a class="text-on-surface-variant hover:text-secondary opacity-80 hover:opacity-100 transition-opacity" href="#">Contact Support</a>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">© 2026 SAVOR Tech. All rights reserved.</div>
+</footer>
+
+
+
+
+</body></html>

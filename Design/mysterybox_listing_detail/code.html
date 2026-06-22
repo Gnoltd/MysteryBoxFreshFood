@@ -1,0 +1,256 @@
+<!DOCTYPE html><html class="dark" lang="en"><plasmo-csui id="g0-textarea-recorder"></plasmo-csui><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Listing Detail - MysteryBox Fresh Food</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#ca8100",
+                        "surface-container-high": "#23293c",
+                        "secondary-container": "#6f00be",
+                        "inverse-primary": "#494bd6",
+                        "on-tertiary": "#472a00",
+                        "outline": "#908fa0",
+                        "secondary": "#ddb7ff",
+                        "secondary-fixed": "#f0dbff",
+                        "on-secondary-fixed-variant": "#6900b3",
+                        "on-error-container": "#ffdad6",
+                        "background": "#0c1324",
+                        "on-background": "#dce1fb",
+                        "error-container": "#93000a",
+                        "on-primary-container": "#0d0096",
+                        "tertiary": "#ffb95f",
+                        "surface-bright": "#33394c",
+                        "on-tertiary-fixed": "#2a1700",
+                        "inverse-surface": "#dce1fb",
+                        "surface-dim": "#0c1324",
+                        "outline-variant": "#464554",
+                        "surface-variant": "#2e3447",
+                        "on-secondary-container": "#d6a9ff",
+                        "on-tertiary-container": "#3e2400",
+                        "surface-container-lowest": "#070d1f",
+                        "on-surface-variant": "#c7c4d7",
+                        "surface-container": "#191f31",
+                        "surface": "#0c1324",
+                        "tertiary-fixed": "#ffddb8",
+                        "surface-container-low": "#151b2d",
+                        "inverse-on-surface": "#2a3043",
+                        "primary-fixed": "#e1e0ff",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "on-secondary-fixed": "#2c0051",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "secondary-fixed-dim": "#ddb7ff",
+                        "on-secondary": "#490080",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "surface-container-highest": "#2e3447",
+                        "error": "#ffb4ab",
+                        "primary-container": "#8083ff",
+                        "surface-tint": "#c0c1ff",
+                        "on-primary-fixed": "#07006c",
+                        "primary": "#c0c1ff",
+                        "on-primary": "#1000a9",
+                        "on-surface": "#dce1fb",
+                        "on-error": "#690005"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "xxl": "48px",
+                        "container-max": "1280px",
+                        "base": "4px",
+                        "xl": "32px",
+                        "xs": "8px",
+                        "md": "16px",
+                        "sm": "12px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "mono-stat": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-caps": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "mono-stat": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(12, 19, 36, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .gradient-border-top {
+            position: relative;
+        }
+        .gradient-border-top::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #c0c1ff 0%, #ddb7ff 100%);
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+        }
+    </style>
+<style data-styled="" data-styled-version="4.3.1"></style></head>
+<body class="bg-background text-on-background font-body-sm pb-32">
+<!-- Top Navigation Area (Task Focused - Sub Page) -->
+<div class="fixed top-0 w-full z-50 glass-panel border-b border-surface-container flex justify-between items-center px-lg h-16">
+<a class="flex items-center gap-2 text-on-surface hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">arrow_back</span>
+<span class="font-body-lg text-body-lg">Browse</span>
+</a>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">share</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">favorite_border</span>
+</button>
+</div>
+</div>
+<!-- Main Content -->
+<main class="pt-16 max-w-container-max mx-auto px-lg mt-md">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Left Column: Media -->
+<div class="relative w-full h-64 md:h-[500px] rounded-lg overflow-hidden border border-surface-container">
+<img class="w-full h-full object-cover" data-alt="A high-quality, mouth-watering close-up photograph of a gourmet pastry mystery box. The scene is illuminated by dramatic, moody directional lighting that highlights the textures of the baked goods. The setting is a dark, modern slate-toned surface, fitting the high-contrast aesthetic of the SAVOR app. The image features deep blacks, subtle indigo ambient light reflections, and vibrant golden-brown crusts. The composition is dynamic and appetizing, inviting the user to claim the culinary treasure." src="https://lh3.googleusercontent.com/aida-public/AB6AXuATevJfMO7jN7tsqoEDzI8Mm-G6GJd6iyvnkf3oWFfH2ZnvHididMHH1F0DGK6-q4Y8dhpU7HPDd4T7f2BkACKkgVgoYf6EINbcscR0vQjhpl9OL2_FrUM7Q9DNbJP_N0cB_FomsWgcuMnJo3VW90znZdHceqBefx6Yj4Xl2fGi4kqOrQVe4JQ2cDOYyGmVmCtoes8iadtwpP4VDqNf-Sd0xbPRHXvkhJSNQb0Rmf2YkGnsmOegy7nr7MHDBw8BiJIw3hXYd750cw0">
+<!-- Badge -->
+<div class="absolute top-md left-md bg-tertiary-container/20 backdrop-blur-md border border-tertiary px-sm py-xs rounded-full flex items-center gap-1 shadow-lg">
+<span class="material-symbols-outlined text-tertiary text-[16px]" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span class="font-label-caps text-label-caps text-tertiary">-40%</span>
+</div>
+</div>
+<!-- Right Column: Details -->
+<div class="flex flex-col gap-lg">
+<!-- Title & Price -->
+<div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-sm">Artisan Pastry Box</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-md">A delightful assortment of today's freshly baked surplus. Includes croissants, danishes, and a surprise specialty item.</p>
+<div class="flex items-end gap-sm mb-xs">
+<span class="font-headline-lg text-headline-lg text-primary">35.000 đ</span>
+<span class="font-body-lg text-body-lg text-outline line-through mb-1">58.000 đ</span>
+</div>
+</div>
+<!-- Status Banner -->
+<div class="bg-primary/10 border border-primary/30 rounded-lg p-sm flex items-center justify-between">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined">timer</span>
+<span class="font-label-caps text-label-caps">2h 15m left</span>
+</div>
+<div class="text-on-surface-variant text-[12px]">
+                        Packed at 14:30
+                    </div>
+</div>
+<!-- Info Grid -->
+<div class="grid grid-cols-2 gap-sm">
+<div class="bg-surface-container p-sm rounded-lg border border-surface-container-high flex flex-col gap-1">
+<span class="text-on-surface-variant font-label-caps text-label-caps">Stock</span>
+<span class="font-mono-stat text-mono-stat text-on-surface">3 Left</span>
+</div>
+<div class="bg-surface-container p-sm rounded-lg border border-surface-container-high flex flex-col gap-1">
+<span class="text-on-surface-variant font-label-caps text-label-caps">Pickup</span>
+<span class="font-mono-stat text-mono-stat text-on-surface">17:00 - 18:00</span>
+</div>
+<div class="bg-surface-container p-sm rounded-lg border border-surface-container-high flex flex-col gap-1">
+<span class="text-on-surface-variant font-label-caps text-label-caps">Category</span>
+<span class="font-mono-stat text-mono-stat text-on-surface">Bakery</span>
+</div>
+<div class="bg-surface-container p-sm rounded-lg border border-surface-container-high flex flex-col gap-1">
+<span class="text-on-surface-variant font-label-caps text-label-caps">Type</span>
+<span class="font-mono-stat text-mono-stat text-on-surface">Mystery Box</span>
+</div>
+</div>
+<!-- Payment Selector -->
+<div class="bg-surface-container-low rounded-lg border border-surface-container-high p-md">
+<h3 class="font-headline-md text-headline-md mb-sm">Payment Method</h3>
+<div class="grid grid-cols-3 gap-sm">
+<button class="bg-surface p-sm rounded border border-primary text-primary flex flex-col items-center gap-2 transition-all">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-caps text-label-caps">COD</span>
+</button>
+<button class="bg-surface p-sm rounded border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary flex flex-col items-center gap-2 transition-all">
+<span class="material-symbols-outlined">account_balance</span>
+<span class="font-label-caps text-label-caps">Bank Transfer</span>
+</button>
+<button class="bg-surface p-sm rounded border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary flex flex-col items-center gap-2 transition-all">
+<span class="material-symbols-outlined">credit_card</span>
+<span class="font-label-caps text-label-caps">Card</span>
+</button>
+</div>
+</div>
+<!-- Reviews -->
+<div class="mt-md">
+<div class="flex items-center justify-between mb-sm">
+<h3 class="font-headline-md text-headline-md">Vendor Reviews</h3>
+<div class="flex items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-mono-stat text-mono-stat">4.8</span>
+<span class="text-on-surface-variant text-body-sm ml-1">(124)</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-md rounded-lg border border-surface-container-high flex gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center shrink-0 border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="font-bold text-on-surface">Alex T.</span>
+<span class="text-on-surface-variant text-[12px]">2 days ago</span>
+</div>
+<p class="text-on-surface-variant font-body-sm text-body-sm">Always great quality from this bakery. The mystery box had 4 huge pastries!</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Fixed Bottom CTA -->
+<div class="fixed bottom-0 left-0 w-full glass-panel border-t border-surface-container p-md z-50">
+<div class="max-w-container-max mx-auto">
+<button class="w-full bg-gradient-to-r from-inverse-primary to-secondary-container text-white py-sm rounded-lg font-headline-md text-headline-md shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity flex justify-center items-center gap-2">
+                Buy Now — 35.000 đ
+            </button>
+</div>
+</div>
+
+
+<footer class="bg-surface-container-lowest border-t border-surface-container py-lg px-lg mt-xxl pb-xxl">
+    <div class="max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-md">
+        <div class="flex flex-col gap-2">
+            <span class="font-headline-md text-primary">MysteryBox Fresh Food</span>
+            <p class="text-on-surface-variant text-body-sm">Reducing food waste, one delicious box at a time.</p>
+        </div>
+        <div class="text-on-surface-variant text-body-sm">
+            © 2026 MysteryBox Fresh Food. All rights reserved.
+        </div>
+    </div>
+</footer></body></html>
