@@ -21,6 +21,7 @@ const CATEGORY_IMAGE: Record<ListingCategory, string> = {
   drinks: '/images/categories/drinks.jpg',
   other: '/images/categories/other.jpg',
 }
+import { ReviewsCarousel } from '../../components/shared/ReviewsCarousel'
 import { Share2, Heart, CreditCard, Banknote, Truck } from 'lucide-react'
 
 type PayMethod = 'card' | 'cod' | 'bank_transfer'
@@ -156,6 +157,9 @@ export default function ListingDetailPage() {
                 </div>
               ))}
             </div>
+
+            {/* Reviews */}
+            <ReviewsCarousel listingId={listing.id} />
 
             {/* Payment method selector */}
             <div className="bg-surface-container-low rounded-xl border border-surface-container-high p-4 flex flex-col gap-3">

@@ -70,6 +70,7 @@ export default function OrderDetailPage() {
         listingId: order.listingId,
         vendorId: order.vendorId,
         customerId: currentUser.uid,
+        customerName: userProfile?.displayName ?? '',
         rating,
         comment,
       })

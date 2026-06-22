@@ -81,6 +81,7 @@ export interface Review {
   listingId: string
   vendorId: string
   customerId: string
+  customerName?: string
   rating: number
   comment: string
   createdAt: Timestamp
