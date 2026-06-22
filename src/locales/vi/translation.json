@@ -255,7 +255,14 @@
     "compose_clearance": "Tạo hộp thanh lý →",
     "follow": "Theo dõi",
     "unfollow": "Bỏ theo dõi",
-    "following": "Đang theo dõi"
+    "following": "Đang theo dõi",
+    "pricing_controls": "Kiểm soát giá",
+    "listing_editor": "Soạn thảo",
+    "editor_empty_title": "Hãy chạy AI Compose trước",
+    "editor_empty_subtitle": "Chọn sản phẩm từ danh mục và nhấn Compose với AI để điền form này.",
+    "editable": "có thể chỉnh sửa",
+    "ai_result": "Kết quả AI",
+    "selected_items": "{{count}} sản phẩm được chọn"
   },
   "categories": {
     "bakery": "Bánh",

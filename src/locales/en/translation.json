@@ -256,7 +256,14 @@
     "compose_clearance": "Compose Clearance Box →",
     "follow": "Follow Vendor",
     "unfollow": "Unfollow",
-    "following": "Following"
+    "following": "Following",
+    "pricing_controls": "Pricing Controls",
+    "listing_editor": "Listing Editor",
+    "editor_empty_title": "Run AI Compose first",
+    "editor_empty_subtitle": "Select items from the catalog and click Compose with AI to populate this form.",
+    "editable": "editable",
+    "ai_result": "AI Result",
+    "selected_items": "{{count}} items selected"
   },
   "categories": {
     "bakery": "Bakery",
