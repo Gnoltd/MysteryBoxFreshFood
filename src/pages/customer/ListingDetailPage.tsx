@@ -96,7 +96,15 @@ export default function ListingDetailPage() {
           <div className="relative h-64 md:h-[480px] rounded-xl overflow-hidden border border-outline-variant">
             {listing.imageUrl
               ? <img src={listing.imageUrl} alt={listing.title} className="w-full h-full object-cover" />
-              : <div className="w-full h-full bg-surface-container flex items-center justify-center text-6xl">🎁</div>}
+              : (
+                <div className="w-full h-full gradient-bg flex flex-col items-center justify-center gap-3 select-none">
+                  <div className="relative">
+                    <div className="text-8xl drop-shadow-2xl">🎁</div>
+                    <div className="absolute inset-0 rounded-full blur-2xl bg-white/10 scale-150" />
+                  </div>
+                  <span className="text-white/60 text-sm font-semibold tracking-widest uppercase">Mystery Box</span>
+                </div>
+              )}
             <span className="absolute top-4 left-4 bg-tertiary-container/20 backdrop-blur-sm border border-tertiary/50 text-tertiary text-label-caps font-bold px-3 py-1 rounded-full">
               -{discount}%
             </span>

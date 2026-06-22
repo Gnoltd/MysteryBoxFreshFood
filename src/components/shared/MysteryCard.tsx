@@ -28,7 +28,12 @@ export function MysteryCard({ listing, onClick }: MysteryCardProps) {
       <div className="relative h-48 bg-surface-container-high overflow-hidden">
         {listing.imageUrl
           ? <img src={listing.imageUrl} alt={listing.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-          : <div className="w-full h-full flex items-center justify-center text-4xl">🎁</div>}
+          : (
+            <div className="w-full h-full gradient-bg flex flex-col items-center justify-center gap-1 select-none">
+              <span className="text-5xl drop-shadow-lg">🎁</span>
+              <span className="text-white/50 text-[10px] font-bold tracking-widest uppercase">Mystery Box</span>
+            </div>
+          )}
 
         {/* Discount badge */}
         <span className="absolute top-2 right-2 bg-error-token text-on-error text-label-caps font-bold px-2 py-0.5 rounded-full shadow-lg">

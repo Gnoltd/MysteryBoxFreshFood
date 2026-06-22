@@ -14,7 +14,7 @@ export function GlassNav({ backHref, backLabel, storeName, actions }: GlassNavPr
 
   return (
     <header className="fixed top-0 w-full z-50 glass-panel border-b border-outline-variant h-16 flex items-center px-6">
-      <div className="max-w-5xl mx-auto w-full flex items-center justify-between">
+      <div className="w-full flex items-center justify-between">
         {backHref ? (
           <button
             onClick={() => navigate(backHref)}
