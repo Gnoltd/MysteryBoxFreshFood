@@ -38,6 +38,15 @@ export default function OrderDetailPage() {
     return unsub
   }, [id])
 
+  const canRate = order?.status === 'picked_up'
+
+  useEffect(() => {
+    if (!order?.id || !canRate) return
+    getReviewForOrder(order.id).then(r => {
+      if (r) { setReviewId(r.id); setRating(r.rating); setComment(r.comment); setSubmitted(true) }
+    })
+  }, [order?.id, canRate])
+
   if (!order) return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="w-12 h-12 rounded-full gradient-bg animate-pulse" />
@@ -54,15 +63,6 @@ export default function OrderDetailPage() {
   const pickupTime = order.pickupEnd
     ? new Date(order.pickupEnd.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     : null
-
-  const canRate = order.status === 'picked_up'
-
-  useEffect(() => {
-    if (!order || !canRate) return
-    getReviewForOrder(order.id).then(r => {
-      if (r) { setReviewId(r.id); setRating(r.rating); setComment(r.comment); setSubmitted(true) }
-    })
-  }, [order?.id, canRate])
 
   const handleSubmitRating = async () => {
     if (!order || !currentUser || rating === 0 || submitting) return
