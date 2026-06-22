@@ -18,17 +18,20 @@ export default function OrdersPage() {
   const { userProfile } = useAuth()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!userProfile) return
-    const unsub = subscribeToCustomerOrders(userProfile.uid, data => {
-      setOrders(data)
-      setLoading(false)
-    })
+    const unsub = subscribeToCustomerOrders(
+      userProfile.uid,
+      data => { setOrders(data); setLoading(false) },
+      () => { setError(t('order.loadError', 'Could not load orders.')); setLoading(false) }
+    )
     return unsub
   }, [userProfile])
 
   if (loading) return <div className="py-20 text-center text-on-surface-variant">{t('browse.loading')}</div>
+  if (error) return <div className="py-20 text-center text-rose-400">{error}</div>
 
   return (
     <div>

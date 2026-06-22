@@ -1,13 +1,21 @@
 import {
-  collection, addDoc, getDocs, query, where, orderBy, limit, serverTimestamp
+  collection, addDoc, updateDoc, doc, getDocs, query, where, orderBy, limit, serverTimestamp
 } from 'firebase/firestore'
 import { db } from '../firebase'
 import type { Review } from '../types'
 
 export async function submitReview(
   data: Omit<Review, 'id' | 'createdAt'>
+): Promise<string> {
+  const ref = await addDoc(collection(db, 'reviews'), { ...data, createdAt: serverTimestamp() })
+  return ref.id
+}
+
+export async function updateReview(
+  reviewId: string,
+  data: { rating: number; comment: string }
 ): Promise<void> {
-  await addDoc(collection(db, 'reviews'), { ...data, createdAt: serverTimestamp() })
+  await updateDoc(doc(db, 'reviews', reviewId), data)
 }
 
 export async function getReviewForOrder(orderId: string): Promise<Review | null> {

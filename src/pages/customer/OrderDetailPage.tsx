@@ -6,7 +6,7 @@ import { db } from '../../firebase'
 import { QRCodeCanvas } from 'qrcode.react'
 import { StatusChip } from '../../components/shared/StatusChip'
 import { useAuth } from '../../contexts/AuthContext'
-import { submitReview, getReviewForOrder } from '../../services/reviews'
+import { submitReview, updateReview, getReviewForOrder } from '../../services/reviews'
 import { ArrowLeft, Share2, Download, Star, CheckCircle } from 'lucide-react'
 import type { Order } from '../../types'
 
@@ -26,6 +26,8 @@ export default function OrderDetailPage() {
   const [copied, setCopied] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [reviewId, setReviewId] = useState<string | null>(null)
   const qrRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -55,26 +57,33 @@ export default function OrderDetailPage() {
 
   const canRate = order.status === 'picked_up'
 
-  // Check if already reviewed
   useEffect(() => {
     if (!order || !canRate) return
-    getReviewForOrder(order.id).then(r => { if (r) { setRating(r.rating); setComment(r.comment); setSubmitted(true) } })
+    getReviewForOrder(order.id).then(r => {
+      if (r) { setReviewId(r.id); setRating(r.rating); setComment(r.comment); setSubmitted(true) }
+    })
   }, [order?.id, canRate])
 
   const handleSubmitRating = async () => {
-    if (!order || !currentUser || rating === 0 || submitting || submitted) return
+    if (!order || !currentUser || rating === 0 || submitting) return
     setSubmitting(true)
     try {
-      await submitReview({
-        orderId: order.id,
-        listingId: order.listingId,
-        vendorId: order.vendorId,
-        customerId: currentUser.uid,
-        customerName: userProfile?.displayName ?? '',
-        rating,
-        comment,
-      })
+      if (reviewId) {
+        await updateReview(reviewId, { rating, comment })
+      } else {
+        const id = await submitReview({
+          orderId: order.id,
+          listingId: order.listingId,
+          vendorId: order.vendorId,
+          customerId: currentUser.uid,
+          customerName: userProfile?.displayName ?? '',
+          rating,
+          comment,
+        })
+        setReviewId(id)
+      }
       setSubmitted(true)
+      setEditing(false)
     } finally {
       setSubmitting(false)
     }
@@ -209,14 +218,24 @@ export default function OrderDetailPage() {
 
         {/* Rate experience */}
         <div className={`bg-surface-container border border-outline-variant rounded-xl p-5 flex flex-col gap-4 ${!canRate ? 'opacity-50' : ''}`}>
-          <p className="text-on-surface font-semibold">{t('order.rateExperience')}</p>
+          <div className="flex items-center justify-between">
+            <p className="text-on-surface font-semibold">{t('order.rateExperience')}</p>
+            {submitted && !editing && canRate && (
+              <button
+                onClick={() => setEditing(true)}
+                className="text-primary text-body-sm hover:underline"
+              >
+                {t('order.editReview', 'Edit')}
+              </button>
+            )}
+          </div>
           <div className="flex gap-1">
             {[1,2,3,4,5].map(star => (
               <button
                 key={star}
-                disabled={!canRate}
-                onClick={() => canRate && setRating(star)}
-                onMouseEnter={() => canRate && setHoverRating(star)}
+                disabled={!canRate || (submitted && !editing)}
+                onClick={() => setRating(star)}
+                onMouseEnter={() => setHoverRating(star)}
                 onMouseLeave={() => setHoverRating(0)}
                 className="transition-transform hover:scale-110 disabled:cursor-not-allowed"
               >
@@ -228,26 +247,36 @@ export default function OrderDetailPage() {
             ))}
           </div>
           <textarea
-            disabled={!canRate}
+            disabled={!canRate || (submitted && !editing)}
             value={comment}
             onChange={e => setComment(e.target.value)}
             placeholder={t('order.ratePlaceholder')}
             rows={3}
             className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-2 text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors disabled:cursor-not-allowed resize-none"
           />
-          {submitted ? (
+          {submitted && !editing ? (
             <div className="flex items-center justify-center gap-2 text-[rgb(16,185,129)] text-body-sm font-semibold py-2">
               <CheckCircle size={16} />
               {t('order.ratingSubmitted', 'Review submitted — thank you!')}
             </div>
           ) : (
-            <button
-              onClick={handleSubmitRating}
-              disabled={!canRate || rating === 0 || submitting}
-              className="gradient-bg text-white rounded-lg py-2.5 font-semibold text-body-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              {submitting ? t('order.submitting', 'Submitting…') : t('order.submitRating')}
-            </button>
+            <div className="flex gap-2">
+              {editing && (
+                <button
+                  onClick={() => setEditing(false)}
+                  className="flex-1 border border-outline-variant text-on-surface-variant rounded-lg py-2.5 text-body-sm hover:border-primary transition-colors"
+                >
+                  {t('common.cancel', 'Cancel')}
+                </button>
+              )}
+              <button
+                onClick={handleSubmitRating}
+                disabled={!canRate || rating === 0 || submitting}
+                className="flex-1 gradient-bg text-white rounded-lg py-2.5 font-semibold text-body-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {submitting ? t('order.submitting', 'Submitting…') : editing ? t('order.updateReview', 'Update review') : t('order.submitRating')}
+              </button>
+            </div>
           )}
           {!canRate && (
             <p className="text-on-surface-variant text-xs text-center">{t('order.rateAfterPickup')}</p>

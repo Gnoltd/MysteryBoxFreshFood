@@ -5,14 +5,22 @@ import {
 import { db } from '../firebase'
 import type { Order } from '../types'
 
-export function subscribeToCustomerOrders(customerId: string, callback: (orders: Order[]) => void): Unsubscribe {
+export function subscribeToCustomerOrders(
+  customerId: string,
+  callback: (orders: Order[]) => void,
+  onError?: (err: Error) => void
+): Unsubscribe {
   const q = query(collection(db, 'orders'), where('customerId', '==', customerId), orderBy('createdAt', 'desc'))
-  return onSnapshot(q, snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() } as Order))))
+  return onSnapshot(q, snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() } as Order))), onError)
 }
 
-export function subscribeToVendorOrders(vendorId: string, callback: (orders: Order[]) => void): Unsubscribe {
+export function subscribeToVendorOrders(
+  vendorId: string,
+  callback: (orders: Order[]) => void,
+  onError?: (err: Error) => void
+): Unsubscribe {
   const q = query(collection(db, 'orders'), where('vendorId', '==', vendorId), orderBy('createdAt', 'desc'))
-  return onSnapshot(q, snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() } as Order))))
+  return onSnapshot(q, snap => callback(snap.docs.map(d => ({ id: d.id, ...d.data() } as Order))), onError)
 }
 
 export function subscribeToOrder(orderId: string, callback: (order: Order | null) => void): Unsubscribe {
