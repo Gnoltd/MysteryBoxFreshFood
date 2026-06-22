@@ -5,7 +5,6 @@ interface StarRatingProps {
 }
 
 export function StarRating({ value, onChange, size = 'md' }: StarRatingProps) {
-  const sizeClass = size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-2xl' : 'text-xl'
   return (
     <div className="flex gap-0.5">
       {[1, 2, 3, 4, 5].map(star => (
