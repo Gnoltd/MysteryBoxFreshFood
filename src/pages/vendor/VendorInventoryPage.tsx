@@ -142,7 +142,10 @@ export default function VendorInventoryPage() {
                 <SelectContent className="bg-surface-container-high border-outline-variant">
                   {ALL_CATEGORIES.map(c => (
                     <SelectItem key={c} value={c} className="text-on-surface">
-                      {CATEGORY_ICONS[c]} {t(`categories.${c}`)}
+                      <span className="flex items-center gap-2">
+                        <img src={CATEGORY_ICONS[c]} alt={c} className="w-5 h-5 object-contain" />
+                        {t(`categories.${c}`)}
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
