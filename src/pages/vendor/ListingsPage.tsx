@@ -55,7 +55,7 @@ export default function ListingsPage() {
           className="bg-surface-container border border-outline-variant rounded-xl px-4 py-2.5 text-body-sm text-on-surface focus:outline-none focus:border-primary transition-colors"
         >
           <option value="all">{t('browse.all')}</option>
-          {(['bakery','fruit','vegetables','dairy','meat','rice','noodles','drinks','snacks','other'] as ListingCategory[]).map(c => (
+          {(['bakery','fruit','vegetables','dairy','meat','drinks','other'] as ListingCategory[]).map(c => (
             <option key={c} value={c}>{c}</option>
           ))}
         </select>

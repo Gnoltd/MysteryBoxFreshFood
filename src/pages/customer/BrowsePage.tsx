@@ -14,10 +14,7 @@ const CATEGORIES: { value: ListingCategory | 'all'; label: string }[] = [
   { value: 'vegetables', label: '🥦 Vegetables' },
   { value: 'dairy',      label: '🧀 Dairy' },
   { value: 'meat',       label: '🥩 Meat' },
-  { value: 'rice',       label: '🍚 Rice' },
-  { value: 'noodles',    label: '🍜 Noodles' },
   { value: 'drinks',     label: '🧃 Drinks' },
-  { value: 'snacks',     label: '🍿 Snacks' },
   { value: 'other',      label: '📦 Other' },
 ]
 

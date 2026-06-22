@@ -5,7 +5,17 @@ import type { Listing, ListingCategory } from '../../types'
 
 const CATEGORY_EMOJI: Record<ListingCategory, string> = {
   bakery: '🥐', fruit: '🍎', vegetables: '🥦', dairy: '🧀', meat: '🥩',
-  rice: '🍚', noodles: '🍜', drinks: '🧃', snacks: '🍿', other: '📦',
+  drinks: '🧃', other: '📦',
+}
+
+const CATEGORY_IMAGE: Record<ListingCategory, string> = {
+  bakery: '/images/categories/bakery.jpg',
+  fruit: '/images/categories/fruit.jpg',
+  vegetables: '/images/categories/vegetables.jpg',
+  dairy: '/images/categories/dairy.jpg',
+  meat: '/images/categories/meat.jpg',
+  drinks: '/images/categories/drinks.jpg',
+  other: '/images/categories/other.jpg',
 }
 
 interface MysteryCardProps {
@@ -17,6 +27,7 @@ export function MysteryCard({ listing, onClick }: MysteryCardProps) {
   const { t } = useTranslation()
   const discount = Math.round((1 - listing.price / listing.originalPrice) * 100)
   const emoji = CATEGORY_EMOJI[listing.category] ?? '📦'
+  const categoryImage = CATEGORY_IMAGE[listing.category]
 
   return (
     <article
@@ -29,9 +40,10 @@ export function MysteryCard({ listing, onClick }: MysteryCardProps) {
         {listing.imageUrl
           ? <img src={listing.imageUrl} alt={listing.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           : (
-            <div className="w-full h-full gradient-bg flex flex-col items-center justify-center gap-1 select-none">
-              <span className="text-5xl drop-shadow-lg">🎁</span>
-              <span className="text-white/50 text-[10px] font-bold tracking-widest uppercase">Mystery Box</span>
+            <div className="relative w-full h-full overflow-hidden">
+              <img src={categoryImage} alt={listing.category} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-black/30" />
+              <span className="absolute bottom-3 left-1/2 -translate-x-1/2 text-white/80 text-[10px] font-bold tracking-widest uppercase">Mystery Box</span>
             </div>
           )}
 

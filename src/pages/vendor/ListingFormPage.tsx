@@ -13,7 +13,7 @@ import { Timestamp } from 'firebase/firestore'
 import type { ListingCategory } from '../../types'
 import { useTranslation } from 'react-i18next'
 
-const CATEGORIES: ListingCategory[] = ['bakery', 'fruit', 'vegetables', 'dairy', 'meat', 'rice', 'noodles', 'drinks', 'snacks', 'other']
+const CATEGORIES: ListingCategory[] = ['bakery', 'fruit', 'vegetables', 'dairy', 'meat', 'drinks', 'other']
 
 export default function ListingFormPage() {
   const { t } = useTranslation()

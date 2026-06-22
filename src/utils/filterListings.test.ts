@@ -16,7 +16,7 @@ const base: Listing = {
 
 const listings: Listing[] = [
   { ...base, id: '1', title: 'Bánh mì box', price: 30000, category: 'bakery', createdAt: ts(1000) },
-  { ...base, id: '2', title: 'Cơm hộp', description: 'Rice lunch', price: 50000, category: 'rice', createdAt: ts(2000) },
+  { ...base, id: '2', title: 'Cơm hộp', description: 'Rice lunch', price: 50000, category: 'other', createdAt: ts(2000) },
   { ...base, id: '3', title: 'Trà sữa', description: 'Milk tea', price: 20000, category: 'drinks', createdAt: ts(3000),
     pickupStart: ts(0), pickupEnd: ts(1) },
 ]

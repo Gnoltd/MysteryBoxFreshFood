@@ -18,13 +18,12 @@ import {
 import type { InventoryItem, ListingCategory } from '../../types'
 
 const ALL_CATEGORIES: ListingCategory[] = [
-  'bakery', 'fruit', 'vegetables', 'dairy', 'meat',
-  'rice', 'noodles', 'drinks', 'snacks', 'other'
+  'bakery', 'fruit', 'vegetables', 'dairy', 'meat', 'drinks', 'other'
 ]
 
 const CATEGORY_ICONS: Record<ListingCategory, string> = {
   bakery: '🥐', fruit: '🍎', vegetables: '🥬', dairy: '🥛', meat: '🥩',
-  rice: '🍚', noodles: '🍜', drinks: '🥤', snacks: '🍿', other: '📦',
+  drinks: '🥤', other: '📦',
 }
 
 interface FormState {

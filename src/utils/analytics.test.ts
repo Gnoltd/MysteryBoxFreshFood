@@ -67,13 +67,13 @@ describe('getOrdersByCategory', () => {
     ]
     const listings = [
       { ...baseListing, id: 'l1', category: 'bakery' as const },
-      { ...baseListing, id: 'l2', category: 'rice' as const },
+      { ...baseListing, id: 'l2', category: 'fruit' as const },
     ]
     const result = getOrdersByCategory(orders, listings)
     const bakery = result.find(r => r.category === 'bakery')
-    const rice = result.find(r => r.category === 'rice')
+    const fruit = result.find(r => r.category === 'fruit')
     expect(bakery?.count).toBe(2)
-    expect(rice?.count).toBe(1)
+    expect(fruit?.count).toBe(1)
   })
 })
 

@@ -10,7 +10,17 @@ import { GlassNav } from '../../components/shared/GlassNav'
 import { StatusChip } from '../../components/shared/StatusChip'
 import { StockBadge } from '../../components/shared/StockBadge'
 import { TimerBadge } from '../../components/shared/TimerBadge'
-import type { Listing } from '../../types'
+import type { Listing, ListingCategory } from '../../types'
+
+const CATEGORY_IMAGE: Record<ListingCategory, string> = {
+  bakery: '/images/categories/bakery.jpg',
+  fruit: '/images/categories/fruit.jpg',
+  vegetables: '/images/categories/vegetables.jpg',
+  dairy: '/images/categories/dairy.jpg',
+  meat: '/images/categories/meat.jpg',
+  drinks: '/images/categories/drinks.jpg',
+  other: '/images/categories/other.jpg',
+}
 import { Share2, Heart, CreditCard, Banknote, Truck } from 'lucide-react'
 
 type PayMethod = 'card' | 'cod' | 'bank_transfer'
@@ -97,12 +107,10 @@ export default function ListingDetailPage() {
             {listing.imageUrl
               ? <img src={listing.imageUrl} alt={listing.title} className="w-full h-full object-cover" />
               : (
-                <div className="w-full h-full gradient-bg flex flex-col items-center justify-center gap-3 select-none">
-                  <div className="relative">
-                    <div className="text-8xl drop-shadow-2xl">🎁</div>
-                    <div className="absolute inset-0 rounded-full blur-2xl bg-white/10 scale-150" />
-                  </div>
-                  <span className="text-white/60 text-sm font-semibold tracking-widest uppercase">Mystery Box</span>
+                <div className="relative w-full h-full overflow-hidden">
+                  <img src={CATEGORY_IMAGE[listing.category]} alt={listing.category} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/30" />
+                  <span className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/80 text-sm font-semibold tracking-widest uppercase">Mystery Box</span>
                 </div>
               )}
             <span className="absolute top-4 left-4 bg-tertiary-container/20 backdrop-blur-sm border border-tertiary/50 text-tertiary text-label-caps font-bold px-3 py-1 rounded-full">
