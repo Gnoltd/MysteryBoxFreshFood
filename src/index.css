@@ -67,6 +67,14 @@
     background: linear-gradient(to right, #494bd6, #6f00be);
     border-radius: inherit;
   }
+  /* QR Scan Page */
+  .qr-grid-bg {
+    background-size: 20px 20px;
+    background-image:
+      linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+  }
+
   .blob {
     position: absolute;
     border-radius: 9999px;
@@ -77,3 +85,59 @@
     box-shadow: 0px 4px 12px rgba(113, 42, 226, 0.15);
   }
 }
+
+/* ── QR Scan Page animations ── */
+@keyframes qr-scan-vertical {
+  0%   { transform: translateY(0);    opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+.qr-scan-line { animation: qr-scan-vertical 2.5s cubic-bezier(0.4,0,0.2,1) infinite; }
+
+@keyframes qr-draw { to { stroke-dashoffset: 0; } }
+.qr-circle-draw {
+  stroke-dasharray: 300; stroke-dashoffset: 300;
+  animation: qr-draw 0.8s ease-out forwards;
+}
+.qr-check-draw {
+  stroke-dasharray: 100; stroke-dashoffset: 100;
+  animation: qr-draw 0.8s ease-out forwards 0.2s;
+}
+
+@keyframes qr-pulse-ring {
+  0%   { transform: scale(0.8); opacity: 0.5; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+.qr-pulse-ring { animation: qr-pulse-ring 2s cubic-bezier(0.215,0.61,0.355,1) infinite; }
+
+@keyframes qr-float-up {
+  0%   { transform: translateY(0) scale(1); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(-150px) scale(0); opacity: 0; }
+}
+
+@keyframes qr-shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px,  0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px,  0, 0); }
+}
+.qr-shake { animation: qr-shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+
+@keyframes qr-error-pulse {
+  0%   { opacity: 0.8; transform: scale(0.95); }
+  100% { opacity: 1;   transform: scale(1.05); }
+}
+.qr-error-glow { animation: qr-error-pulse 2s infinite alternate; }
+
+/* Hide html5-qrcode default UI, keep only the video */
+#qr-reader { border: none !important; padding: 0 !important; }
+#qr-reader__dashboard { display: none !important; }
+#qr-reader__header_message { display: none !important; }
+#qr-reader select { display: none !important; }
+#qr-reader button { display: none !important; }
+#qr-reader video { width: 100% !important; height: 100% !important; object-fit: cover; }
+#qr-reader__scan_region { border: none !important; }
+#qr-reader__scan_region img { display: none !important; }
