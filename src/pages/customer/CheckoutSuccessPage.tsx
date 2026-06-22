@@ -46,8 +46,8 @@ export default function CheckoutSuccessPage() {
         </div>
 
         <div>
-          <h1 className="text-headline-lg-mobile font-bold text-on-surface">{t('order.confirmed')}</h1>
-          <p className="text-on-surface-variant text-body-lg mt-2">{t('order.showQR')}</p>
+          <h1 className="text-headline-lg-mobile font-bold text-on-surface">{t('order.paymentSuccessful')}</h1>
+          <p className="text-on-surface-variant text-body-lg mt-2">{t('order.qrReady')}</p>
         </div>
 
         {order ? (
@@ -79,11 +79,19 @@ export default function CheckoutSuccessPage() {
           <div className="w-48 h-48 bg-surface-container rounded-xl animate-pulse" />
         )}
 
-        <Link to="/orders">
-          <button className="gradient-bg text-white rounded-lg px-6 py-3 font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
-            {t('order.viewAll')}
-          </button>
-        </Link>
+        {order ? (
+          <Link to={`/orders/${order.id}`} className="w-full">
+            <button className="w-full gradient-bg text-white rounded-lg px-6 py-3 font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+              {t('order.viewMyOrder')}
+            </button>
+          </Link>
+        ) : (
+          <Link to="/orders" className="w-full">
+            <button className="w-full gradient-bg text-white rounded-lg px-6 py-3 font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+              {t('order.viewAll')}
+            </button>
+          </Link>
+        )}
       </div>
     </div>
   )

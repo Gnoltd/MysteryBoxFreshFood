@@ -22,11 +22,14 @@ export default function CheckoutCancelPage() {
           <p className="text-on-surface-variant text-body-lg mt-2">{t('order.cancelledMsg')}</p>
         </div>
 
-        <Link to="/browse">
-          <button className="border border-outline-variant hover:border-primary text-primary text-body-lg font-semibold rounded-lg px-8 py-3 transition-colors">
+        <Link to="/browse" className="w-full">
+          <button className="w-full border border-outline-variant hover:border-primary text-primary text-body-lg font-semibold rounded-lg px-8 py-3 transition-colors">
             {t('order.backToBrowse')}
           </button>
         </Link>
+        <a href="mailto:support@mysterybox.vn" className="text-on-surface-variant text-body-sm hover:text-primary transition-colors">
+          {t('order.contactSupport')}
+        </a>
       </div>
     </div>
   )
