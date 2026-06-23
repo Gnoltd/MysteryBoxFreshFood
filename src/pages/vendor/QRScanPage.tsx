@@ -136,14 +136,14 @@ export default function QRScanPage() {
                 </div>
               </div>
               {/* Corner brackets */}
-              <div className="absolute -top-1 -left-1 w-10 h-10 border-t-[3px] border-l-[3px] border-[#c0c1ff] rounded-tl-2xl z-30"
-                style={{ boxShadow: '0 0 8px #c0c1ff, inset 0 0 8px #c0c1ff' }} />
-              <div className="absolute -top-1 -right-1 w-10 h-10 border-t-[3px] border-r-[3px] border-[#ddb7ff] rounded-tr-2xl z-30"
-                style={{ boxShadow: '0 0 8px #ddb7ff, inset 0 0 8px #ddb7ff' }} />
-              <div className="absolute -bottom-1 -left-1 w-10 h-10 border-b-[3px] border-l-[3px] border-[#ddb7ff] rounded-bl-2xl z-30"
-                style={{ boxShadow: '0 0 8px #ddb7ff, inset 0 0 8px #ddb7ff' }} />
-              <div className="absolute -bottom-1 -right-1 w-10 h-10 border-b-[3px] border-r-[3px] border-[#c0c1ff] rounded-br-2xl z-30"
-                style={{ boxShadow: '0 0 8px #c0c1ff, inset 0 0 8px #c0c1ff' }} />
+              <div className="absolute top-0 left-0 w-12 h-12 border-t-[3px] border-l-[3px] border-[#c0c1ff] rounded-tl-2xl z-30"
+                style={{ boxShadow: '0 0 10px #c0c1ff, inset 0 0 8px rgba(192,193,255,0.3)' }} />
+              <div className="absolute top-0 right-0 w-12 h-12 border-t-[3px] border-r-[3px] border-[#ddb7ff] rounded-tr-2xl z-30"
+                style={{ boxShadow: '0 0 10px #ddb7ff, inset 0 0 8px rgba(221,183,255,0.3)' }} />
+              <div className="absolute bottom-0 left-0 w-12 h-12 border-b-[3px] border-l-[3px] border-[#ddb7ff] rounded-bl-2xl z-30"
+                style={{ boxShadow: '0 0 10px #ddb7ff, inset 0 0 8px rgba(221,183,255,0.3)' }} />
+              <div className="absolute bottom-0 right-0 w-12 h-12 border-b-[3px] border-r-[3px] border-[#c0c1ff] rounded-br-2xl z-30"
+                style={{ boxShadow: '0 0 10px #c0c1ff, inset 0 0 8px rgba(192,193,255,0.3)' }} />
               {/* Center reticle */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 border border-outline/30 rounded-full flex items-center justify-center z-10">
                 <div className="w-1 h-1 bg-outline/50 rounded-full" />
