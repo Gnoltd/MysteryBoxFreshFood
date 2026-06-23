@@ -206,7 +206,7 @@ export default function VendorDashboardPage() {
                 contentStyle={{ background: '#12182e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, backdropFilter: 'blur(12px)' }}
                 labelStyle={{ color: '#c7c4d7', fontSize: 12 }}
                 itemStyle={{ color: '#c0c1ff', fontSize: 12 }}
-                formatter={(v: number) => [`${v.toLocaleString('vi-VN')} đ`, 'Revenue']}
+                formatter={(v) => [v != null ? Number(v).toLocaleString('vi-VN') + ' đ' : '–', 'Revenue']}
               />
             </LineChart>
           </ResponsiveContainer>
