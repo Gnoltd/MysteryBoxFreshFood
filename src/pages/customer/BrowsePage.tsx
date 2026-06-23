@@ -1,15 +1,16 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { subscribeToActiveListings } from '../../services/listings'
 import { getListingRatings } from '../../services/reviews'
 import { MysteryCard } from '../../components/shared/MysteryCard'
-import { Search } from 'lucide-react'
+import { MysteryCardSkeleton } from '../../components/shared/ShimmerSkeleton'
+import { Search, SlidersHorizontal, X, ChevronDown, Sparkles } from 'lucide-react'
 import type { Listing, ListingCategory } from '../../types'
 
-const CATEGORIES: { value: ListingCategory | 'all'; label: string; icon?: string }[] = [
-  { value: 'all',        label: 'All' },
+const CATEGORIES: { value: ListingCategory | 'all'; label: string; icon?: string; emoji?: string }[] = [
+  { value: 'all',        label: 'All',        emoji: '🛒' },
   { value: 'bakery',     label: 'Bakery',     icon: '/images/icons/bakery.png' },
   { value: 'fruit',      label: 'Fruit',      icon: '/images/icons/fruit.png' },
   { value: 'vegetables', label: 'Vegetables', icon: '/images/icons/vegetables.png' },
@@ -21,6 +22,44 @@ const CATEGORIES: { value: ListingCategory | 'all'; label: string; icon?: string
 
 type SortKey = 'top_rated' | 'newest' | 'price_asc' | 'price_desc' | 'discount'
 
+// Typewriter hook for search placeholder
+function usePlaceholderTypewriter(phrases: string[], speed = 80, pause = 2000) {
+  const [text, setText] = useState('')
+  const [phraseIdx, setPhraseIdx] = useState(0)
+  const [charIdx, setCharIdx] = useState(0)
+  const [deleting, setDeleting] = useState(false)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>()
+
+  useEffect(() => {
+    const current = phrases[phraseIdx]
+    const tick = () => {
+      if (!deleting) {
+        if (charIdx < current.length) {
+          setText(current.slice(0, charIdx + 1))
+          setCharIdx(i => i + 1)
+          timeoutRef.current = setTimeout(tick, speed)
+        } else {
+          timeoutRef.current = setTimeout(() => setDeleting(true), pause)
+        }
+      } else {
+        if (charIdx > 0) {
+          setText(current.slice(0, charIdx - 1))
+          setCharIdx(i => i - 1)
+          timeoutRef.current = setTimeout(tick, speed / 2)
+        } else {
+          setDeleting(false)
+          setPhraseIdx(i => (i + 1) % phrases.length)
+          timeoutRef.current = setTimeout(tick, 300)
+        }
+      }
+    }
+    timeoutRef.current = setTimeout(tick, 100)
+    return () => clearTimeout(timeoutRef.current)
+  }, [charIdx, deleting, phraseIdx, phrases, speed, pause])
+
+  return text
+}
+
 export default function BrowsePage() {
   const { t } = useTranslation()
   const { userProfile } = useAuth()
@@ -30,14 +69,22 @@ export default function BrowsePage() {
   const [loading, setLoading] = useState(true)
   const [category, setCategory] = useState<ListingCategory | 'all'>('all')
   const [searchText, setSearchText] = useState('')
+  const [searchFocused, setSearchFocused] = useState(false)
   const [minPrice, setMinPrice] = useState('')
   const [maxPrice, setMaxPrice] = useState('')
   const [availableOnly, setAvailableOnly] = useState(false)
   const [sortBy, setSortBy] = useState<SortKey>('top_rated')
+  const [filtersOpen, setFiltersOpen] = useState(false)
+
+  const placeholder = usePlaceholderTypewriter([
+    'Search fresh bakery…',
+    'Find local vegetables…',
+    'Discover mystery boxes…',
+    'Organic dairy deals…',
+  ])
 
   useEffect(() => {
     const unsub = subscribeToActiveListings(data => {
-      // Filter out listings whose pickup window has already ended
       const now = Date.now() / 1000
       const live = data.filter(l => l.pickupEnd.seconds > now)
       setListings(live)
@@ -71,119 +118,179 @@ export default function BrowsePage() {
     })
   }, [listings, ratings, category, searchText, minPrice, maxPrice, availableOnly, sortBy])
 
-  const inputCls = 'w-full bg-surface-dim border border-outline-variant rounded-lg h-10 px-3 text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors'
+  const inputCls = 'w-full bg-surface-container-high/50 border border-white/10 rounded-xl h-10 px-3 text-sm text-on-surface placeholder:text-outline focus:outline-none input-glow transition-all'
+  const firstName = userProfile?.displayName?.split(' ')[0] ?? ''
 
   return (
-    <div>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-headline-lg-mobile font-bold text-on-surface flex items-center gap-2">
-          {t('browse.greeting', { name: userProfile?.displayName?.split(' ')[0] ?? '' })}
-          <img src="/images/icons/wave.png" alt="" className="w-7 h-7 object-contain" />
+    <div className="animate-fade-in-up">
+      {/* ── Hero Header ── */}
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-1">
+          <Sparkles size={16} className="text-tertiary animate-pulse" />
+          <span className="text-xs text-on-surface-variant font-medium tracking-wider uppercase">Fresh Deals Today</span>
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-black text-on-surface leading-tight">
+          {t('browse.greeting', { name: firstName }) || `Hey ${firstName} 👋`}
         </h1>
-        <p className="text-on-surface-variant text-body-lg mt-1">{t('browse.subtitle')}</p>
+        <p className="text-on-surface-variant text-base mt-2 max-w-lg">{t('browse.subtitle')}</p>
       </div>
 
-      {/* Category chips */}
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-6 scrollbar-hide">
-        {CATEGORIES.map(cat => (
+      {/* ── Live Search Bar ── */}
+      <div className={`relative mb-6 transition-all duration-300 ${searchFocused ? 'scale-[1.01]' : ''}`}>
+        <div className={`relative flex items-center glass glow-border rounded-2xl overflow-hidden transition-all duration-300 ${
+          searchFocused ? 'ring-2 ring-primary/30 shadow-lg shadow-primary/10' : ''
+        }`}>
+          <Search size={18} className={`absolute left-4 transition-colors ${searchFocused ? 'text-primary' : 'text-outline'}`} />
+          <input
+            type="text"
+            placeholder={!searchFocused && !searchText ? placeholder : t('browse.searchPlaceholder')}
+            value={searchText}
+            onChange={e => setSearchText(e.target.value)}
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setSearchFocused(false)}
+            className="w-full bg-transparent h-14 pl-12 pr-32 text-base text-on-surface placeholder:text-outline/70 focus:outline-none"
+          />
+          {searchText && (
+            <button
+              onClick={() => setSearchText('')}
+              className="absolute right-20 text-outline hover:text-on-surface transition-colors"
+            >
+              <X size={16} />
+            </button>
+          )}
+          {/* Filters toggle */}
+          <button
+            onClick={() => setFiltersOpen(f => !f)}
+            className={`absolute right-2 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+              filtersOpen ? 'gradient-bg text-white' : 'glass text-on-surface-variant hover:text-on-surface'
+            }`}
+          >
+            <SlidersHorizontal size={13} />
+            Filters
+            <ChevronDown size={12} className={`transition-transform ${filtersOpen ? 'rotate-180' : ''}`} />
+          </button>
+        </div>
+      </div>
+
+      {/* ── Category Chips ── */}
+      <div className="flex gap-2 overflow-x-auto pb-3 mb-6 scrollbar-hide">
+        {CATEGORIES.map((cat, i) => (
           <button
             key={cat.value}
             onClick={() => setCategory(cat.value)}
-            className={`shrink-0 px-4 py-1.5 rounded-full text-body-sm font-semibold border transition-colors ${
+            className={`relative shrink-0 flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-200 hover:scale-105 active:scale-95 animate-fade-in-up overflow-hidden ${
               category === cat.value
-                ? 'gradient-bg text-white border-transparent'
-                : 'bg-surface-container border-outline-variant text-on-surface-variant hover:border-primary/50'
+                ? 'border-transparent text-white'
+                : 'glass border-white/10 text-on-surface-variant hover:border-primary/30 hover:text-on-surface'
             }`}
+            style={{ animationDelay: `${i * 0.05}s` }}
           >
-            <span className="flex items-center gap-1.5">
-              {cat.icon && <img src={cat.icon} alt="" className="w-10 h-10 object-contain" />}
+            {category === cat.value && (
+              <span className="absolute inset-0 gradient-bg" />
+            )}
+            <span className="relative z-10 flex items-center gap-1.5">
+              {cat.emoji && <span>{cat.emoji}</span>}
+              {cat.icon && <img src={cat.icon} alt="" className="w-5 h-5 object-contain" />}
               {cat.label}
             </span>
           </button>
         ))}
       </div>
 
-      {/* Layout: sidebar + grid */}
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* Sidebar */}
-        <aside className="w-full md:w-64 shrink-0 md:sticky md:top-24 self-start">
-          <div className="bg-surface-container border border-outline-variant rounded-lg p-4 flex flex-col gap-4">
-            <p className="text-label-caps text-on-surface-variant uppercase tracking-wider">{t('browse.filters')}</p>
-
-            {/* Search */}
-            <div className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" />
-              <input
-                type="text"
-                placeholder={t('browse.searchPlaceholder')}
-                value={searchText}
-                onChange={e => setSearchText(e.target.value)}
-                className="w-full bg-surface-dim border border-outline-variant rounded-lg h-10 pl-9 pr-3 text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
-              />
+      {/* ── Collapsible Filter Panel ── */}
+      <div className={`overflow-hidden transition-all duration-300 ${filtersOpen ? 'max-h-96 mb-6' : 'max-h-0'}`}>
+        <div className="glass glow-border rounded-2xl p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Price range */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-on-surface-variant font-semibold uppercase tracking-wider">{t('browse.priceRange')}</label>
+            <div className="flex gap-2">
+              <input type="number" placeholder={t('browse.min')} value={minPrice}
+                onChange={e => setMinPrice(e.target.value)} className={inputCls} />
+              <input type="number" placeholder={t('browse.max')} value={maxPrice}
+                onChange={e => setMaxPrice(e.target.value)} className={inputCls} />
             </div>
+          </div>
 
-            {/* Price range */}
-            <div className="flex flex-col gap-2">
-              <p className="text-body-sm text-on-surface-variant">{t('browse.priceRange')}</p>
-              <div className="flex gap-2">
-                <input type="number" placeholder={t('browse.min')} value={minPrice}
-                  onChange={e => setMinPrice(e.target.value)} className={inputCls} />
-                <input type="number" placeholder={t('browse.max')} value={maxPrice}
-                  onChange={e => setMaxPrice(e.target.value)} className={inputCls} />
+          {/* Sort */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-on-surface-variant font-semibold uppercase tracking-wider">{t('browse.sortBy')}</label>
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value as SortKey)}
+              className={inputCls}
+            >
+              <option value="top_rated">{t('browse.sortTopRated', 'Top Rated')}</option>
+              <option value="newest">{t('browse.sortNewest')}</option>
+              <option value="price_asc">{t('browse.sortPriceAsc')}</option>
+              <option value="price_desc">{t('browse.sortPriceDesc')}</option>
+              <option value="discount">{t('browse.sortDiscount')}</option>
+            </select>
+          </div>
+
+          {/* Available only */}
+          <div className="flex items-end">
+            <label className="flex items-center gap-2.5 cursor-pointer text-sm text-on-surface-variant hover:text-on-surface transition-colors">
+              <div
+                onClick={() => setAvailableOnly(v => !v)}
+                className={`relative w-10 h-5 rounded-full transition-all duration-300 cursor-pointer ${availableOnly ? 'gradient-bg' : 'bg-surface-container-high border border-white/10'}`}
+              >
+                <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${availableOnly ? 'translate-x-5' : 'translate-x-0.5'}`} />
               </div>
-            </div>
-
-            {/* Available only */}
-            <label className="flex items-center gap-2 cursor-pointer text-body-sm text-on-surface-variant">
-              <input type="checkbox" checked={availableOnly} onChange={e => setAvailableOnly(e.target.checked)}
-                className="accent-indigo-500 w-4 h-4 rounded" />
               {t('browse.availableOnly')}
             </label>
+          </div>
 
-            {/* Sort */}
-            <div className="flex flex-col gap-1.5">
-              <p className="text-body-sm text-on-surface-variant">{t('browse.sortBy')}</p>
-              <select
-                value={sortBy}
-                onChange={e => setSortBy(e.target.value as SortKey)}
-                className="w-full bg-surface-dim border border-outline-variant rounded-lg h-10 px-3 text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+          {/* Clear filters */}
+          {(minPrice || maxPrice || availableOnly || searchText) && (
+            <div className="flex items-end">
+              <button
+                onClick={() => { setMinPrice(''); setMaxPrice(''); setAvailableOnly(false); setSearchText('') }}
+                className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1.5 transition-colors"
               >
-                <option value="top_rated">{t('browse.sortTopRated', 'Top Rated')}</option>
-                <option value="newest">{t('browse.sortNewest')}</option>
-                <option value="price_asc">{t('browse.sortPriceAsc')}</option>
-                <option value="price_desc">{t('browse.sortPriceDesc')}</option>
-                <option value="discount">{t('browse.sortDiscount')}</option>
-              </select>
+                <X size={12} /> Clear all filters
+              </button>
             </div>
-          </div>
-        </aside>
+          )}
+        </div>
+      </div>
 
-        {/* Card grid */}
-        {loading ? (
-          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-56 bg-surface-container rounded-xl animate-pulse" />
-            ))}
+      {/* ── Results summary ── */}
+      {!loading && (
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-sm text-on-surface-variant">
+            <span className="text-on-surface font-semibold">{filtered.length}</span> listings found
+          </p>
+        </div>
+      )}
+
+      {/* ── Card Grid ── */}
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <MysteryCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-24 text-on-surface-variant animate-fade-in-up">
+          <div className="w-20 h-20 glass rounded-full flex items-center justify-center mb-4 animate-float">
+            <img src="/images/icons/single-item.png" alt="" className="w-12 h-12 object-contain" />
           </div>
-        ) : filtered.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center py-20 text-on-surface-variant">
-            <img src="/images/icons/single-item.png" alt="" className="w-14 h-14 mx-auto mb-4 object-contain" />
-            <p className="text-body-lg">{t('browse.noListings')}</p>
-          </div>
-        ) : (
-          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map(listing => (
+          <p className="text-lg font-semibold text-on-surface mb-1">No listings found</p>
+          <p className="text-sm">{t('browse.noListings')}</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filtered.map((listing, i) => (
+            <div key={listing.id} style={{ animationDelay: `${Math.min(i * 0.05, 0.4)}s` }}>
               <MysteryCard
-                key={listing.id}
                 listing={listing}
                 rating={ratings[listing.id]}
                 onClick={() => navigate(`/listing/${listing.id}`)}
               />
-            ))}
-          </div>
-        )}
-      </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
