@@ -42,3 +42,11 @@ functions/node_modules/
 # Claude Code local session data
 .claude/
 .vercel
+
+# Design-sync build artifacts (regenerated per run)
+dist-lib/
+ds-bundle/
+.ds-sync/
+.design-sync/.cache/
+.design-sync/learnings/
+.design-sync/node_modules

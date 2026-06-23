@@ -1,0 +1,30 @@
+{
+  "projectId": "c2a90bd9-79af-45c1-8634-2fb9a7b13664",
+  "shape": "package",
+  "pkg": "mysterybox",
+  "globalName": "MysteryBox",
+  "buildCmd": "npm run build:lib",
+  "srcDir": "src/components",
+  "tsconfig": "tsconfig.lib.json",
+  "cssEntry": "dist-lib/index.css",
+  "componentSrcMap": {
+    "ProtectedRoute": null,
+    "RoleRoute": null,
+    "AuthLayout": null,
+    "CustomerLayout": null,
+    "VendorLayout": null,
+    "NotificationPanel": null,
+    "ReviewsCarousel": null,
+    "LanguageToggle": null,
+    "MysteryBoxProvider": null
+  },
+  "provider": {
+    "component": "MysteryBoxProvider"
+  },
+  "overrides": {
+    "Card": { "cardMode": "column" },
+    "GlassNav": { "cardMode": "single", "primaryStory": "HomeNav" },
+    "ListingCard": { "cardMode": "column" },
+    "MysteryCard": { "cardMode": "column" }
+  }
+}
