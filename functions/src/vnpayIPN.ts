@@ -5,10 +5,10 @@ import * as crypto from 'crypto'
 function verifyVNPay(params: Record<string, string>, hashSecret: string, received: string): boolean {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { vnp_SecureHash, vnp_SecureHashType, ...rest } = params
-  // Decode URL-encoded values before signing (VNPAY signs raw decoded values)
-  const decoded: Record<string, string> = {}
-  for (const k of Object.keys(rest)) decoded[k] = decodeURIComponent(rest[k].replace(/\+/g, ' '))
-  const signData = Object.keys(decoded).sort().map(k => `${k}=${decoded[k]}`).join('&')
+  // Express already URL-decodes query params; re-encode with PHP urlencode() equivalent to match VNPAY's signing
+  const signData = Object.keys(rest).sort()
+    .map(k => `${k}=${encodeURIComponent(rest[k]).replace(/%20/g, '+')}`)
+    .join('&')
   const hash = crypto.createHmac('sha512', hashSecret).update(Buffer.from(signData, 'utf-8')).digest('hex')
   return hash === received
 }

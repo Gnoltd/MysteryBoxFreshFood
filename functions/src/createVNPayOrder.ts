@@ -8,13 +8,17 @@ function formatVNDate(date: Date): string {
   return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`
 }
 
-// VNPAY requires raw (non-URL-encoded) values for both signing and URL building
-function buildRawQuery(params: Record<string, string>): string {
-  return Object.keys(params).sort().map(k => `${k}=${params[k]}`).join('&')
+// VNPAY signs with URL-encoded values (matching PHP urlencode() — same as official Node.js demo sortObject)
+function encodeVNPay(value: string): string {
+  return encodeURIComponent(value).replace(/%20/g, '+')
+}
+
+function buildSignData(params: Record<string, string>): string {
+  return Object.keys(params).sort().map(k => `${k}=${encodeVNPay(params[k])}`).join('&')
 }
 
 function signVNPay(params: Record<string, string>, hashSecret: string): string {
-  return crypto.createHmac('sha512', hashSecret).update(Buffer.from(buildRawQuery(params), 'utf-8')).digest('hex')
+  return crypto.createHmac('sha512', hashSecret).update(Buffer.from(buildSignData(params), 'utf-8')).digest('hex')
 }
 
 export const createVNPayOrder = functions.https.onCall(
@@ -76,7 +80,7 @@ export const createVNPayOrder = functions.https.onCall(
       vnp_CreateDate: formatVNDate(vnTime),
     }
 
-    const signData = buildRawQuery(params)
+    const signData = buildSignData(params)
     const secureHash = signVNPay(params, hashSecret)
 
     functions.logger.info('VNPAY sign data:', signData)
