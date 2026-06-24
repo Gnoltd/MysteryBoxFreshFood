@@ -64,8 +64,17 @@ export default function ListingFormPage() {
         const d = new Date(ts.seconds * 1000)
         return d.toISOString().slice(0, 16)
       }
-      setPickupStart(toDatetimeLocal(l.pickupStart))
-      setPickupEnd(toDatetimeLocal(l.pickupEnd))
+      const pickupEndMs = l.pickupEnd.seconds * 1000
+      if (pickupEndMs < Date.now()) {
+        // Expired listing — pre-fill a fresh pickup window so vendor can renew with one click
+        const freshStart = new Date(Date.now() + 30 * 60 * 1000)   // now + 30 min
+        const freshEnd   = new Date(Date.now() + 4 * 60 * 60 * 1000) // now + 4 h
+        setPickupStart(freshStart.toISOString().slice(0, 16))
+        setPickupEnd(freshEnd.toISOString().slice(0, 16))
+      } else {
+        setPickupStart(toDatetimeLocal(l.pickupStart))
+        setPickupEnd(toDatetimeLocal(l.pickupEnd))
+      }
       if (l.packedAt) setPackedAt(toDatetimeLocal(l.packedAt))
     })
   }, [id])

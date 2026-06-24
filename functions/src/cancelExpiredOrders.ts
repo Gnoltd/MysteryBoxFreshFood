@@ -63,4 +63,18 @@ export const cancelExpiredOrders = functions.pubsub
     )
 
     console.log('cancelExpiredOrders: done')
+
+    // Auto-expire active listings whose pickup window has passed
+    const activeSnap = await db.collection('listings').where('status', '==', 'active').get()
+    const nowMs = Date.now()
+    const toExpire = activeSnap.docs.filter(d => {
+      const pe = d.data().pickupEnd as admin.firestore.Timestamp | undefined
+      return pe && pe.toMillis() < nowMs
+    })
+    if (toExpire.length > 0) {
+      const batch = db.batch()
+      toExpire.forEach(d => batch.update(d.ref, { status: 'expired' }))
+      await batch.commit()
+      console.log(`cancelExpiredOrders: expired ${toExpire.length} listings past pickup`)
+    }
   })

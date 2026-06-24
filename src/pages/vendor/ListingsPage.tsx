@@ -7,7 +7,7 @@ import { StockProgressBar } from '../../components/shared/StockProgressBar'
 import { StatusChip } from '../../components/shared/StatusChip'
 import { GradientButton } from '../../components/shared/GradientButton'
 import type { Listing, ListingCategory } from '../../types'
-import { Pencil, Trash2, Wand2 } from 'lucide-react'
+import { Pencil, Trash2, Wand2, RefreshCw } from 'lucide-react'
 
 export default function ListingsPage() {
   const { t } = useTranslation()
@@ -29,8 +29,17 @@ export default function ListingsPage() {
   })
 
   const handleToggleStatus = async (l: Listing) => {
-    const next = l.status === 'active' ? 'expired' : 'active'
-    await updateListing(l.id, { status: next })
+    // Only toggle between active ↔ draft for non-expired, non-sold-out listings
+    if (l.status === 'active') await updateListing(l.id, { status: 'draft' })
+    else if (l.status === 'draft') await updateListing(l.id, { status: 'active' })
+    // expired/sold_out → vendor must renew via edit page (handled by Renew button)
+  }
+
+  const STATUS_CONFIG: Record<string, { variant: 'emerald' | 'amber' | 'rose' | 'slate'; label: string }> = {
+    active:   { variant: 'emerald', label: t('listing.active') },
+    sold_out: { variant: 'amber',   label: t('listing.soldOut', 'Sold Out') },
+    expired:  { variant: 'rose',    label: t('listing.expired', 'Expired') },
+    draft:    { variant: 'slate',   label: t('listing.draft') },
   }
 
   const handleDelete = async (id: string) => {
@@ -114,14 +123,30 @@ export default function ListingsPage() {
                     {l.price.toLocaleString('vi-VN')} đ
                   </td>
                   <td className="px-4 py-3">
-                    <button onClick={() => handleToggleStatus(l)}>
-                      <StatusChip variant={l.status === 'active' ? 'emerald' : 'slate'}>
-                        {l.status === 'active' ? t('listing.active') : t('listing.draft')}
+                    {(l.status === 'active' || l.status === 'draft') ? (
+                      <button onClick={() => handleToggleStatus(l)}>
+                        <StatusChip variant={STATUS_CONFIG[l.status]?.variant ?? 'slate'}>
+                          {STATUS_CONFIG[l.status]?.label ?? l.status}
+                        </StatusChip>
+                      </button>
+                    ) : (
+                      <StatusChip variant={STATUS_CONFIG[l.status]?.variant ?? 'slate'}>
+                        {STATUS_CONFIG[l.status]?.label ?? l.status}
                       </StatusChip>
-                    </button>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">
+                      {/* Renew button for expired/sold_out — navigates to edit with fresh times */}
+                      {(l.status === 'expired' || l.status === 'sold_out') && (
+                        <button
+                          onClick={() => navigate(`/vendor/listings/${l.id}/edit`)}
+                          className="p-1.5 rounded-lg hover:bg-primary/10 text-on-surface-variant hover:text-primary transition-colors"
+                          title={t('listing.renew', 'Renew listing')}
+                        >
+                          <RefreshCw size={15} />
+                        </button>
+                      )}
                       <button onClick={() => navigate(`/vendor/listings/${l.id}/edit`)} className="p-1.5 rounded-lg hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors">
                         <Pencil size={15} />
                       </button>
