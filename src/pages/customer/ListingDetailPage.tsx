@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { onSnapshot, doc, getDoc } from 'firebase/firestore'
+import { onSnapshot, doc } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { initiateCheckout } from '../../services/stripe'
 import { initiateLocalOrder } from '../../services/localPayment'
@@ -23,11 +23,9 @@ const CATEGORY_IMAGE: Record<ListingCategory, string> = {
   other: '/images/categories/other.jpg',
 }
 import { ReviewsCarousel } from '../../components/shared/ReviewsCarousel'
-import { Share2, Heart, CreditCard, Banknote, Truck, Building2 } from 'lucide-react'
+import { Share2, Heart, CreditCard, Truck, Building2 } from 'lucide-react'
 
-type PayMethod = 'card' | 'cod' | 'bank_transfer' | 'vnpay'
-
-interface BankInfo { bankName: string; bankAccount: string; bankAccountName: string }
+type PayMethod = 'card' | 'cod' | 'vnpay'
 
 export default function ListingDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -35,23 +33,12 @@ export default function ListingDetailPage() {
   const navigate = useNavigate()
   const [listing, setListing] = useState<Listing | null>(null)
   const [payMethod, setPayMethod] = useState<PayMethod>('card')
-  const [bankInfo, setBankInfo] = useState<BankInfo | null>(null)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (!id) return
     const unsub = onSnapshot(doc(db, 'listings', id), snap => {
-      if (snap.exists()) {
-        const data = { id: snap.id, ...snap.data() } as Listing
-        setListing(data)
-        // fetch vendor bank info
-        getDoc(doc(db, 'users', data.vendorId)).then(vSnap => {
-          if (vSnap.exists()) {
-            const v = vSnap.data()
-            if (v.bankAccount) setBankInfo({ bankName: v.bankName ?? '', bankAccount: v.bankAccount, bankAccountName: v.bankAccountName ?? '' })
-          }
-        })
-      }
+      if (snap.exists()) setListing({ id: snap.id, ...snap.data() } as Listing)
     })
     return unsub
   }, [id])

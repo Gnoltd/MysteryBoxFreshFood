@@ -13,6 +13,7 @@ const STATUS_BADGE: Record<OrderStatus, string> = {
   cancelled: 'bg-red-900 text-red-300',
   pending_cod: 'bg-orange-900 text-orange-300',
   pending_bank_transfer: 'bg-blue-900 text-blue-300',
+  pending_vnpay: 'bg-purple-900 text-purple-300',
   refunded: 'bg-surface-container text-on-surface-variant',
 }
 
@@ -23,6 +24,7 @@ const STATUS_LABEL: Record<OrderStatus, string> = {
   cancelled: 'CANCELLED',
   pending_cod: 'COD',
   pending_bank_transfer: 'BANK',
+  pending_vnpay: 'VNPAY',
   refunded: 'REFUNDED',
 }
 
