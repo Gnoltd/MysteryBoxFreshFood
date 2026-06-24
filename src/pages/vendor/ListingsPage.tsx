@@ -29,17 +29,14 @@ export default function ListingsPage() {
   })
 
   const handleToggleStatus = async (l: Listing) => {
-    // Only toggle between active ↔ draft for non-expired, non-sold-out listings
-    if (l.status === 'active') await updateListing(l.id, { status: 'draft' })
-    else if (l.status === 'draft') await updateListing(l.id, { status: 'active' })
-    // expired/sold_out → vendor must renew via edit page (handled by Renew button)
+    // active → expired (pause); expired/sold_out need renew via edit
+    if (l.status === 'active') await updateListing(l.id, { status: 'expired' })
   }
 
   const STATUS_CONFIG: Record<string, { variant: 'emerald' | 'amber' | 'rose' | 'slate'; label: string }> = {
     active:   { variant: 'emerald', label: t('listing.active') },
     sold_out: { variant: 'amber',   label: t('listing.soldOut', 'Sold Out') },
     expired:  { variant: 'rose',    label: t('listing.expired', 'Expired') },
-    draft:    { variant: 'slate',   label: t('listing.draft') },
   }
 
   const handleDelete = async (id: string) => {
@@ -123,11 +120,9 @@ export default function ListingsPage() {
                     {l.price.toLocaleString('vi-VN')} đ
                   </td>
                   <td className="px-4 py-3">
-                    {(l.status === 'active' || l.status === 'draft') ? (
-                      <button onClick={() => handleToggleStatus(l)}>
-                        <StatusChip variant={STATUS_CONFIG[l.status]?.variant ?? 'slate'}>
-                          {STATUS_CONFIG[l.status]?.label ?? l.status}
-                        </StatusChip>
+                    {l.status === 'active' ? (
+                      <button onClick={() => handleToggleStatus(l)} title={t('listing.pauseHint', 'Click to pause')}>
+                        <StatusChip variant="emerald">{t('listing.active')}</StatusChip>
                       </button>
                     ) : (
                       <StatusChip variant={STATUS_CONFIG[l.status]?.variant ?? 'slate'}>
