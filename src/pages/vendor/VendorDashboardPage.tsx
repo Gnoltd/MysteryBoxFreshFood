@@ -11,6 +11,7 @@ import { useCountUp } from '../../hooks/useCountUp'
 import { LineChart, Line, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts'
 import type { Listing, Order } from '../../types'
 import { Package, ShoppingBag, TrendingUp, Star, QrCode, Wand2, PlusCircle, Pencil, Check, X, Zap } from 'lucide-react'
+import { VN_BANKS } from '../../data/vnBanks'
 
 function AnimatedStat({ value, prefix = '', suffix = '', className = '' }: {
   value: number; prefix?: string; suffix?: string; className?: string
@@ -390,13 +391,22 @@ export default function VendorDashboardPage() {
         <div className="p-5">
           {editingBank ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-on-surface-variant font-semibold uppercase tracking-wider">{t('vendor.bankName', 'Bank Name')}</label>
-                <input value={bankName} onChange={e => setBankName(e.target.value)} placeholder="e.g. Vietcombank" className={inputCls} />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs text-on-surface-variant font-semibold uppercase tracking-wider">{t('vendor.bankBin', 'Bank BIN / Code')}</label>
-                <input value={bankBin} onChange={e => setBankBin(e.target.value)} placeholder="e.g. 970436" className={inputCls} />
+              <div className="flex flex-col gap-1.5 sm:col-span-2">
+                <label className="text-xs text-on-surface-variant font-semibold uppercase tracking-wider">{t('vendor.bankName', 'Bank')}</label>
+                <select
+                  value={bankBin}
+                  onChange={e => {
+                    const bank = VN_BANKS.find(b => b.bin === e.target.value)
+                    setBankBin(e.target.value)
+                    setBankName(bank?.name ?? '')
+                  }}
+                  className={inputCls}
+                >
+                  <option value="">— Select your bank —</option>
+                  {VN_BANKS.map(b => (
+                    <option key={b.bin} value={b.bin}>{b.name} ({b.shortName})</option>
+                  ))}
+                </select>
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs text-on-surface-variant font-semibold uppercase tracking-wider">{t('vendor.bankAccount', 'Account Number')}</label>
@@ -408,10 +418,9 @@ export default function VendorDashboardPage() {
               </div>
             </div>
           ) : userProfile?.bankAccount ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { label: t('vendor.bankName', 'Bank Name'), value: userProfile.bankName },
-                { label: t('vendor.bankBin', 'Bank BIN / Code'), value: userProfile.bankBin },
+                { label: t('vendor.bankName', 'Bank'), value: userProfile.bankName },
                 { label: t('vendor.bankAccount', 'Account Number'), value: userProfile.bankAccount },
                 { label: t('vendor.bankAccountName', 'Account Holder Name'), value: userProfile.bankAccountName },
               ].map(({ label, value }) => (
