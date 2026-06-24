@@ -27,12 +27,15 @@ export const createVNPayOrder = functions.https.onCall(
     const customerId = context.auth.uid
     const db = admin.firestore()
     const config = functions.config().vnpay
-    const appUrl = functions.config().app?.url ?? 'https://mystery-box-fresh-food.vercel.app'
+    const tmnCode = (config.tmn_code as string).trim()
+    const hashSecret = (config.hash_secret as string).trim()
+    const vnpUrl = (config.url as string).trim()
+    const appUrl = (functions.config().app?.url ?? 'https://mystery-box-fresh-food.vercel.app').trim()
 
-    const ipAddr =
-      (context.rawRequest.headers['x-forwarded-for'] as string)?.split(',')[0].trim() ??
-      context.rawRequest.ip ??
-      '127.0.0.1'
+    const rawIp = (context.rawRequest.headers['x-forwarded-for'] as string | undefined)
+      ?.split(',')[0].trim()
+    // VNPAY requires IPv4 — strip IPv6-mapped prefix if present
+    const ipAddr = (rawIp ?? '127.0.0.1').replace(/^::ffff:/, '')
 
     const listingRef = db.collection('listings').doc(listingId)
     const listingSnap = await listingRef.get()
@@ -61,7 +64,7 @@ export const createVNPayOrder = functions.https.onCall(
     const params: Record<string, string> = {
       vnp_Version: '2.1.0',
       vnp_Command: 'pay',
-      vnp_TmnCode: config.tmn_code,
+      vnp_TmnCode: tmnCode,
       vnp_Amount: String(Math.round(listing.price * quantity) * 100),
       vnp_CurrCode: 'VND',
       vnp_TxnRef: orderId,
@@ -73,8 +76,14 @@ export const createVNPayOrder = functions.https.onCall(
       vnp_CreateDate: formatVNDate(vnTime),
     }
 
-    const secureHash = signVNPay(params, config.hash_secret)
-    const paymentUrl = `${config.url}?${buildRawQuery(params)}&vnp_SecureHash=${secureHash}`
+    const signData = buildRawQuery(params)
+    const secureHash = signVNPay(params, hashSecret)
+
+    functions.logger.info('VNPAY sign data:', signData)
+    functions.logger.info('VNPAY hash:', secureHash)
+    functions.logger.info('VNPAY tmnCode:', tmnCode, 'hashSecret length:', hashSecret.length)
+
+    const paymentUrl = `${vnpUrl}?${signData}&vnp_SecureHash=${secureHash}`
     return { url: paymentUrl, orderId }
   }
 )
