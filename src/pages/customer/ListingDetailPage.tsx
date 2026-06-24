@@ -7,7 +7,6 @@ import { initiateCheckout } from '../../services/stripe'
 import { initiateLocalOrder } from '../../services/localPayment'
 import { initiateVNPayOrder } from '../../services/vnpay'
 import { GradientButton } from '../../components/shared/GradientButton'
-import { GlassNav } from '../../components/shared/GlassNav'
 import { StatusChip } from '../../components/shared/StatusChip'
 import { StockBadge } from '../../components/shared/StockBadge'
 import { TimerBadge } from '../../components/shared/TimerBadge'
@@ -23,7 +22,7 @@ const CATEGORY_IMAGE: Record<ListingCategory, string> = {
   other: '/images/categories/other.jpg',
 }
 import { ReviewsCarousel } from '../../components/shared/ReviewsCarousel'
-import { Share2, Heart, CreditCard, Truck, Building2 } from 'lucide-react'
+import { ArrowLeft, Share2, Heart, CreditCard, Truck, Building2 } from 'lucide-react'
 
 type PayMethod = 'card' | 'cod' | 'vnpay'
 
@@ -65,7 +64,7 @@ export default function ListingDetailPage() {
     new Date(ts.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
   if (!listing) return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
+    <div className="flex items-center justify-center py-24">
       <div className="w-12 h-12 rounded-full gradient-bg animate-pulse" />
     </div>
   )
@@ -80,118 +79,123 @@ export default function ListingDetailPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-background pb-32">
-      <GlassNav
-        backHref="/browse"
-        backLabel={t('nav.browse')}
-        actions={
-          <>
-            <button className="p-2 hover:text-on-surface transition-colors"><Share2 size={20} /></button>
-            <button className="p-2 hover:text-on-surface transition-colors"><Heart size={20} /></button>
-          </>
-        }
-      />
+    <div className="pb-28">
+      {/* Inline back nav — no fixed positioning, sits naturally after layout header */}
+      <div className="flex items-center justify-between mb-5">
+        <button
+          onClick={() => navigate('/browse')}
+          className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors group"
+        >
+          <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-0.5" />
+          <span className="text-sm font-medium">{t('nav.browse')}</span>
+        </button>
+        <div className="flex items-center gap-1 text-on-surface-variant">
+          <button className="p-2 rounded-full hover:bg-white/5 hover:text-on-surface transition-all"><Share2 size={18} /></button>
+          <button className="p-2 rounded-full hover:bg-white/5 hover:text-on-surface transition-all"><Heart size={18} /></button>
+        </div>
+      </div>
 
-      <div className="pt-16 max-w-5xl mx-auto px-6 mt-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Image */}
-          <div className="relative h-64 md:h-[480px] rounded-xl overflow-hidden border border-outline-variant">
-            {listing.imageUrl
-              ? <img src={listing.imageUrl} alt={listing.title} className="w-full h-full object-cover" />
-              : (
-                <div className="relative w-full h-full overflow-hidden">
-                  <img src={CATEGORY_IMAGE[listing.category]} alt={listing.category} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/30" />
-                  <span className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/80 text-sm font-semibold tracking-widest uppercase">Mystery Box</span>
-                </div>
-              )}
+      {/* Two-column grid on md+, single column on mobile */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+        {/* Image */}
+        <div className="relative h-64 sm:h-80 md:h-[480px] rounded-xl overflow-hidden border border-outline-variant">
+          {listing.imageUrl
+            ? <img src={listing.imageUrl} alt={listing.title} className="w-full h-full object-cover" />
+            : (
+              <div className="relative w-full h-full overflow-hidden">
+                <img src={CATEGORY_IMAGE[listing.category]} alt={listing.category} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/30" />
+                <span className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/80 text-sm font-semibold tracking-widest uppercase">Mystery Box</span>
+              </div>
+            )}
+          {discount > 0 && (
             <span className="absolute top-4 left-4 bg-tertiary-container/20 backdrop-blur-sm border border-tertiary/50 text-tertiary text-label-caps font-bold px-3 py-1 rounded-full">
               -{discount}%
             </span>
+          )}
+        </div>
+
+        {/* Details */}
+        <div className="flex flex-col gap-5">
+          <div>
+            <h1 className="text-xl sm:text-2xl md:text-headline-lg font-bold text-on-surface">{listing.title}</h1>
+            <p className="text-on-surface-variant text-body-lg mt-2">{listing.description}</p>
           </div>
 
-          {/* Details */}
-          <div className="flex flex-col gap-5">
-            <div>
-              <h1 className="text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface">{listing.title}</h1>
-              <p className="text-on-surface-variant text-body-lg mt-2">{listing.description}</p>
-            </div>
+          {/* Price */}
+          <div className="flex items-end gap-3">
+            <span className="text-primary font-bold text-headline-md">{listing.price.toLocaleString('vi-VN')} đ</span>
+            <span className="text-outline text-body-lg line-through mb-0.5">{listing.originalPrice.toLocaleString('vi-VN')} đ</span>
+          </div>
 
-            {/* Price */}
-            <div className="flex items-end gap-3">
-              <span className="text-primary font-bold text-headline-md">{listing.price.toLocaleString('vi-VN')} đ</span>
-              <span className="text-outline text-body-lg line-through mb-0.5">{listing.originalPrice.toLocaleString('vi-VN')} đ</span>
+          {/* Timer banner */}
+          <div className="bg-primary/10 border border-primary/30 rounded-xl p-3 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-primary">
+              <TimerBadge pickupEnd={listing.pickupEnd} />
             </div>
+            {listing.packedAt && (
+              <span className="text-on-surface-variant text-xs">
+                {t('listing.packedAt')} {formatTime(listing.packedAt)}
+              </span>
+            )}
+          </div>
 
-            {/* Timer banner */}
-            <div className="bg-primary/10 border border-primary/30 rounded-xl p-3 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-primary">
-                <TimerBadge pickupEnd={listing.pickupEnd} />
+          {/* Info grid */}
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: t('listing.remaining'), value: <StockBadge quantity={listing.quantityRemaining} /> },
+              { label: t('listing.pickup'),    value: `${formatTime(listing.pickupStart)} – ${formatTime(listing.pickupEnd)}` },
+              { label: t('listing.category'),  value: <StatusChip variant="slate">{listing.category}</StatusChip> },
+            ].map(({ label, value }) => (
+              <div key={label} className="bg-surface-container border border-outline-variant rounded-xl p-3 flex flex-col gap-1">
+                <span className="text-label-caps text-on-surface-variant uppercase tracking-wider">{label}</span>
+                <span className="text-mono-stat font-semibold text-on-surface">{value}</span>
               </div>
-              {listing.packedAt && (
-                <span className="text-on-surface-variant text-xs">
-                  {t('listing.packedAt')} {formatTime(listing.packedAt)}
-                </span>
-              )}
-            </div>
+            ))}
+          </div>
 
-            {/* Info grid */}
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: t('listing.remaining'), value: <StockBadge quantity={listing.quantityRemaining} /> },
-                { label: t('listing.pickup'),    value: `${formatTime(listing.pickupStart)} – ${formatTime(listing.pickupEnd)}` },
-                { label: t('listing.category'),  value: <StatusChip variant="slate">{listing.category}</StatusChip> },
-              ].map(({ label, value }) => (
-                <div key={label} className="bg-surface-container border border-outline-variant rounded-xl p-3 flex flex-col gap-1">
-                  <span className="text-label-caps text-on-surface-variant uppercase tracking-wider">{label}</span>
-                  <span className="text-mono-stat font-semibold text-on-surface">{value}</span>
-                </div>
+          {/* Reviews */}
+          <ReviewsCarousel listingId={listing.id} />
+
+          {/* Payment method selector */}
+          <div className="bg-surface-container-low rounded-xl border border-surface-container-high p-4 flex flex-col gap-3">
+            <p className="text-label-caps text-on-surface-variant uppercase tracking-wider">{t('payment.selectMethod')}</p>
+            <div className="grid grid-cols-3 gap-2">
+              {PAY_OPTIONS.map(({ key, label, icon: Icon }) => (
+                <button
+                  key={key}
+                  onClick={() => setPayMethod(key)}
+                  className={`flex flex-col items-center gap-1.5 p-3 rounded-lg border text-xs sm:text-body-sm font-semibold transition-colors ${
+                    payMethod === key
+                      ? 'border-primary text-primary bg-surface-container'
+                      : 'border-outline-variant text-on-surface-variant hover:border-primary/50'
+                  }`}
+                >
+                  <Icon size={18} />
+                  {label}
+                </button>
               ))}
             </div>
 
-            {/* Reviews */}
-            <ReviewsCarousel listingId={listing.id} />
-
-            {/* Payment method selector */}
-            <div className="bg-surface-container-low rounded-xl border border-surface-container-high p-4 flex flex-col gap-3">
-              <p className="text-label-caps text-on-surface-variant uppercase tracking-wider">{t('payment.selectMethod')}</p>
-              <div className="grid grid-cols-3 gap-2">
-                {PAY_OPTIONS.map(({ key, label, icon: Icon }) => (
-                  <button
-                    key={key}
-                    onClick={() => setPayMethod(key)}
-                    className={`flex flex-col items-center gap-1.5 p-3 rounded-lg border text-body-sm font-semibold transition-colors ${
-                      payMethod === key
-                        ? 'border-primary text-primary bg-surface-container'
-                        : 'border-outline-variant text-on-surface-variant hover:border-primary/50'
-                    }`}
-                  >
-                    <Icon size={18} />
-                    {label}
-                  </button>
-                ))}
+            {/* COD note */}
+            {payMethod === 'cod' && (
+              <div className="bg-surface-container border border-outline-variant rounded-lg p-3 text-body-sm text-on-surface-variant">
+                {t('payment.codNote')}
               </div>
+            )}
 
-              {/* COD note */}
-              {payMethod === 'cod' && (
-                <div className="bg-surface-container border border-outline-variant rounded-lg p-3 text-body-sm text-on-surface-variant">
-                  {t('payment.codNote')}
-                </div>
-              )}
-
-              {/* VNPAY note */}
-              {payMethod === 'vnpay' && (
-                <div className="bg-surface-container border border-outline-variant rounded-lg p-3 text-body-sm text-on-surface-variant">
-                  {t('payment.vnpayNote', 'You will be redirected to VNPAY to complete payment via bank transfer, MoMo, ZaloPay, or card.')}
-                </div>
-              )}
-            </div>
+            {/* VNPAY note */}
+            {payMethod === 'vnpay' && (
+              <div className="bg-surface-container border border-outline-variant rounded-lg p-3 text-body-sm text-on-surface-variant">
+                {t('payment.vnpayNote', 'You will be redirected to VNPAY to complete payment via bank transfer, MoMo, ZaloPay, or card.')}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* Sticky bottom CTA */}
-      <div className="fixed bottom-0 left-0 right-0 glass-panel border-t border-outline-variant px-6 py-4">
+      <div className="fixed bottom-0 left-0 right-0 glass-panel border-t border-outline-variant px-4 sm:px-6 py-4 z-40">
         <div className="max-w-5xl mx-auto">
           <GradientButton
             onClick={handleClaim}

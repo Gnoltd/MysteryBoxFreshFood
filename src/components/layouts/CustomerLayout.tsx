@@ -6,7 +6,7 @@ import { signOut } from '../../services/auth'
 import { LanguageToggle } from '../shared/LanguageToggle'
 import { NotificationPanel } from '../shared/NotificationPanel'
 import { ParticleBackground } from '../shared/ParticleBackground'
-import { Bell, LogOut, ShoppingBag, Package, Star } from 'lucide-react'
+import { Bell, LogOut, ShoppingBag, Package, Star, Menu, X } from 'lucide-react'
 import { useUnreadCount } from '../../hooks/useUnreadCount'
 
 export function CustomerLayout() {
@@ -15,6 +15,7 @@ export function CustomerLayout() {
   const location = useLocation()
   const navigate = useNavigate()
   const [avatarOpen, setAvatarOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const avatarRef = useRef<HTMLDivElement>(null)
   const [scrolled, setScrolled] = useState(false)
 
@@ -33,6 +34,11 @@ export function CustomerLayout() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [location.pathname])
 
   const handleSignOut = async () => {
     await signOut()
@@ -61,15 +67,16 @@ export function CustomerLayout() {
 
       {/* Top Nav */}
       <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrolled
+        scrolled || mobileMenuOpen
           ? 'glass-strong shadow-2xl shadow-black/30'
           : 'bg-transparent'
       }`}>
         {/* Top gradient line */}
         <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-        <div className="max-w-[1280px] mx-auto px-6 h-16 flex items-center justify-between">
+
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
           {/* Logo */}
-          <Link to="/browse" className="flex items-center gap-2.5 group">
+          <Link to="/browse" className="flex items-center gap-2 group shrink-0">
             <div className="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center shadow-lg glow-primary-sm transition-transform group-hover:scale-110">
               <span className="text-white text-xs font-black">MB</span>
             </div>
@@ -79,7 +86,7 @@ export function CustomerLayout() {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-1 flex-1 justify-center">
             {navItems.map(({ to, label, icon: Icon }) => {
               const active = location.pathname === to
               return (
@@ -109,8 +116,11 @@ export function CustomerLayout() {
           </nav>
 
           {/* Right actions */}
-          <div className="flex items-center gap-2">
-            <LanguageToggle />
+          <div className="flex items-center gap-1 sm:gap-2">
+            {/* Language toggle — hidden on mobile (shown in mobile menu) */}
+            <div className="hidden sm:block">
+              <LanguageToggle />
+            </div>
 
             {/* Bell */}
             <button
@@ -150,13 +160,56 @@ export function CustomerLayout() {
                 </div>
               )}
             </div>
+
+            {/* Hamburger — mobile only */}
+            <button
+              onClick={() => setMobileMenuOpen(o => !o)}
+              className="md:hidden w-9 h-9 rounded-full glass glow-border flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-all"
+              aria-label="Menu"
+            >
+              {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile dropdown menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden glass-strong border-t border-white/5 px-4 py-3 flex flex-col gap-1">
+            {navItems.map(({ to, label, icon: Icon }) => {
+              const active = location.pathname === to
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                    active
+                      ? 'gradient-bg text-white shadow-lg'
+                      : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
+                  }`}
+                >
+                  <Icon size={16} />
+                  {label}
+                </Link>
+              )
+            })}
+            <a
+              href="#how-it-works"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all"
+            >
+              {t('nav.howItWorks')}
+            </a>
+            <div className="pt-2 pb-1 border-t border-white/5 flex items-center px-4">
+              <LanguageToggle />
+            </div>
+          </div>
+        )}
       </header>
 
       <NotificationPanel open={notifOpen} onClose={() => setNotifOpen(false)} />
 
-      <main className="pt-16 max-w-[1280px] mx-auto px-4 sm:px-6 py-8 relative z-10">
+      <main className="pt-16 max-w-[1280px] mx-auto px-4 sm:px-6 py-6 relative z-10">
         <Outlet />
       </main>
     </div>
