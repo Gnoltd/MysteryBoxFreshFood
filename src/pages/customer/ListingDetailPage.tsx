@@ -5,6 +5,7 @@ import { onSnapshot, doc, getDoc } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { initiateCheckout } from '../../services/stripe'
 import { initiateLocalOrder } from '../../services/localPayment'
+import { initiateVNPayOrder } from '../../services/vnpay'
 import { GradientButton } from '../../components/shared/GradientButton'
 import { GlassNav } from '../../components/shared/GlassNav'
 import { StatusChip } from '../../components/shared/StatusChip'
@@ -22,9 +23,9 @@ const CATEGORY_IMAGE: Record<ListingCategory, string> = {
   other: '/images/categories/other.jpg',
 }
 import { ReviewsCarousel } from '../../components/shared/ReviewsCarousel'
-import { Share2, Heart, CreditCard, Banknote, Truck } from 'lucide-react'
+import { Share2, Heart, CreditCard, Banknote, Truck, Building2 } from 'lucide-react'
 
-type PayMethod = 'card' | 'cod' | 'bank_transfer'
+type PayMethod = 'card' | 'cod' | 'bank_transfer' | 'vnpay'
 
 interface BankInfo { bankName: string; bankAccount: string; bankAccountName: string }
 
@@ -61,8 +62,11 @@ export default function ListingDetailPage() {
     try {
       if (payMethod === 'card') {
         await initiateCheckout(listing.id, 1)
+      } else if (payMethod === 'vnpay') {
+        const { url } = await initiateVNPayOrder(listing.id, 1)
+        window.location.href = url
       } else {
-        const { orderId } = await initiateLocalOrder(listing.id, 1, payMethod)
+        const { orderId } = await initiateLocalOrder(listing.id, 1, payMethod as 'cod' | 'bank_transfer')
         navigate(`/orders/${orderId}`)
       }
     } finally {
@@ -83,9 +87,9 @@ export default function ListingDetailPage() {
   const soldOut = listing.status === 'sold_out' || listing.quantityRemaining === 0
 
   const PAY_OPTIONS: Array<{ key: PayMethod; label: string; icon: React.ElementType }> = [
-    { key: 'card',          label: t('payment.card'),        icon: CreditCard },
-    { key: 'cod',           label: t('payment.cod'),         icon: Truck },
-    { key: 'bank_transfer', label: t('payment.bankTransfer'), icon: Banknote },
+    { key: 'card',  label: t('payment.card'),   icon: CreditCard },
+    { key: 'vnpay', label: t('payment.vnpay'),  icon: Building2 },
+    { key: 'cod',   label: t('payment.cod'),    icon: Truck },
   ]
 
   return (
@@ -188,27 +192,10 @@ export default function ListingDetailPage() {
                 </div>
               )}
 
-              {/* Bank transfer details */}
-              {payMethod === 'bank_transfer' && (
-                <div className="bg-surface-container border border-outline-variant rounded-lg p-3 flex flex-col gap-2">
-                  {bankInfo ? (
-                    <>
-                      <p className="text-label-caps text-on-surface-variant uppercase tracking-wider mb-1">{t('payment.bankDetails')}</p>
-                      {[
-                        { label: t('payment.bankName'), value: bankInfo.bankName },
-                        { label: t('payment.bankAccount'), value: bankInfo.bankAccount },
-                        { label: t('payment.bankAccountName'), value: bankInfo.bankAccountName },
-                      ].map(({ label, value }) => (
-                        <div key={label} className="flex justify-between text-body-sm">
-                          <span className="text-on-surface-variant">{label}</span>
-                          <span className="text-on-surface font-semibold">{value}</span>
-                        </div>
-                      ))}
-                      <p className="text-xs text-on-surface-variant mt-1">{t('payment.bankTransferNote')}</p>
-                    </>
-                  ) : (
-                    <p className="text-body-sm text-on-surface-variant">{t('payment.noBankInfo')}</p>
-                  )}
+              {/* VNPAY note */}
+              {payMethod === 'vnpay' && (
+                <div className="bg-surface-container border border-outline-variant rounded-lg p-3 text-body-sm text-on-surface-variant">
+                  {t('payment.vnpayNote', 'You will be redirected to VNPAY to complete payment via bank transfer, MoMo, ZaloPay, or card.')}
                 </div>
               )}
             </div>

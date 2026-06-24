@@ -12,6 +12,7 @@ import BrowsePage from './pages/customer/BrowsePage'
 import ListingDetailPage from './pages/customer/ListingDetailPage'
 import CheckoutSuccessPage from './pages/customer/CheckoutSuccessPage'
 import CheckoutCancelPage from './pages/customer/CheckoutCancelPage'
+import VNPayReturnPage from './pages/customer/VNPayReturnPage'
 import OrdersPage from './pages/customer/OrdersPage'
 import OrderDetailPage from './pages/customer/OrderDetailPage'
 import VendorDashboardPage from './pages/vendor/VendorDashboardPage'
@@ -40,6 +41,7 @@ export default function App() {
             <Route path="/listing/:id" element={<ListingDetailPage />} />
             <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
             <Route path="/checkout/cancel" element={<CheckoutCancelPage />} />
+            <Route path="/checkout/vnpay-return" element={<VNPayReturnPage />} />
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/orders/:id" element={<OrderDetailPage />} />
             <Route path="/subscriptions" element={<SubscriptionsPage />} />

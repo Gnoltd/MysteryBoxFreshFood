@@ -17,8 +17,8 @@ export interface UserProfile {
 
 export type ListingCategory = 'bakery' | 'fruit' | 'vegetables' | 'dairy' | 'meat' | 'drinks' | 'other'
 export type ListingStatus = 'active' | 'sold_out' | 'expired'
-export type OrderStatus = 'pending' | 'paid' | 'picked_up' | 'cancelled' | 'pending_cod' | 'pending_bank_transfer' | 'refunded'
-export type PaymentMethod = 'stripe' | 'cod' | 'bank_transfer'
+export type OrderStatus = 'pending' | 'paid' | 'picked_up' | 'cancelled' | 'pending_cod' | 'pending_bank_transfer' | 'pending_vnpay' | 'refunded'
+export type PaymentMethod = 'stripe' | 'cod' | 'bank_transfer' | 'vnpay'
 
 export interface BoxItem {
   name: string
@@ -59,6 +59,7 @@ export interface Order {
   qrCode: string
   stripeSessionId?: string
   stripePaymentIntentId?: string
+  vnpayTransactionNo?: string
   pickupEnd?: Timestamp
   boxContents?: BoxItem[]
   createdAt: Timestamp
