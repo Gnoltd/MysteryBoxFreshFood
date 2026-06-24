@@ -24,6 +24,7 @@ export default function OrderDetailPage() {
   const [hoverRating, setHoverRating] = useState(0)
   const [comment, setComment] = useState('')
   const [vendorBank, setVendorBank] = useState<{ bankBin: string; bankAccount: string; bankAccountName: string } | null>(null)
+  const [qrImgError, setQrImgError] = useState(false)
   const [copied, setCopied] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -180,17 +181,38 @@ export default function OrderDetailPage() {
         </div>
 
         {/* VietQR payment section — bank transfer only, shown while pending */}
-        {order.paymentMethod === 'bank_transfer' && order.status === 'pending_bank_transfer' && vendorBank && (
+        {order.paymentMethod === 'bank_transfer' && order.status === 'pending_bank_transfer' && (
           <div className="bg-surface-container border border-primary/30 rounded-xl p-5 flex flex-col items-center gap-4">
             <div className="text-center">
               <p className="text-on-surface font-semibold">{t('order.bankTransferTitle', 'Bank Transfer Payment')}</p>
               <p className="text-on-surface-variant text-body-sm mt-1">{t('order.scanWithBankApp', 'Scan with your banking app to transfer')}</p>
             </div>
-            <img
-              src={`https://img.vietqr.io/image/${vendorBank.bankBin}-${vendorBank.bankAccount}-compact2.png?amount=${order.totalPrice}&addInfo=${encodeURIComponent('MB' + order.id.slice(0, 8).toUpperCase())}&accountName=${encodeURIComponent(vendorBank.bankAccountName)}`}
-              alt="VietQR"
-              className="rounded-xl w-64 h-auto"
-            />
+
+            {vendorBank && !qrImgError ? (
+              <img
+                src={`https://img.vietqr.io/image/${vendorBank.bankBin}-${vendorBank.bankAccount}-compact2.png?amount=${order.totalPrice}&addInfo=${encodeURIComponent('MB' + order.id.slice(0, 8).toUpperCase())}&accountName=${encodeURIComponent(vendorBank.bankAccountName)}`}
+                alt="VietQR"
+                className="rounded-xl w-64 h-auto"
+                onError={() => setQrImgError(true)}
+              />
+            ) : vendorBank ? (
+              <div className="w-full bg-surface-container-high rounded-xl p-4 flex flex-col gap-2 text-body-sm">
+                <p className="text-on-surface-variant text-xs text-center mb-1">Transfer manually using the details below</p>
+                {[
+                  { label: 'Bank', value: vendorBank.bankBin },
+                  { label: 'Account No.', value: vendorBank.bankAccount },
+                  { label: 'Account Name', value: vendorBank.bankAccountName },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex justify-between">
+                    <span className="text-on-surface-variant">{label}</span>
+                    <span className="text-on-surface font-mono font-semibold">{value}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-on-surface-variant text-body-sm text-center">Vendor has not set bank details yet.</p>
+            )}
+
             <div className="w-full flex flex-col gap-1.5 text-body-sm">
               <div className="flex justify-between">
                 <span className="text-on-surface-variant">{t('order.transferRef', 'Transfer ref')}</span>
