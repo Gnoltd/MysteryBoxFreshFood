@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { onSnapshot, doc } from 'firebase/firestore'
+import { onSnapshot, doc, getDoc } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { QRCodeCanvas } from 'qrcode.react'
 import { StatusChip } from '../../components/shared/StatusChip'
@@ -23,6 +23,7 @@ export default function OrderDetailPage() {
   const [rating, setRating] = useState(0)
   const [hoverRating, setHoverRating] = useState(0)
   const [comment, setComment] = useState('')
+  const [vendorBank, setVendorBank] = useState<{ bankBin: string; bankAccount: string; bankAccountName: string } | null>(null)
   const [copied, setCopied] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -33,7 +34,18 @@ export default function OrderDetailPage() {
   useEffect(() => {
     if (!id) return
     const unsub = onSnapshot(doc(db, 'orders', id), snap => {
-      if (snap.exists()) setOrder({ id: snap.id, ...snap.data() } as Order)
+      if (!snap.exists()) return
+      const o = { id: snap.id, ...snap.data() } as Order
+      setOrder(o)
+      if (o.paymentMethod === 'bank_transfer' && o.vendorId) {
+        getDoc(doc(db, 'users', o.vendorId)).then(vSnap => {
+          if (!vSnap.exists()) return
+          const v = vSnap.data()
+          if (v.bankAccount && v.bankBin) {
+            setVendorBank({ bankBin: v.bankBin, bankAccount: v.bankAccount, bankAccountName: v.bankAccountName ?? '' })
+          }
+        })
+      }
     })
     return unsub
   }, [id])
@@ -167,11 +179,42 @@ export default function OrderDetailPage() {
           })}
         </div>
 
+        {/* VietQR payment section — bank transfer only, shown while pending */}
+        {order.paymentMethod === 'bank_transfer' && order.status === 'pending_bank_transfer' && vendorBank && (
+          <div className="bg-surface-container border border-primary/30 rounded-xl p-5 flex flex-col items-center gap-4">
+            <div className="text-center">
+              <p className="text-on-surface font-semibold">{t('order.bankTransferTitle', 'Bank Transfer Payment')}</p>
+              <p className="text-on-surface-variant text-body-sm mt-1">{t('order.scanWithBankApp', 'Scan with your banking app to transfer')}</p>
+            </div>
+            <img
+              src={`https://img.vietqr.io/image/${vendorBank.bankBin}-${vendorBank.bankAccount}-compact2.png?amount=${order.totalPrice}&addInfo=${encodeURIComponent('MB' + order.id.slice(0, 8).toUpperCase())}&accountName=${encodeURIComponent(vendorBank.bankAccountName)}`}
+              alt="VietQR"
+              className="rounded-xl w-64 h-auto"
+            />
+            <div className="w-full flex flex-col gap-1.5 text-body-sm">
+              <div className="flex justify-between">
+                <span className="text-on-surface-variant">{t('order.transferRef', 'Transfer ref')}</span>
+                <span className="text-on-surface font-mono font-semibold">{'MB' + order.id.slice(0, 8).toUpperCase()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-on-surface-variant">{t('order.amount', 'Amount')}</span>
+                <span className="text-primary font-bold">{order.totalPrice.toLocaleString('vi-VN')} đ</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* QR section */}
         <div className="bg-surface-container border border-outline-variant rounded-xl p-5 flex flex-col items-center gap-4">
           <div>
             <p className="text-on-surface font-semibold text-center">{t('order.pickupQR')}</p>
-            <p className="text-on-surface-variant text-body-sm text-center mt-1">{t('order.showVendor')}</p>
+            <p className="text-on-surface-variant text-body-sm text-center mt-1">
+              {order.paymentMethod === 'bank_transfer'
+                ? t('order.showQRBank')
+                : order.paymentMethod === 'cod'
+                ? t('order.showQRCOD')
+                : t('order.showVendor')}
+            </p>
           </div>
 
           {/* QR code on white bg */}
