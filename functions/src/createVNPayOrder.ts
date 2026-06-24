@@ -8,13 +8,13 @@ function formatVNDate(date: Date): string {
   return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`
 }
 
-function signVNPay(params: Record<string, string>, hashSecret: string): string {
-  const signData = Object.keys(params).sort().map(k => `${k}=${params[k]}`).join('&')
-  return crypto.createHmac('sha512', hashSecret).update(Buffer.from(signData, 'utf-8')).digest('hex')
+// VNPAY requires raw (non-URL-encoded) values for both signing and URL building
+function buildRawQuery(params: Record<string, string>): string {
+  return Object.keys(params).sort().map(k => `${k}=${params[k]}`).join('&')
 }
 
-function buildQueryString(params: Record<string, string>): string {
-  return Object.keys(params).sort().map(k => `${k}=${encodeURIComponent(params[k])}`).join('&')
+function signVNPay(params: Record<string, string>, hashSecret: string): string {
+  return crypto.createHmac('sha512', hashSecret).update(Buffer.from(buildRawQuery(params), 'utf-8')).digest('hex')
 }
 
 export const createVNPayOrder = functions.https.onCall(
@@ -62,7 +62,7 @@ export const createVNPayOrder = functions.https.onCall(
       vnp_Version: '2.1.0',
       vnp_Command: 'pay',
       vnp_TmnCode: config.tmn_code,
-      vnp_Amount: String(listing.price * quantity * 100),
+      vnp_Amount: String(Math.round(listing.price * quantity) * 100),
       vnp_CurrCode: 'VND',
       vnp_TxnRef: orderId,
       vnp_OrderInfo: `MB${orderId.slice(0, 8).toUpperCase()}`,
@@ -74,7 +74,7 @@ export const createVNPayOrder = functions.https.onCall(
     }
 
     const secureHash = signVNPay(params, config.hash_secret)
-    const paymentUrl = `${config.url}?${buildQueryString(params)}&vnp_SecureHash=${secureHash}`
+    const paymentUrl = `${config.url}?${buildRawQuery(params)}&vnp_SecureHash=${secureHash}`
     return { url: paymentUrl, orderId }
   }
 )
