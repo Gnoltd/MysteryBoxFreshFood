@@ -13,6 +13,10 @@ function signVNPay(params: Record<string, string>, hashSecret: string): string {
   return crypto.createHmac('sha512', hashSecret).update(Buffer.from(signData, 'utf-8')).digest('hex')
 }
 
+function buildQueryString(params: Record<string, string>): string {
+  return Object.keys(params).sort().map(k => `${k}=${encodeURIComponent(params[k])}`).join('&')
+}
+
 export const createVNPayOrder = functions.https.onCall(
   async (data: { listingId: string; quantity: number }, context: functions.https.CallableContext) => {
     if (!context.auth) {
@@ -61,7 +65,7 @@ export const createVNPayOrder = functions.https.onCall(
       vnp_Amount: String(listing.price * quantity * 100),
       vnp_CurrCode: 'VND',
       vnp_TxnRef: orderId,
-      vnp_OrderInfo: `Thanh toan don hang ${orderId.slice(0, 8).toUpperCase()}`,
+      vnp_OrderInfo: `MB${orderId.slice(0, 8).toUpperCase()}`,
       vnp_OrderType: 'other',
       vnp_Locale: 'vn',
       vnp_ReturnUrl: `${appUrl}/checkout/vnpay-return`,
@@ -69,8 +73,8 @@ export const createVNPayOrder = functions.https.onCall(
       vnp_CreateDate: formatVNDate(vnTime),
     }
 
-    params.vnp_SecureHash = signVNPay(params, config.hash_secret)
-    const paymentUrl = `${config.url}?${new URLSearchParams(params).toString()}`
+    const secureHash = signVNPay(params, config.hash_secret)
+    const paymentUrl = `${config.url}?${buildQueryString(params)}&vnp_SecureHash=${secureHash}`
     return { url: paymentUrl, orderId }
   }
 )
