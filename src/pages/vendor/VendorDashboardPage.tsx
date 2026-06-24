@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { subscribeToVendorListings } from '../../services/listings'
 import { getVendorOrders } from '../../services/orders'
-import { updateVendorProfile } from '../../services/auth'
+import { updateVendorProfile, updateVendorBankInfo } from '../../services/auth'
 import { StatusChip } from '../../components/shared/StatusChip'
 import { StatCardSkeleton } from '../../components/shared/ShimmerSkeleton'
 import { useCountUp } from '../../hooks/useCountUp'
@@ -36,11 +36,22 @@ export default function VendorDashboardPage() {
   const [storeDescription, setStoreDescription] = useState('')
   const [savingProfile, setSavingProfile] = useState(false)
 
+  const [editingBank, setEditingBank] = useState(false)
+  const [bankName, setBankName] = useState('')
+  const [bankBin, setBankBin] = useState('')
+  const [bankAccount, setBankAccount] = useState('')
+  const [bankAccountName, setBankAccountName] = useState('')
+  const [savingBank, setSavingBank] = useState(false)
+
   useEffect(() => {
     if (!userProfile) return
     setStoreName(userProfile.storeName ?? userProfile.displayName ?? '')
     setAddress(userProfile.address ?? '')
     setStoreDescription(userProfile.storeDescription ?? '')
+    setBankName(userProfile.bankName ?? '')
+    setBankBin(userProfile.bankBin ?? '')
+    setBankAccount(userProfile.bankAccount ?? '')
+    setBankAccountName(userProfile.bankAccountName ?? '')
     const unsub = subscribeToVendorListings(userProfile.uid, d => {
       setListings(d)
       setDataLoaded(true)
@@ -61,6 +72,17 @@ export default function VendorDashboardPage() {
       setEditingProfile(false)
     } finally {
       setSavingProfile(false)
+    }
+  }
+
+  const handleSaveBankInfo = async () => {
+    if (!userProfile) return
+    setSavingBank(true)
+    try {
+      await updateVendorBankInfo(userProfile.uid, bankName.trim(), bankBin.trim(), bankAccount.trim(), bankAccountName.trim())
+      setEditingBank(false)
+    } finally {
+      setSavingBank(false)
     }
   }
 
@@ -331,6 +353,80 @@ export default function VendorDashboardPage() {
                   <span className="text-sm text-on-surface">{value ?? <span className="text-outline italic">Not set</span>}</span>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Bank Account Info */}
+      <div className="glass glow-border rounded-2xl overflow-hidden animate-fade-in-up-delay-3">
+        <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+          <div>
+            <h2 className="text-sm font-bold text-on-surface">{t('vendor.bankInfo', 'Bank Account Info')}</h2>
+            <p className="text-xs text-on-surface-variant mt-0.5">{t('vendor.bankInfoSub', 'Customers see this when they choose bank transfer')}</p>
+          </div>
+          {!editingBank ? (
+            <button onClick={() => setEditingBank(true)} className="flex items-center gap-1.5 text-primary text-xs hover:text-primary/80 transition-colors font-semibold shrink-0">
+              <Pencil size={12} /> {t('vendor.editBankInfo', 'Edit')}
+            </button>
+          ) : (
+            <div className="flex gap-3 shrink-0">
+              <button
+                onClick={() => { setEditingBank(false); setBankName(userProfile?.bankName ?? ''); setBankBin(userProfile?.bankBin ?? ''); setBankAccount(userProfile?.bankAccount ?? ''); setBankAccountName(userProfile?.bankAccountName ?? '') }}
+                className="flex items-center gap-1 text-on-surface-variant text-xs hover:text-on-surface transition-colors"
+              >
+                <X size={13} /> {t('common.cancel', 'Cancel')}
+              </button>
+              <button
+                onClick={handleSaveBankInfo}
+                disabled={savingBank}
+                className="flex items-center gap-1 gradient-bg text-white text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-40 transition-all hover:opacity-90 glow-primary-sm"
+              >
+                <Check size={13} /> {savingBank ? t('listing.saving', 'Saving…') : t('vendor.saveBankInfo', 'Save Bank Info')}
+              </button>
+            </div>
+          )}
+        </div>
+        <div className="p-5">
+          {editingBank ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs text-on-surface-variant font-semibold uppercase tracking-wider">{t('vendor.bankName', 'Bank Name')}</label>
+                <input value={bankName} onChange={e => setBankName(e.target.value)} placeholder="e.g. Vietcombank" className={inputCls} />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs text-on-surface-variant font-semibold uppercase tracking-wider">{t('vendor.bankBin', 'Bank BIN / Code')}</label>
+                <input value={bankBin} onChange={e => setBankBin(e.target.value)} placeholder="e.g. 970436" className={inputCls} />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs text-on-surface-variant font-semibold uppercase tracking-wider">{t('vendor.bankAccount', 'Account Number')}</label>
+                <input value={bankAccount} onChange={e => setBankAccount(e.target.value)} placeholder="e.g. 1234567890" className={inputCls} />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs text-on-surface-variant font-semibold uppercase tracking-wider">{t('vendor.bankAccountName', 'Account Holder Name')}</label>
+                <input value={bankAccountName} onChange={e => setBankAccountName(e.target.value)} placeholder="e.g. NGUYEN VAN A" className={inputCls} />
+              </div>
+            </div>
+          ) : userProfile?.bankAccount ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { label: t('vendor.bankName', 'Bank Name'), value: userProfile.bankName },
+                { label: t('vendor.bankBin', 'Bank BIN / Code'), value: userProfile.bankBin },
+                { label: t('vendor.bankAccount', 'Account Number'), value: userProfile.bankAccount },
+                { label: t('vendor.bankAccountName', 'Account Holder Name'), value: userProfile.bankAccountName },
+              ].map(({ label, value }) => (
+                <div key={label} className="flex flex-col gap-1">
+                  <span className="text-xs text-on-surface-variant font-semibold uppercase tracking-wider">{label}</span>
+                  <span className="text-sm text-on-surface font-mono">{value ?? <span className="text-outline italic font-sans">Not set</span>}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 py-2">
+              <div className="w-8 h-8 rounded-lg bg-yellow-400/10 flex items-center justify-center shrink-0">
+                <Pencil size={14} className="text-yellow-400" />
+              </div>
+              <p className="text-sm text-on-surface-variant">{t('vendor.bankInfoNotSet', 'Not set — customers can\'t use bank transfer')}</p>
             </div>
           )}
         </div>

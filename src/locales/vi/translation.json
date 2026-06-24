@@ -206,6 +206,7 @@
     "bankInfo": "Thông tin tài khoản ngân hàng",
     "bankInfoSub": "Khách hàng sẽ thấy khi chọn chuyển khoản",
     "bankName": "Tên ngân hàng",
+    "bankBin": "Mã BIN ngân hàng",
     "bankAccount": "Số tài khoản",
     "bankAccountName": "Tên chủ tài khoản",
     "saveBankInfo": "Lưu thông tin ngân hàng",

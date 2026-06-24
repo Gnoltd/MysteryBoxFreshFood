@@ -207,6 +207,7 @@
     "bankInfo": "Bank Account Info",
     "bankInfoSub": "Customers see this when they choose bank transfer",
     "bankName": "Bank Name",
+    "bankBin": "Bank BIN / Code",
     "bankAccount": "Account Number",
     "bankAccountName": "Account Holder Name",
     "saveBankInfo": "Save Bank Info",
