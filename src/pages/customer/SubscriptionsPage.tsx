@@ -122,15 +122,11 @@ export default function SubscriptionsPage() {
   }
 
   const handleCancel = async () => {
-    if (!subscription?.stripeSubscriptionId) {
-      setSubError('Cannot cancel: subscription ID missing. Please contact support.')
-      return
-    }
     setCancelling(true)
     setSubError(null)
     try {
-      await cancelSubscription(subscription.stripeSubscriptionId)
-      setSubscription(prev => prev ? { ...prev, status: 'cancelled' } : null)
+      await cancelSubscription()
+      setSubscription(null)
     } catch (e: any) {
       setSubError(e?.message ?? 'Cancel failed — please try again')
     } finally {
