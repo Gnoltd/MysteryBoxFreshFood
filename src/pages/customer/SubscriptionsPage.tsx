@@ -26,6 +26,7 @@ export default function SubscriptionsPage() {
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [loadingPlan, setLoadingPlan] = useState<SubscriptionPlan | null>(null)
   const [cancelling, setCancelling] = useState(false)
+  const [subError, setSubError] = useState<string | null>(null)
   const subResult = searchParams.get('sub')
 
   const PLANS = [
@@ -82,11 +83,14 @@ export default function SubscriptionsPage() {
   const handleSubscribe = async (plan: SubscriptionPlan) => {
     if (plan === 'free') return
     setLoadingPlan(plan)
+    setSubError(null)
     try {
       const { url } = await createSubscription(plan)
+      if (!url) throw new Error('No checkout URL returned')
       window.location.href = url
-    } catch (e) {
+    } catch (e: any) {
       console.error(e)
+      setSubError(e?.message ?? 'Subscription failed — please try again')
       setLoadingPlan(null)
     }
   }
@@ -147,6 +151,11 @@ export default function SubscriptionsPage() {
 
       {/* Plan cards */}
       <section className="mb-12">
+        {subError && (
+          <div className="mb-4 rounded-xl px-4 py-3 text-sm text-red-400 bg-red-500/10 border border-red-500/30">
+            {subError}
+          </div>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {PLANS.map(({ key, displayName, price, popular, features, limitPerDay }) => {
             const isActive = subscription?.plan === key && subscription?.status === 'active'
