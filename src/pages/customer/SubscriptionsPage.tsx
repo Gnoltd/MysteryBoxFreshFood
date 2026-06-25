@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { getFollows, unfollowVendor, toggleNotifications } from '../../services/follows'
-import { getSubscription, createSubscription, cancelSubscription } from '../../services/subscriptions'
+import { subscribeToSubscription, createSubscription, cancelSubscription } from '../../services/subscriptions'
 import { getUserProfile } from '../../services/auth'
 import { GradientButton } from '../../components/shared/GradientButton'
 import { GhostButton } from '../../components/shared/GhostButton'
@@ -67,7 +67,9 @@ export default function SubscriptionsPage() {
       )
       setVendorNames(names)
     })
-    getSubscription(userProfile.uid).then(setSubscription)
+    // Real-time listener — updates instantly when webhook writes the subscription doc
+    const unsub = subscribeToSubscription(userProfile.uid, setSubscription)
+    return unsub
   }, [userProfile])
 
   const handleToggleNotif = async (follow: Follow) => {

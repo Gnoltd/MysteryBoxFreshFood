@@ -3,7 +3,10 @@ import * as admin from 'firebase-admin'
 import Stripe from 'stripe'
 
 const stripe = new Stripe(functions.config().stripe.secret_key, { apiVersion: '2023-10-16' })
-const endpointSecret: string = functions.config().stripe.subscription_webhook_secret
+// Falls back to main webhook secret if subscription_webhook_secret is not separately configured
+const endpointSecret: string =
+  functions.config().stripe.subscription_webhook_secret ||
+  functions.config().stripe.webhook_secret
 
 export const stripeSubscriptionWebhook = functions.https.onRequest(async (req, res) => {
   const sig = req.headers['stripe-signature'] as string
