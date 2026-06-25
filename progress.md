@@ -260,6 +260,7 @@ Full functional prototype — all features complete:
 - `src/pages/customer/ListingDetailPage.tsx` — daily quota line above CTA
 - `functions/src/stripeSubscriptionWebhook.ts` — webhook secret fallback + type fix
 - Both locale files — `browse.boxesLeft`, `browse.noBoxesLeft`
+- `src/hooks/useDailyBoxStatus.ts` — fixed: removed composite index dependency, all filtering done client-side so badge renders without extra Firestore indexes
 
 **Design files used:** `Design/mysterybox_marketplace/`, `Design/intelligent_vendor_core/`, `Design/mysterybox_browse/`, `Design/mysterybox_login/`, `Design/mysterybox_subscriptions/`, etc.
 
