@@ -28,6 +28,7 @@ export default function SubscriptionsPage() {
   const [cancelling, setCancelling] = useState(false)
   const [subError, setSubError] = useState<string | null>(null)
   const subResult = searchParams.get('sub')
+  const stripeSessionId = searchParams.get('session_id') ?? undefined
 
   const PLANS = [
     {
@@ -72,14 +73,28 @@ export default function SubscriptionsPage() {
   }, [userProfile])
 
   // When returning from Stripe checkout success, sync subscription from Stripe directly.
-  // This acts as a fallback in case the stripeSubscriptionWebhook hasn't fired yet.
+  // Uses the session ID for a direct lookup — reliable even before the webhook fires.
   useEffect(() => {
     if (subResult !== 'success' || !userProfile) return
-    const timer = setTimeout(() => {
-      syncSubscription().catch(err => console.error('syncSubscription failed:', err))
-    }, 1500)
-    return () => clearTimeout(timer)
-  }, [subResult, userProfile])
+
+    let cancelled = false
+    const attempt = async (delayMs: number) => {
+      await new Promise(r => setTimeout(r, delayMs))
+      if (cancelled) return
+      try {
+        const result = await syncSubscription(stripeSessionId)
+        if (!result.synced && !cancelled) {
+          // Retry once more after 3s if Stripe hasn't processed yet
+          await new Promise(r => setTimeout(r, 3000))
+          if (!cancelled) await syncSubscription(stripeSessionId)
+        }
+      } catch (err) {
+        console.error('syncSubscription failed:', err)
+      }
+    }
+    attempt(1000)
+    return () => { cancelled = true }
+  }, [subResult, userProfile, stripeSessionId])
 
   const handleToggleNotif = async (follow: Follow) => {
     await toggleNotifications(follow.id, !follow.notificationsEnabled)

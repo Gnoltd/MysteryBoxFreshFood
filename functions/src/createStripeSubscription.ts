@@ -50,7 +50,7 @@ export const createStripeSubscription = functions.https.onCall(async (data, cont
       },
       quantity: 1,
     }],
-    success_url: `${appUrl}/subscriptions?sub=success&plan=${plan}`,
+    success_url: `${appUrl}/subscriptions?sub=success&plan=${plan}&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${appUrl}/subscriptions?sub=cancelled`,
     metadata: { uid, plan },
   })
