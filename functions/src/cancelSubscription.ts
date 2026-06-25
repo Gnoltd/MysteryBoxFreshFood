@@ -19,7 +19,14 @@ export const cancelSubscription = functions.https.onCall(async (data, context) =
 
   if (snap.empty) throw new functions.https.HttpsError('not-found', 'Subscription not found')
 
-  await stripe.subscriptions.cancel(subscriptionId)
+  try {
+    await stripe.subscriptions.cancel(subscriptionId)
+  } catch (e: any) {
+    // Already cancelled or not found in Stripe — still mark Firestore as cancelled
+    if (e?.code !== 'resource_missing') {
+      functions.logger.warn('stripe cancel skipped', e?.message)
+    }
+  }
   await snap.docs[0].ref.update({ status: 'cancelled' })
   return { ok: true }
 })

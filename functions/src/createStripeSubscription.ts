@@ -34,7 +34,12 @@ export const createStripeSubscription = functions.https.onCall(async (data, cont
       throw new functions.https.HttpsError('already-exists', 'Already subscribed to this plan')
     }
     if (existingData.stripeSubscriptionId) {
-      await stripe.subscriptions.cancel(existingData.stripeSubscriptionId)
+      try {
+        await stripe.subscriptions.cancel(existingData.stripeSubscriptionId)
+      } catch (e: any) {
+        // Ignore if already cancelled or not found in Stripe
+        if (e?.code !== 'resource_missing') functions.logger.warn('stripe cancel skipped', e?.message)
+      }
     }
     await existingSnap.docs[0].ref.update({ status: 'cancelled' })
   }
