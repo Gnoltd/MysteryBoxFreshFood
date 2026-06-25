@@ -65,6 +65,7 @@ export default function VNPayReturnPage() {
             <div>
               <h1 className="text-headline-lg-mobile font-bold text-on-surface">{t('order.vnpayFailed', 'Payment failed')}</h1>
               <p className="text-on-surface-variant text-body-lg mt-2">{t('order.vnpayFailedSub', 'Your payment was not completed. No charge was made.')}</p>
+              <p className="text-xs text-outline mt-2 font-mono">Code: {responseCode} / Status: {transactionStatus}</p>
             </div>
           </>
         )}
