@@ -32,6 +32,7 @@ export default function ListingDetailPage() {
   const navigate = useNavigate()
   const [listing, setListing] = useState<Listing | null>(null)
   const [payMethod, setPayMethod] = useState<PayMethod>('card')
+  const [selectedBox, setSelectedBox] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -42,14 +43,19 @@ export default function ListingDetailPage() {
     return unsub
   }, [id])
 
+  const handlePayMethod = (key: PayMethod) => {
+    setPayMethod(key)
+    if (key === 'cod') setSelectedBox(null)
+  }
+
   const handleClaim = async () => {
     if (!listing) return
     setLoading(true)
     try {
       if (payMethod === 'card') {
-        await initiateCheckout(listing.id, 1)
+        await initiateCheckout(listing.id, 1, selectedBox ?? undefined)
       } else if (payMethod === 'vnpay') {
-        const { url } = await initiateVNPayOrder(listing.id, 1)
+        const { url } = await initiateVNPayOrder(listing.id, 1, selectedBox ?? undefined)
         window.location.href = url
       } else {
         const { orderId } = await initiateLocalOrder(listing.id, 1, payMethod as 'cod' | 'bank_transfer')
@@ -71,6 +77,10 @@ export default function ListingDetailPage() {
 
   const discount = Math.round((1 - listing.price / listing.originalPrice) * 100)
   const soldOut = listing.status === 'sold_out' || listing.quantityRemaining === 0
+  const hasBoxPlans = (listing.boxPlans?.length ?? 0) > 0
+  const availableBoxes = listing.boxPlans?.filter(p => !p.takenByOrderId) ?? []
+  const boxSelectionRequired = hasBoxPlans && (payMethod === 'card' || payMethod === 'vnpay')
+  const boxNotSelected = boxSelectionRequired && selectedBox === null
 
   const PAY_OPTIONS: Array<{ key: PayMethod; label: string; icon: React.ElementType }> = [
     { key: 'card',  label: t('payment.card'),   icon: CreditCard },
@@ -145,7 +155,27 @@ export default function ListingDetailPage() {
             {[
               { label: t('listing.remaining'), value: <StockBadge quantity={listing.quantityRemaining} /> },
               { label: t('listing.pickup'),    value: `${formatTime(listing.pickupStart)} – ${formatTime(listing.pickupEnd)}` },
-              { label: t('listing.category'),  value: <StatusChip variant="slate">{listing.category}</StatusChip> },
+              {
+                label: t('listing.category'),
+                value: (
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <StatusChip variant="slate">{listing.category}</StatusChip>
+                    {hasBoxPlans && availableBoxes.map(p => (
+                      <button
+                        key={p.boxNumber}
+                        onClick={() => setSelectedBox(prev => prev === p.boxNumber ? null : p.boxNumber)}
+                        className={`text-xs font-bold px-2 py-0.5 rounded-full border transition-colors ${
+                          selectedBox === p.boxNumber
+                            ? 'bg-primary text-white border-primary'
+                            : 'border-outline-variant text-on-surface-variant hover:border-primary/50'
+                        }`}
+                      >
+                        {t('listing.box_number', { n: p.boxNumber })}
+                      </button>
+                    ))}
+                  </div>
+                ),
+              },
             ].map(({ label, value }) => (
               <div key={label} className="bg-surface-container border border-outline-variant rounded-xl p-3 flex flex-col gap-1">
                 <span className="text-label-caps text-on-surface-variant uppercase tracking-wider">{label}</span>
@@ -164,7 +194,7 @@ export default function ListingDetailPage() {
               {PAY_OPTIONS.map(({ key, label, icon: Icon }) => (
                 <button
                   key={key}
-                  onClick={() => setPayMethod(key)}
+                  onClick={() => handlePayMethod(key)}
                   className={`flex flex-col items-center gap-1.5 p-3 rounded-lg border text-xs sm:text-body-sm font-semibold transition-colors ${
                     payMethod === key
                       ? 'border-primary text-primary bg-surface-container'
@@ -184,6 +214,13 @@ export default function ListingDetailPage() {
               </div>
             )}
 
+            {/* Box selection not available for COD */}
+            {payMethod === 'cod' && hasBoxPlans && (
+              <div className="bg-surface-container border border-outline-variant rounded-lg p-3 text-body-sm text-on-surface-variant mt-2">
+                {t('listing.boxSelectionCashOnly')}
+              </div>
+            )}
+
             {/* VNPAY note */}
             {payMethod === 'vnpay' && (
               <div className="bg-surface-container border border-outline-variant rounded-lg p-3 text-body-sm text-on-surface-variant">
@@ -199,13 +236,15 @@ export default function ListingDetailPage() {
         <div className="max-w-5xl mx-auto">
           <GradientButton
             onClick={handleClaim}
-            disabled={soldOut || loading}
+            disabled={soldOut || loading || boxNotSelected}
             className="w-full"
           >
             {soldOut
               ? t('listing.soldOut')
               : loading
               ? t('listing.claiming')
+              : boxNotSelected
+              ? t('listing.selectBoxFirst')
               : `${t('listing.buyNow')} — ${listing.price.toLocaleString('vi-VN')} đ`}
           </GradientButton>
         </div>
