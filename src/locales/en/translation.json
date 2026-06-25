@@ -384,6 +384,15 @@
     "whyLocalTitle": "Local Support",
     "whyLocalDesc": "Support local F&B businesses and keep your community thriving.",
     "whyFreshTitle": "Freshness Guaranteed",
-    "whyFreshDesc": "All boxes are packed fresh daily and must be collected within the pickup window."
+    "whyFreshDesc": "All boxes are packed fresh daily and must be collected within the pickup window.",
+    "perMonth": "/ month",
+    "perWeek": "/ week",
+    "mostPopular": "Most Popular"
+  },
+  "notif": {
+    "title": "Notifications",
+    "empty": "No notifications yet",
+    "markAllRead": "Mark all as read",
+    "newBox": "New box available"
   }
 }

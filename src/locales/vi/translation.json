@@ -383,6 +383,15 @@
     "whyLocalTitle": "Ủng hộ địa phương",
     "whyLocalDesc": "Hỗ trợ các doanh nghiệp F&B địa phương.",
     "whyFreshTitle": "Tươi ngon đảm bảo",
-    "whyFreshDesc": "Tất cả hộp được đóng gói tươi mỗi ngày."
+    "whyFreshDesc": "Tất cả hộp được đóng gói tươi mỗi ngày.",
+    "perMonth": "/ tháng",
+    "perWeek": "/ tuần",
+    "mostPopular": "Phổ biến nhất"
+  },
+  "notif": {
+    "title": "Thông báo",
+    "empty": "Chưa có thông báo",
+    "markAllRead": "Đánh dấu tất cả đã đọc",
+    "newBox": "Có hộp mới"
   }
 }

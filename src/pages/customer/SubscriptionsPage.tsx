@@ -3,41 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { getFollows, unfollowVendor, toggleNotifications } from '../../services/follows'
 import { getSubscription, createSubscription, cancelSubscription } from '../../services/subscriptions'
+import { getUserProfile } from '../../services/auth'
 import { GradientButton } from '../../components/shared/GradientButton'
 import { GhostButton } from '../../components/shared/GhostButton'
 import { StatusChip } from '../../components/shared/StatusChip'
 import type { Follow, Subscription, SubscriptionPlan } from '../../types'
 import { Bell, BellOff, Trash2, Leaf, Users, Sparkles } from 'lucide-react'
-
-interface PlanMeta {
-  key: SubscriptionPlan
-  displayName: string
-  price: string
-  popular?: boolean
-  features: string[]
-}
-
-const PLANS: PlanMeta[] = [
-  {
-    key: 'free',
-    displayName: 'Basic',
-    price: 'Free',
-    features: ['subs.featureFollow', 'subs.featureNotify'],
-  },
-  {
-    key: 'monthly',
-    displayName: 'Elite',
-    price: '300.000 đ / ngày',
-    popular: true,
-    features: ['subs.featureFollow', 'subs.featureNotify', 'subs.featurePriority', 'subs.featureWeekly', 'subs.featureVoucher'],
-  },
-  {
-    key: 'weekly',
-    displayName: 'Pro',
-    price: '150.000 đ / ngày',
-    features: ['subs.featureFollow', 'subs.featureNotify', 'subs.featurePriority', 'subs.featureWeekly'],
-  },
-]
 
 const WHY_ITEMS = [
   { icon: Leaf,     titleKey: 'subs.whySustainTitle',  descKey: 'subs.whySustainDesc' },
@@ -49,13 +20,46 @@ export default function SubscriptionsPage() {
   const { t } = useTranslation()
   const { userProfile } = useAuth()
   const [follows, setFollows] = useState<Follow[]>([])
+  const [vendorNames, setVendorNames] = useState<Record<string, string>>({})
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [loadingPlan, setLoadingPlan] = useState<SubscriptionPlan | null>(null)
   const [cancelling, setCancelling] = useState(false)
 
+  const PLANS = [
+    {
+      key: 'free' as SubscriptionPlan,
+      displayName: 'Basic',
+      price: t('subs.planFreePrice'),
+      features: ['subs.featureFollow', 'subs.featureNotify'],
+    },
+    {
+      key: 'monthly' as SubscriptionPlan,
+      displayName: 'Elite',
+      price: `300.000 đ ${t('subs.perMonth')}`,
+      popular: true,
+      features: ['subs.featureFollow', 'subs.featureNotify', 'subs.featurePriority', 'subs.featureWeekly', 'subs.featureVoucher'],
+    },
+    {
+      key: 'weekly' as SubscriptionPlan,
+      displayName: 'Pro',
+      price: `150.000 đ ${t('subs.perWeek')}`,
+      features: ['subs.featureFollow', 'subs.featureNotify', 'subs.featurePriority', 'subs.featureWeekly'],
+    },
+  ]
+
   useEffect(() => {
     if (!userProfile) return
-    getFollows(userProfile.uid).then(setFollows)
+    getFollows(userProfile.uid).then(async follows => {
+      setFollows(follows)
+      const names: Record<string, string> = {}
+      await Promise.all(
+        follows.map(async f => {
+          const profile = await getUserProfile(f.vendorId)
+          names[f.vendorId] = profile?.storeName ?? f.vendorId
+        })
+      )
+      setVendorNames(names)
+    })
     getSubscription(userProfile.uid).then(setSubscription)
   }, [userProfile])
 
@@ -140,7 +144,7 @@ export default function SubscriptionsPage() {
                 {popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <span className="gradient-bg text-white text-label-caps font-bold px-3 py-1 rounded-full whitespace-nowrap">
-                      MOST POPULAR
+                      {t('subs.mostPopular').toUpperCase()}
                     </span>
                   </div>
                 )}
@@ -214,7 +218,9 @@ export default function SubscriptionsPage() {
                   {follow.vendorId.slice(0, 1).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-on-surface font-semibold text-body-sm truncate">{follow.vendorId}</p>
+                  <p className="text-on-surface font-semibold text-body-sm truncate">
+                    {vendorNames[follow.vendorId] ?? follow.vendorId}
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <button onClick={() => handleToggleNotif(follow)}
