@@ -188,15 +188,52 @@ Full functional prototype — all features complete:
 | Implementation Plan 1 | ✅ Complete |
 | Implementation Plan 2 | ✅ Complete |
 
-**New features planned:**
+**New features built:**
 - Value-balanced random box distribution algorithm (`src/utils/boxDistribution.ts`)
 - Per-box preview in VendorComposePage (replaces flat packing guide)
 - VendorOrderDetailPage — vendor sees exact items per box to pack physically
-- Customer box selector (Box 1, 2, 3…) on ListingDetailPage — inline with category chip
+- Customer box selector — separate cell next to Category, scrollable dropdown picker
 - Box reveal card after Stripe/VNPAY payment on CheckoutSuccessPage + OrderDetailPage
 - COD/bank transfer: no box selection, no reveal
 - First-payment-wins box assignment with auto-reassignment notification
 - Post-pickup 10% discount if customer received a below-average box
+
+---
+
+## Post-Launch Fixes & Subscription Improvements (2026-06-25)
+
+| Task | Status |
+|---|---|
+| Fix box selector UI — separate cell beside Category | ✅ Complete |
+| Fix subscription plan prices (/ ngày → / tháng, i18n) | ✅ Complete |
+| Fix followed vendor display (raw UID → store name) | ✅ Complete |
+| Fix NotificationPanel hardcoded English — full i18n | ✅ Complete |
+| Fix "MOST POPULAR" badge — i18n | ✅ Complete |
+| Fix Pro plan price unit (/ week → / month) | ✅ Complete |
+| Fix free plan price label ("Free forever" → "Free Plan") | ✅ Complete |
+| Reorder subscription plans (Free → Pro → Elite) | ✅ Complete |
+| Stripe Checkout redirect for subscription payments | ✅ Complete |
+| stripeSubscriptionWebhook — handle checkout.session.completed | ✅ Complete |
+| Daily box limits per plan (Free=2, Pro=5, Elite=8) | ✅ Complete |
+| Daily limit shown on subscription plan cards | ✅ Complete |
+| Daily limit error displayed on ListingDetailPage | ✅ Complete |
+| Subscription success/cancelled banner on return from Stripe | ✅ Complete |
+
+**Files changed:**
+- `functions/src/planLimits.ts` — NEW shared daily limit helper
+- `functions/src/createStripeSubscription.ts` — Checkout Session redirect
+- `functions/src/stripeSubscriptionWebhook.ts` — checkout.session.completed handler
+- `functions/src/createCheckoutSession.ts` — daily limit check
+- `functions/src/createVNPayOrder.ts` — daily limit check
+- `functions/src/createLocalOrder.ts` — daily limit check
+- `src/services/subscriptions.ts` — returns `{ url }` instead of `{ clientSecret }`
+- `src/pages/customer/SubscriptionsPage.tsx` — full overhaul
+- `src/pages/customer/ListingDetailPage.tsx` — box selector cell + limit error
+- `src/components/shared/NotificationPanel.tsx` — full i18n
+- Both locale files — new keys: `subs.dailyLimit`, `subs.subSuccess`, `subs.subCancelled`, `subs.limitReached`, `notif.*`, `subs.perMonth/perWeek/mostPopular`
+
+**One manual deployment step:**
+- Stripe Dashboard → Webhooks → subscription endpoint → add `checkout.session.completed` event
 
 **Design files used:** `Design/mysterybox_marketplace/`, `Design/intelligent_vendor_core/`, `Design/mysterybox_browse/`, `Design/mysterybox_login/`, `Design/mysterybox_subscriptions/`, etc.
 
