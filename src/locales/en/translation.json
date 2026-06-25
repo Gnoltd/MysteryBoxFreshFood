@@ -92,6 +92,7 @@
     "saving": "Saving…",
     "save": "Save Listing",
     "box_number": "Box {{n}}",
+    "selectBox": "Select Box",
     "selectBoxFirst": "Select a box first",
     "boxSelectionCashOnly": "Box selection and reveal are available for card and VNPAY payments only."
   },

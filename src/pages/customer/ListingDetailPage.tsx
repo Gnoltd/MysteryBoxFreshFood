@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { onSnapshot, doc } from 'firebase/firestore'
@@ -22,7 +22,7 @@ const CATEGORY_IMAGE: Record<ListingCategory, string> = {
   other: '/images/categories/other.jpg',
 }
 import { ReviewsCarousel } from '../../components/shared/ReviewsCarousel'
-import { ArrowLeft, Share2, Heart, CreditCard, Truck, Building2 } from 'lucide-react'
+import { ArrowLeft, Share2, Heart, CreditCard, Truck, Building2, Package, ChevronDown, Check } from 'lucide-react'
 
 type PayMethod = 'card' | 'cod' | 'vnpay'
 
@@ -33,7 +33,9 @@ export default function ListingDetailPage() {
   const [listing, setListing] = useState<Listing | null>(null)
   const [payMethod, setPayMethod] = useState<PayMethod>('card')
   const [selectedBox, setSelectedBox] = useState<number | null>(null)
+  const [boxPickerOpen, setBoxPickerOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const boxPickerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!id) return
@@ -42,6 +44,16 @@ export default function ListingDetailPage() {
     })
     return unsub
   }, [id])
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (boxPickerRef.current && !boxPickerRef.current.contains(e.target as Node)) {
+        setBoxPickerOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
   const handlePayMethod = (key: PayMethod) => {
     setPayMethod(key)
@@ -158,21 +170,49 @@ export default function ListingDetailPage() {
               {
                 label: t('listing.category'),
                 value: (
-                  <div className="flex flex-wrap items-center gap-1.5">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <StatusChip variant="slate">{listing.category}</StatusChip>
-                    {hasBoxPlans && availableBoxes.map(p => (
-                      <button
-                        key={p.boxNumber}
-                        onClick={() => setSelectedBox(prev => prev === p.boxNumber ? null : p.boxNumber)}
-                        className={`text-xs font-bold px-2 py-0.5 rounded-full border transition-colors ${
-                          selectedBox === p.boxNumber
-                            ? 'bg-primary text-white border-primary'
-                            : 'border-outline-variant text-on-surface-variant hover:border-primary/50'
-                        }`}
-                      >
-                        {t('listing.box_number', { n: p.boxNumber })}
-                      </button>
-                    ))}
+                    {hasBoxPlans && boxSelectionRequired && (
+                      <div ref={boxPickerRef} className="relative">
+                        <button
+                          onClick={() => setBoxPickerOpen(o => !o)}
+                          className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full border transition-colors ${
+                            selectedBox !== null
+                              ? 'bg-primary text-white border-primary'
+                              : 'border-outline-variant text-on-surface-variant hover:border-primary/50'
+                          }`}
+                        >
+                          <Package size={11} />
+                          {selectedBox !== null
+                            ? t('listing.box_number', { n: selectedBox })
+                            : t('listing.selectBox')}
+                          <ChevronDown size={11} className={`transition-transform ${boxPickerOpen ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {boxPickerOpen && (
+                          <div className="absolute left-0 top-full mt-1 z-50 bg-surface-container border border-outline-variant rounded-xl shadow-xl overflow-hidden min-w-[120px]">
+                            <div className="max-h-48 overflow-y-auto">
+                              {availableBoxes.length === 0 ? (
+                                <p className="text-on-surface-variant text-xs px-3 py-2">{t('listing.soldOut')}</p>
+                              ) : (
+                                availableBoxes.map(p => (
+                                  <button
+                                    key={p.boxNumber}
+                                    onClick={() => { setSelectedBox(p.boxNumber); setBoxPickerOpen(false) }}
+                                    className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold hover:bg-surface-container-high transition-colors ${
+                                      selectedBox === p.boxNumber ? 'text-primary' : 'text-on-surface'
+                                    }`}
+                                  >
+                                    {t('listing.box_number', { n: p.boxNumber })}
+                                    {selectedBox === p.boxNumber && <Check size={11} />}
+                                  </button>
+                                ))
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ),
               },

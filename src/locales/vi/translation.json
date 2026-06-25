@@ -92,6 +92,7 @@
     "saving": "Đang lưu…",
     "save": "Lưu sản phẩm",
     "box_number": "Hộp {{n}}",
+    "selectBox": "Chọn hộp",
     "selectBoxFirst": "Chọn một hộp trước",
     "boxSelectionCashOnly": "Chọn hộp và xem nội dung chỉ khả dụng với thanh toán thẻ và VNPAY."
   },
