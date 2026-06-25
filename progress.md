@@ -1,8 +1,8 @@
 # MysteryBox — Progress
 
-## Current Phase: Full Redesign + Subscriptions + Real-Time (Planning Complete)
+## Current Phase: Mystery Box Selection, Distribution & Reveal (Planning Complete)
 
-**Last updated:** 2026-06-22  
+**Last updated:** 2026-06-25  
 **Spec:** `docs/superpowers/specs/2026-06-17-mysterybox-design.md`  
 **Plan:** `docs/superpowers/plans/2026-06-17-mysterybox-implementation.md`
 **Extensions spec:** `docs/superpowers/specs/2026-06-19-extensions-design.md`  
@@ -17,6 +17,10 @@
 **Redesign Plan 2 (Customer Pages):** `docs/superpowers/plans/2026-06-22-redesign-p2-customer-pages.md`  
 **Redesign Plan 3 (Subscriptions + Real-Time):** `docs/superpowers/plans/2026-06-22-redesign-p3-subscriptions-realtime.md`  
 **Redesign Plan 4 (Vendor Pages):** `docs/superpowers/plans/2026-06-22-redesign-p4-vendor-pages.md`
+
+**Mystery Box spec:** `docs/superpowers/specs/2026-06-25-mystery-box-selection-reveal-design.md`
+**Mystery Box Plan 1 (Types + Algorithm + Vendor):** `docs/superpowers/plans/2026-06-25-mystery-box-p1-types-algorithm-vendor.md`
+**Mystery Box Plan 2 (Customer + Cloud Functions):** `docs/superpowers/plans/2026-06-25-mystery-box-p2-customer-cloud-functions.md`
 
 ---
 
@@ -171,6 +175,28 @@ Full functional prototype — all features complete:
 | Plan Part 4 — Vendor Pages Redesign | ✅ Complete |
 | Implementation | ✅ Complete |
 | VendorComposePage workbench redesign | ✅ Complete |
+
+---
+
+## Mystery Box Selection, Distribution & Reveal (2026-06-25)
+
+| Task | Status |
+|---|---|
+| Brainstorming & design | ✅ Complete |
+| Plan 1 — Types + Algorithm + Vendor Side | ✅ Complete |
+| Plan 2 — Customer Side + Cloud Functions | ✅ Complete |
+| Implementation Plan 1 | ⏳ Pending |
+| Implementation Plan 2 | ⏳ Pending |
+
+**New features planned:**
+- Value-balanced random box distribution algorithm (`src/utils/boxDistribution.ts`)
+- Per-box preview in VendorComposePage (replaces flat packing guide)
+- VendorOrderDetailPage — vendor sees exact items per box to pack physically
+- Customer box selector (Box 1, 2, 3…) on ListingDetailPage — inline with category chip
+- Box reveal card after Stripe/VNPAY payment on CheckoutSuccessPage + OrderDetailPage
+- COD/bank transfer: no box selection, no reveal
+- First-payment-wins box assignment with auto-reassignment notification
+- Post-pickup 10% discount if customer received a below-average box
 
 **Design files used:** `Design/mysterybox_marketplace/`, `Design/intelligent_vendor_core/`, `Design/mysterybox_browse/`, `Design/mysterybox_login/`, `Design/mysterybox_subscriptions/`, etc.
 
