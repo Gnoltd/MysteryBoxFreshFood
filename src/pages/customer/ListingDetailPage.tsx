@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+
+const formatTime = (ts: { seconds: number }) =>
+  new Date(ts.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { onSnapshot, doc } from 'firebase/firestore'
@@ -92,9 +95,6 @@ export default function ListingDetailPage() {
       setLoading(false)
     }
   }
-
-  const formatTime = (ts: { seconds: number }) =>
-    new Date(ts.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
   if (!listing) return (
     <div className="flex items-center justify-center py-24">

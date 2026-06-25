@@ -102,7 +102,7 @@ export default function VendorInventoryPage() {
     await deleteInventoryItem(currentUser.uid, id)
   }
 
-  const sorted = [...items].sort((a, b) => {
+  const sorted = items.toSorted((a, b) => {
     const aExp = expiryLabel(a) !== null
     const bExp = expiryLabel(b) !== null
     if (aExp !== bExp) return aExp ? -1 : 1

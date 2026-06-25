@@ -18,12 +18,17 @@ export function distributeBoxes(
   const targetPerBox = totalValue / numBoxes
 
   // Sort expensive items first so they spread before cheap filler
-  const sorted = [...items].sort((a, b) => b.unitPrice - a.unitPrice)
+  const sorted = items.toSorted((a, b) => b.unitPrice - a.unitPrice)
+
+  // itemsByName for O(1) lookup in balance pass
+  const itemsByName = new Map(items.map(it => [it.name, it]))
 
   const boxes: Array<{ value: number; items: BoxItem[] }> = Array.from(
     { length: numBoxes },
     () => ({ value: 0, items: [] }),
   )
+  // Per-box Maps for O(1) item lookup during greedy fill and balance pass
+  const boxItemMaps: Array<Map<string, BoxItem>> = Array.from({ length: numBoxes }, () => new Map())
 
   // Greedy random fill — one unit at a time
   for (const item of sorted) {
@@ -31,17 +36,20 @@ export function distributeBoxes(
       // Pick from the bottom 40% of boxes by current value
       const indexed = boxes
         .map((b, idx) => ({ idx, value: b.value }))
-        .sort((a, b) => a.value - b.value)
+        .toSorted((a, b) => a.value - b.value)
       const poolSize = Math.max(1, Math.ceil(numBoxes * 0.4))
       const pool = indexed.slice(0, poolSize)
       const chosen = pool[Math.floor(Math.random() * pool.length)]
 
       const box = boxes[chosen.idx]
-      const existing = box.items.find(bi => bi.name === item.name)
+      const boxMap = boxItemMaps[chosen.idx]
+      const existing = boxMap.get(item.name)
       if (existing) {
         existing.qty++
       } else {
-        box.items.push({ name: item.name, qty: 1, unit: item.unit })
+        const bi: BoxItem = { name: item.name, qty: 1, unit: item.unit }
+        box.items.push(bi)
+        boxMap.set(item.name, bi)
       }
       box.value += item.unitPrice
     }
@@ -57,7 +65,7 @@ export function distributeBoxes(
     const maxDev = boxes.reduce((mx, b) => Math.max(mx, Math.abs(b.value - targetPerBox)), 0)
     if (maxDev / targetPerBox <= 0.2) break
 
-    const byValue = [...boxes.keys()].sort((a, b) => boxes[b].value - boxes[a].value)
+    const byValue = boxes.map((_, i) => i).toSorted((a, b) => boxes[b].value - boxes[a].value)
     const richIdx = byValue[0]
     const poorIdx = byValue[byValue.length - 1]
 
@@ -65,7 +73,7 @@ export function distributeBoxes(
     let bestItemName = ''
 
     for (const bItem of boxes[richIdx].items) {
-      const src = items.find(it => it.name === bItem.name)
+      const src = itemsByName.get(bItem.name)
       if (!src) continue
       const v = src.unitPrice
       const oldDev = Math.abs(boxes[richIdx].value - targetPerBox) + Math.abs(boxes[poorIdx].value - targetPerBox)
@@ -78,19 +86,28 @@ export function distributeBoxes(
     }
 
     if (bestItemName && bestReduction > 0) {
-      const src = items.find(it => it.name === bestItemName)!
+      const src = itemsByName.get(bestItemName)!
       const v = src.unitPrice
 
       // Remove one unit from richest
-      const richItem = boxes[richIdx].items.find(bi => bi.name === bestItemName)!
-      if (richItem.qty > 1) richItem.qty--
-      else boxes[richIdx].items = boxes[richIdx].items.filter(bi => bi.name !== bestItemName)
+      const richItem = boxItemMaps[richIdx].get(bestItemName)!
+      if (richItem.qty > 1) {
+        richItem.qty--
+      } else {
+        boxes[richIdx].items = boxes[richIdx].items.filter(bi => bi.name !== bestItemName)
+        boxItemMaps[richIdx].delete(bestItemName)
+      }
       boxes[richIdx].value -= v
 
       // Add one unit to poorest
-      const poorItem = boxes[poorIdx].items.find(bi => bi.name === bestItemName)
-      if (poorItem) poorItem.qty++
-      else boxes[poorIdx].items.push({ name: bestItemName, qty: 1, unit: src.unit })
+      const poorItem = boxItemMaps[poorIdx].get(bestItemName)
+      if (poorItem) {
+        poorItem.qty++
+      } else {
+        const bi: BoxItem = { name: bestItemName, qty: 1, unit: src.unit }
+        boxes[poorIdx].items.push(bi)
+        boxItemMaps[poorIdx].set(bestItemName, bi)
+      }
       boxes[poorIdx].value += v
 
       improved = true

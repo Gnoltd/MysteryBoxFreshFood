@@ -42,10 +42,12 @@ export async function getListingRatings(
 ): Promise<Record<string, { avg: number; count: number }>> {
   if (listingIds.length === 0) return {}
   const result: Record<string, { avg: number; count: number }> = {}
-  // Firestore 'in' supports max 30 items per query
-  for (let i = 0; i < listingIds.length; i += 30) {
-    const chunk = listingIds.slice(i, i + 30)
-    const snap = await getDocs(query(collection(db, 'reviews'), where('listingId', 'in', chunk)))
+  const chunks: string[][] = []
+  for (let i = 0; i < listingIds.length; i += 30) chunks.push(listingIds.slice(i, i + 30))
+  const snaps = await Promise.all(
+    chunks.map(chunk => getDocs(query(collection(db, 'reviews'), where('listingId', 'in', chunk))))
+  )
+  for (const snap of snaps) {
     const grouped: Record<string, number[]> = {}
     snap.docs.forEach(d => {
       const { listingId, rating } = d.data() as Review

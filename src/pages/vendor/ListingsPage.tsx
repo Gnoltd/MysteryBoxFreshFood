@@ -9,6 +9,10 @@ import { GradientButton } from '../../components/shared/GradientButton'
 import type { Listing, ListingCategory } from '../../types'
 import { Pencil, Trash2, Wand2, RefreshCw } from 'lucide-react'
 
+async function handleToggleStatus(l: { id: string; status: string }) {
+  if (l.status === 'active') await updateListing(l.id, { status: 'expired' })
+}
+
 export default function ListingsPage() {
   const { t } = useTranslation()
   const { userProfile } = useAuth()
@@ -27,11 +31,6 @@ export default function ListingsPage() {
     const matchCat = category === 'all' || l.category === category
     return matchSearch && matchCat
   })
-
-  const handleToggleStatus = async (l: Listing) => {
-    // active → expired (pause); expired/sold_out need renew via edit
-    if (l.status === 'active') await updateListing(l.id, { status: 'expired' })
-  }
 
   const STATUS_CONFIG: Record<string, { variant: 'emerald' | 'amber' | 'rose' | 'slate'; label: string }> = {
     active:   { variant: 'emerald', label: t('listing.active') },

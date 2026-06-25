@@ -106,7 +106,7 @@ export default function BrowsePage() {
     if (minPrice) result = result.filter(l => l.price >= Number(minPrice))
     if (maxPrice) result = result.filter(l => l.price <= Number(maxPrice))
     if (availableOnly) result = result.filter(l => l.quantityRemaining > 0 && l.status === 'active')
-    return [...result].sort((a, b) => {
+    return result.toSorted((a, b) => {
       if (sortBy === 'top_rated') {
         const ra = ratings[a.id]?.avg ?? 0
         const rb = ratings[b.id]?.avg ?? 0

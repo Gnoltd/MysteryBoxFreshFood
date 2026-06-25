@@ -6,7 +6,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth'
-import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { httpsCallable } from 'firebase/functions'
 import { auth, db, functions } from '../firebase'
 import type { UserProfile } from '../types'
@@ -19,9 +19,11 @@ export async function signUp(
   extra?: Partial<UserProfile>
 ): Promise<void> {
   const cred = await createUserWithEmailAndPassword(auth, email, password)
-  await updateProfile(cred.user, { displayName })
-  const createUserProfile = httpsCallable(functions, 'createUserProfile')
-  await createUserProfile({ role, displayName, lang: 'en', extra: extra ?? {} })
+  const createUserProfileFn = httpsCallable(functions, 'createUserProfile')
+  await Promise.all([
+    updateProfile(cred.user, { displayName }),
+    createUserProfileFn({ role, displayName, lang: 'en', extra: extra ?? {} }),
+  ])
 }
 
 export async function signIn(email: string, password: string): Promise<void> {
@@ -38,30 +40,24 @@ export async function signInWithGoogle(): Promise<void> {
   const userRef = doc(db, 'users', cred.user.uid)
   const snap = await getDoc(userRef)
   if (!snap.exists()) {
-    await setDoc(userRef, {
+    const createUserProfileFn = httpsCallable(functions, 'createUserProfile')
+    await createUserProfileFn({
       role: 'customer',
       displayName: cred.user.displayName ?? '',
-      email: cred.user.email ?? '',
       lang: 'en',
-      createdAt: serverTimestamp(),
     })
   }
 }
 
 export async function createGoogleUserProfile(
-  uid: string,
+  _uid: string,
   displayName: string,
-  email: string,
+  _email: string,
   role: 'vendor' | 'customer',
   extra?: Partial<UserProfile>
 ): Promise<void> {
-  await setDoc(doc(db, 'users', uid), {
-    role,
-    displayName,
-    email,
-    lang: 'en',
-    ...extra,
-  })
+  const createUserProfileFn = httpsCallable(functions, 'createUserProfile')
+  await createUserProfileFn({ role, displayName, lang: 'en', extra: extra ?? {} })
 }
 
 export async function getUserProfile(uid: string): Promise<UserProfile | null> {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
@@ -8,10 +8,11 @@ import { updateVendorProfile, updateVendorBankInfo } from '../../services/auth'
 import { StatusChip } from '../../components/shared/StatusChip'
 import { StatCardSkeleton } from '../../components/shared/ShimmerSkeleton'
 import { useCountUp } from '../../hooks/useCountUp'
-import { LineChart, Line, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts'
 import type { Listing, Order } from '../../types'
 import { Package, ShoppingBag, TrendingUp, Star, QrCode, Wand2, PlusCircle, Pencil, Check, X, Zap } from 'lucide-react'
 import { VN_BANKS } from '../../data/vnBanks'
+
+const RevenueChart = lazy(() => import('../../components/shared/RevenueChart'))
 
 function AnimatedStat({ value, prefix = '', suffix = '', className = '' }: {
   value: number; prefix?: string; suffix?: string; className?: string
@@ -92,7 +93,10 @@ export default function VendorDashboardPage() {
     .reduce((sum, o) => sum + o.totalPrice, 0)
   const activeListings = listings.filter(l => l.status === 'active').length
   const pendingPickups = orders.filter(o => o.status === 'paid').length
-  const ratings = orders.filter(o => (o as any).rating).map((o: any) => o.rating as number)
+  const ratings = orders.reduce<number[]>((acc, o) => {
+    if ((o as any).rating) acc.push((o as any).rating as number)
+    return acc
+  }, [])
   const avgRating = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0
 
   const recentOrders = orders.slice(0, 5)
@@ -208,31 +212,9 @@ export default function VendorDashboardPage() {
             <TrendingUp size={14} className="text-emerald-400" />
             {t('dashboard.revenueChart')}
           </h2>
-          <ResponsiveContainer width="100%" height={140}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-              <Line
-                type="monotone"
-                dataKey="revenue"
-                stroke="url(#lineGrad)"
-                strokeWidth={2.5}
-                dot={false}
-                activeDot={{ r: 5, fill: '#c0c1ff', stroke: '#494bd6' }}
-              />
-              <defs>
-                <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#494bd6" />
-                  <stop offset="100%" stopColor="#ddb7ff" />
-                </linearGradient>
-              </defs>
-              <Tooltip
-                contentStyle={{ background: '#12182e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, backdropFilter: 'blur(12px)' }}
-                labelStyle={{ color: '#c7c4d7', fontSize: 12 }}
-                itemStyle={{ color: '#c0c1ff', fontSize: 12 }}
-                formatter={(v) => [v != null ? Number(v).toLocaleString('vi-VN') + ' đ' : '–', 'Revenue']}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <Suspense fallback={<div className="h-[140px] animate-pulse bg-white/5 rounded-xl" />}>
+            <RevenueChart data={chartData} />
+          </Suspense>
         </div>
 
         {/* Quick Actions */}

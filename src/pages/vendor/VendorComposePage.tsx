@@ -209,7 +209,7 @@ export default function VendorComposePage() {
         status: 'active',
         boxContents: validPlans
           ? validPlans[0]?.items ?? []
-          : packingGuide.filter(p => p.perBox > 0).map(p => ({ name: p.name, qty: p.perBox })),
+          : packingGuide.flatMap(p => p.perBox > 0 ? [{ name: p.name, qty: p.perBox }] : []),
         ...(validPlans ? { boxPlans: validPlans } : {}),
       })
 
@@ -227,11 +227,14 @@ export default function VendorComposePage() {
     } finally { setPublishLoading(false) }
   }
 
-  const sortedInventory = [...inventoryItems].sort((a, b) => {
+  const sortedInventory = inventoryItems.toSorted((a, b) => {
     const aExp = expiryLabel(a) !== null; const bExp = expiryLabel(b) !== null
     if (aExp !== bExp) return aExp ? -1 : 1
     return a.name.localeCompare(b.name)
   })
+  const filteredInventory = sortedInventory.filter(item =>
+    item.name.toLowerCase().includes(search.toLowerCase())
+  )
 
   return (
     <div className="h-[calc(100vh-4rem)] grid grid-cols-12 gap-4">
@@ -275,8 +278,7 @@ export default function VendorComposePage() {
               </Button>
             </div>
           )}
-          {sortedInventory
-            .filter(item => item.name.toLowerCase().includes(search.toLowerCase()))
+          {filteredInventory
             .map(item => {
               const selected = selectedItems.has(item.id)
               const expiry = expiryLabel(item)

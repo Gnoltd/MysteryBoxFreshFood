@@ -37,8 +37,8 @@ export function filterListings(listings: Listing[], filters: FilterState): Listi
     }
     return true
   })
-  if (filters.sort === 'price_asc') result = [...result].sort((a, b) => a.price - b.price)
-  if (filters.sort === 'price_desc') result = [...result].sort((a, b) => b.price - a.price)
+  if (filters.sort === 'price_asc') result = result.toSorted((a, b) => a.price - b.price)
+  if (filters.sort === 'price_desc') result = result.toSorted((a, b) => b.price - a.price)
   return result
 }
 
