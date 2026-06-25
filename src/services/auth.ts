@@ -7,7 +7,8 @@ import {
   signInWithPopup,
 } from 'firebase/auth'
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore'
-import { auth, db } from '../firebase'
+import { httpsCallable } from 'firebase/functions'
+import { auth, db, functions } from '../firebase'
 import type { UserProfile } from '../types'
 
 export async function signUp(
@@ -19,13 +20,8 @@ export async function signUp(
 ): Promise<void> {
   const cred = await createUserWithEmailAndPassword(auth, email, password)
   await updateProfile(cred.user, { displayName })
-  await setDoc(doc(db, 'users', cred.user.uid), {
-    role,
-    displayName,
-    email,
-    lang: 'en',
-    ...extra,
-  })
+  const createUserProfile = httpsCallable(functions, 'createUserProfile')
+  await createUserProfile({ role, displayName, lang: 'en', extra: extra ?? {} })
 }
 
 export async function signIn(email: string, password: string): Promise<void> {
