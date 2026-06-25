@@ -42,7 +42,7 @@ export default function SubscriptionsPage() {
     {
       key: 'weekly' as SubscriptionPlan,
       displayName: 'Pro',
-      price: `150.000 đ ${t('subs.perWeek')}`,
+      price: `150.000 đ ${t('subs.perMonth')}`,
       features: ['subs.featureFollow', 'subs.featureNotify', 'subs.featurePriority', 'subs.featureWeekly'],
     },
   ]
