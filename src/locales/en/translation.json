@@ -90,7 +90,10 @@
     "draft": "Draft",
     "deleteConfirm": "Delete this listing?",
     "saving": "Saving…",
-    "save": "Save Listing"
+    "save": "Save Listing",
+    "box_number": "Box {{n}}",
+    "selectBoxFirst": "Select a box first",
+    "boxSelectionCashOnly": "Box selection and reveal are available for card and VNPAY payments only."
   },
   "payment": {
     "selectMethod": "Payment method",
@@ -171,7 +174,9 @@
     "rateExperience": "Rate Your Experience",
     "ratePlaceholder": "Tell us about your experience...",
     "submitRating": "Submit Rating",
-    "rateAfterPickup": "You can rate after picking up your order"
+    "rateAfterPickup": "You can rate after picking up your order",
+    "boxRevealTitle": "Your Box {{n}} contained:",
+    "boxReassigned": "Box {{original}} was just taken — you got Box {{got}} instead"
   },
   "vendor": {
     "dashboard": "Dashboard",

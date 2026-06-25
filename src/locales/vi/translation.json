@@ -90,7 +90,10 @@
     "draft": "Nháp",
     "deleteConfirm": "Xóa sản phẩm này?",
     "saving": "Đang lưu…",
-    "save": "Lưu sản phẩm"
+    "save": "Lưu sản phẩm",
+    "box_number": "Hộp {{n}}",
+    "selectBoxFirst": "Chọn một hộp trước",
+    "boxSelectionCashOnly": "Chọn hộp và xem nội dung chỉ khả dụng với thanh toán thẻ và VNPAY."
   },
   "payment": {
     "selectMethod": "Phương thức thanh toán",
@@ -170,7 +173,9 @@
     "rateExperience": "Đánh giá trải nghiệm",
     "ratePlaceholder": "Kể về trải nghiệm của bạn...",
     "submitRating": "Gửi đánh giá",
-    "rateAfterPickup": "Bạn có thể đánh giá sau khi nhận hàng"
+    "rateAfterPickup": "Bạn có thể đánh giá sau khi nhận hàng",
+    "boxRevealTitle": "Hộp {{n}} của bạn chứa:",
+    "boxReassigned": "Hộp {{original}} vừa bị lấy — bạn nhận được Hộp {{got}} thay thế"
   },
   "vendor": {
     "dashboard": "Tổng quan",
