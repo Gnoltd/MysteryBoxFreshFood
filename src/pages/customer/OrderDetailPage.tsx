@@ -8,7 +8,33 @@ import { StatusChip } from '../../components/shared/StatusChip'
 import { useAuth } from '../../contexts/AuthContext'
 import { submitReview, updateReview, getReviewForOrder } from '../../services/reviews'
 import { ArrowLeft, Share2, Download, Star, CheckCircle } from 'lucide-react'
+import { formatBoxItem } from '../../utils/boxDistribution'
 import type { Order } from '../../types'
+
+function BoxRevealCard({ order }: { order: Order }) {
+  const { t } = useTranslation()
+  const revealable = order.paymentMethod === 'stripe' || order.paymentMethod === 'vnpay'
+  if (!revealable || !order.boxContents?.length || order.boxNumber == null) return null
+  return (
+    <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
+      {order.boxReassigned && (
+        <p className="text-amber-400 text-xs mb-3">
+          {t('order.boxReassigned', { original: order.originalBoxNumber, got: order.boxNumber })}
+        </p>
+      )}
+      <p className="text-primary font-semibold text-sm mb-3">
+        🎁 {t('order.boxRevealTitle', { n: order.boxNumber })}
+      </p>
+      <ul className="space-y-1">
+        {order.boxContents.map(item => (
+          <li key={item.name} className="text-on-surface-variant text-sm">
+            {formatBoxItem(item)}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
 
 const STATUS_STEPS: Array<{ key: string; labelKey: string }> = [
   { key: 'paid',      labelKey: 'order.statusPaid' },
@@ -261,6 +287,9 @@ export default function OrderDetailPage() {
             </button>
           </div>
         </div>
+
+        {/* Box reveal */}
+        <BoxRevealCard order={order} />
 
         {/* Payment details */}
         {order.paymentMethod && (

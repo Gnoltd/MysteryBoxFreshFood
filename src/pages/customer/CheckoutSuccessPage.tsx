@@ -6,7 +6,33 @@ import { db } from '../../firebase'
 import { QRCodeSVG } from 'qrcode.react'
 import { useAuth } from '../../contexts/AuthContext'
 import { StatusChip } from '../../components/shared/StatusChip'
+import { formatBoxItem } from '../../utils/boxDistribution'
 import type { Order } from '../../types'
+
+function BoxRevealCard({ order }: { order: Order }) {
+  const { t } = useTranslation()
+  const revealable = order.paymentMethod === 'stripe' || order.paymentMethod === 'vnpay'
+  if (!revealable || !order.boxContents?.length || order.boxNumber == null) return null
+  return (
+    <div className="w-full bg-primary/5 border border-primary/20 rounded-xl p-4 text-left">
+      {order.boxReassigned && (
+        <p className="text-amber-400 text-xs mb-3">
+          {t('order.boxReassigned', { original: order.originalBoxNumber, got: order.boxNumber })}
+        </p>
+      )}
+      <p className="text-primary font-semibold text-sm mb-3">
+        🎁 {t('order.boxRevealTitle', { n: order.boxNumber })}
+      </p>
+      <ul className="space-y-1">
+        {order.boxContents.map(item => (
+          <li key={item.name} className="text-on-surface-variant text-sm">
+            {formatBoxItem(item)}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
 
 const STATUS_STEPS = ['paid', 'picked_up'] as const
 const STEP_LABELS: Record<string, string> = { paid: 'order.statusPaid', picked_up: 'order.statusPickedUp' }
@@ -74,6 +100,8 @@ export default function CheckoutSuccessPage() {
             <StatusChip variant={order.status === 'picked_up' ? 'emerald' : 'primary'}>
               {t(`order.status_${order.status}`)}
             </StatusChip>
+
+            <BoxRevealCard order={order} />
           </>
         ) : (
           <div className="w-48 h-48 bg-surface-container rounded-xl animate-pulse" />
