@@ -2,7 +2,7 @@
 
 ## Current Phase: Mystery Box Selection, Distribution & Reveal (Complete)
 
-**Last updated:** 2026-06-25  
+**Last updated:** 2026-06-26  
 **Spec:** `docs/superpowers/specs/2026-06-17-mysterybox-design.md`  
 **Plan:** `docs/superpowers/plans/2026-06-17-mysterybox-implementation.md`
 **Extensions spec:** `docs/superpowers/specs/2026-06-19-extensions-design.md`  
@@ -274,3 +274,32 @@ Full functional prototype — all features complete:
 - Stripe recurring subscriptions (`subscriptions/` collection)
 - New SubscriptionsPage (`/subscriptions`)
 - New Cloud Functions: `savePushToken`, `onListingPublished`, `createStripeSubscription`, `stripeSubscriptionWebhook`, `cancelSubscription`
+
+---
+
+## React Doctor Code Quality Pass (2026-06-26)
+
+| Issue | Status |
+|---|---|
+| Security: client writes `role` field in `signUp` | ✅ Fixed |
+| Security: client writes `role` in `signInWithGoogle` | ✅ Fixed |
+| Security: client writes `role` in `createGoogleUserProfile` | ✅ Fixed |
+| Performance: sequential awaits in `signUp` → `Promise.all` | ✅ Fixed |
+| Performance: sequential Firestore chunk fetches in `getListingRatings` → `Promise.all` | ✅ Fixed |
+| Performance: recharts eager load in VendorDashboardPage | ✅ Fixed |
+| Performance: `find()` inside loops in `boxDistribution.ts` (×5) | ✅ Fixed |
+| Performance: `sort()[0]` for max in `analytics.ts` | ✅ Fixed |
+| Performance: `filter().forEach()` chains → `for...of` in `analytics.ts` (×3) | ✅ Fixed |
+| Performance: `PAID_STATUSES.includes()` → `Set.has()` in `analytics.ts` (×3) | ✅ Fixed |
+| Performance: `[...array].sort()` → `.toSorted()` across 5 files | ✅ Fixed |
+| Performance: `filter().map()` chains combined in VendorComposePage + VendorDashboardPage | ✅ Fixed |
+| Maintainability: `formatTime` inline in `ListingDetailPage` | ✅ Fixed |
+| Maintainability: `handleToggleStatus` inline in `ListingsPage` | ✅ Fixed |
+
+**Score: 47/100 → 86/100 (Critical → Great)**
+
+**New Cloud Function:** `functions/src/createUserProfile.ts` — callable CF that validates role server-side using `context.auth.uid`; all three client auth paths now call this instead of writing directly to Firestore.
+
+**New component:** `src/components/shared/RevenueChart.tsx` — extracted from VendorDashboardPage and lazy-loaded via `React.lazy` + `Suspense`.
+
+**tsconfig.app.json:** `lib` updated to include `ES2023` for `Array.prototype.toSorted`.
