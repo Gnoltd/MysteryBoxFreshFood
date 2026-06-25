@@ -167,61 +167,57 @@ export default function ListingDetailPage() {
             {[
               { label: t('listing.remaining'), value: <StockBadge quantity={listing.quantityRemaining} /> },
               { label: t('listing.pickup'),    value: `${formatTime(listing.pickupStart)} – ${formatTime(listing.pickupEnd)}` },
-              {
-                label: t('listing.category'),
-                value: (
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <StatusChip variant="slate">{listing.category}</StatusChip>
-                    {hasBoxPlans && boxSelectionRequired && (
-                      <div ref={boxPickerRef} className="relative">
-                        <button
-                          onClick={() => setBoxPickerOpen(o => !o)}
-                          className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full border transition-colors ${
-                            selectedBox !== null
-                              ? 'bg-primary text-white border-primary'
-                              : 'border-outline-variant text-on-surface-variant hover:border-primary/50'
-                          }`}
-                        >
-                          <Package size={11} />
-                          {selectedBox !== null
-                            ? t('listing.box_number', { n: selectedBox })
-                            : t('listing.selectBox')}
-                          <ChevronDown size={11} className={`transition-transform ${boxPickerOpen ? 'rotate-180' : ''}`} />
-                        </button>
-
-                        {boxPickerOpen && (
-                          <div className="absolute left-0 top-full mt-1 z-50 bg-surface-container border border-outline-variant rounded-xl shadow-xl overflow-hidden min-w-[120px]">
-                            <div className="max-h-48 overflow-y-auto">
-                              {availableBoxes.length === 0 ? (
-                                <p className="text-on-surface-variant text-xs px-3 py-2">{t('listing.soldOut')}</p>
-                              ) : (
-                                availableBoxes.map(p => (
-                                  <button
-                                    key={p.boxNumber}
-                                    onClick={() => { setSelectedBox(p.boxNumber); setBoxPickerOpen(false) }}
-                                    className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold hover:bg-surface-container-high transition-colors ${
-                                      selectedBox === p.boxNumber ? 'text-primary' : 'text-on-surface'
-                                    }`}
-                                  >
-                                    {t('listing.box_number', { n: p.boxNumber })}
-                                    {selectedBox === p.boxNumber && <Check size={11} />}
-                                  </button>
-                                ))
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ),
-              },
+              { label: t('listing.category'),  value: <StatusChip variant="slate">{listing.category}</StatusChip> },
             ].map(({ label, value }) => (
               <div key={label} className="bg-surface-container border border-outline-variant rounded-xl p-3 flex flex-col gap-1">
                 <span className="text-label-caps text-on-surface-variant uppercase tracking-wider">{label}</span>
                 <span className="text-mono-stat font-semibold text-on-surface">{value}</span>
               </div>
             ))}
+
+            {/* Box selector — separate cell, right of Category */}
+            {hasBoxPlans && boxSelectionRequired && (
+              <div ref={boxPickerRef} className="relative bg-surface-container border border-outline-variant rounded-xl p-3 flex flex-col gap-1">
+                <span className="text-label-caps text-on-surface-variant uppercase tracking-wider">{t('listing.selectBox')}</span>
+                <button
+                  onClick={() => setBoxPickerOpen(o => !o)}
+                  className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full border transition-colors self-start ${
+                    selectedBox !== null
+                      ? 'bg-primary text-white border-primary'
+                      : 'border-outline-variant text-on-surface-variant hover:border-primary/50'
+                  }`}
+                >
+                  <Package size={11} />
+                  {selectedBox !== null
+                    ? t('listing.box_number', { n: selectedBox })
+                    : t('listing.selectBox')}
+                  <ChevronDown size={11} className={`transition-transform ${boxPickerOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {boxPickerOpen && (
+                  <div className="absolute left-0 top-full mt-1 z-50 bg-surface-container border border-outline-variant rounded-xl shadow-xl overflow-hidden min-w-[120px]">
+                    <div className="max-h-48 overflow-y-auto">
+                      {availableBoxes.length === 0 ? (
+                        <p className="text-on-surface-variant text-xs px-3 py-2">{t('listing.soldOut')}</p>
+                      ) : (
+                        availableBoxes.map(p => (
+                          <button
+                            key={p.boxNumber}
+                            onClick={() => { setSelectedBox(p.boxNumber); setBoxPickerOpen(false) }}
+                            className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold hover:bg-surface-container-high transition-colors ${
+                              selectedBox === p.boxNumber ? 'text-primary' : 'text-on-surface'
+                            }`}
+                          >
+                            {t('listing.box_number', { n: p.boxNumber })}
+                            {selectedBox === p.boxNumber && <Check size={11} />}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Reviews */}
