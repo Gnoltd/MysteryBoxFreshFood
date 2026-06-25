@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { subscribeToVendorOrders } from '../../services/orders'
 import { TimerBadge } from '../../components/shared/TimerBadge'
+import { formatBoxItem } from '../../utils/boxDistribution'
 import type { Order, OrderStatus } from '../../types'
 
 const STATUS_BADGE: Record<OrderStatus, string> = {
@@ -61,9 +62,10 @@ export default function VendorOrdersPage() {
 
       <div className="space-y-3">
         {orders.map(o => (
-          <div
+          <Link
             key={o.id}
-            className="bg-surface-container border border-outline-variant rounded-xl p-4"
+            to={`/vendor/orders/${o.id}`}
+            className="block bg-surface-container border border-outline-variant rounded-xl p-4 hover:border-outline transition-colors"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -77,7 +79,7 @@ export default function VendorOrdersPage() {
                 </p>
                 {o.boxContents && o.boxContents.length > 0 && (
                   <p className="text-outline text-xs mt-1">
-                    <img src="/images/icons/single-item.png" alt="" className="w-3 h-3 object-contain inline mr-1" />{t('vendor.each_box')}: {o.boxContents.map(b => `${b.qty}× ${b.name}`).join(', ')}
+                    <img src="/images/icons/single-item.png" alt="" className="w-3 h-3 object-contain inline mr-1" />{t('vendor.each_box')}: {o.boxContents.map(b => formatBoxItem(b)).join(', ')}
                   </p>
                 )}
                 <div className="mt-1 hidden md:block">
@@ -90,7 +92,7 @@ export default function VendorOrdersPage() {
                 {STATUS_LABEL[o.status]}
               </span>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

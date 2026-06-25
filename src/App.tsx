@@ -21,6 +21,7 @@ import VendorComposePage from './pages/vendor/VendorComposePage'
 import ListingsPage from './pages/vendor/ListingsPage'
 import ListingFormPage from './pages/vendor/ListingFormPage'
 import VendorOrdersPage from './pages/vendor/VendorOrdersPage'
+import VendorOrderDetailPage from './pages/vendor/VendorOrderDetailPage'
 import QRScanPage from './pages/vendor/QRScanPage'
 import VendorStorePage from './pages/customer/VendorStorePage'
 import SubscriptionsPage from './pages/customer/SubscriptionsPage'
@@ -53,6 +54,7 @@ export default function App() {
             <Route path="/vendor/listings/new" element={<ListingFormPage />} />
             <Route path="/vendor/listings/:id/edit" element={<ListingFormPage />} />
             <Route path="/vendor/orders" element={<VendorOrdersPage />} />
+            <Route path="/vendor/orders/:id" element={<VendorOrderDetailPage />} />
             <Route path="/vendor/scan" element={<QRScanPage />} />
             <Route path="/vendor/inventory" element={<VendorInventoryPage />} />
             <Route path="/vendor/compose" element={<VendorComposePage />} />
