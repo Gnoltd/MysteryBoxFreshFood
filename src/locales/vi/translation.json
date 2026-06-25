@@ -57,7 +57,9 @@
     "sortNewest": "Mới nhất",
     "sortPriceAsc": "Giá: Thấp đến Cao",
     "sortPriceDesc": "Giá: Cao đến Thấp",
-    "sortDiscount": "Giảm giá nhiều nhất"
+    "sortDiscount": "Giảm giá nhiều nhất",
+    "boxesLeft": "Còn {{n}} / {{total}} hộp hôm nay",
+    "noBoxesLeft": "Đã đạt giới hạn hôm nay — nâng cấp gói để mua thêm"
   },
   "listing": {
     "buyNow": "Mua ngay",

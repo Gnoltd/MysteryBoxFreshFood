@@ -11,6 +11,8 @@ import { StatusChip } from '../../components/shared/StatusChip'
 import { StockBadge } from '../../components/shared/StockBadge'
 import { TimerBadge } from '../../components/shared/TimerBadge'
 import type { Listing, ListingCategory } from '../../types'
+import { useDailyBoxStatus } from '../../hooks/useDailyBoxStatus'
+import { useAuth } from '../../contexts/AuthContext'
 
 const CATEGORY_IMAGE: Record<ListingCategory, string> = {
   bakery: '/images/categories/bakery.jpg',
@@ -29,7 +31,9 @@ type PayMethod = 'card' | 'cod' | 'vnpay'
 export default function ListingDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { t } = useTranslation()
+  const { userProfile } = useAuth()
   const navigate = useNavigate()
+  const dailyStatus = useDailyBoxStatus(userProfile?.uid)
   const [listing, setListing] = useState<Listing | null>(null)
   const [payMethod, setPayMethod] = useState<PayMethod>('card')
   const [selectedBox, setSelectedBox] = useState<number | null>(null)
@@ -282,6 +286,15 @@ export default function ListingDetailPage() {
       <div className="fixed bottom-0 left-0 right-0 glass-panel border-t border-outline-variant px-4 sm:px-6 py-4 z-40">
         {claimError && (
           <p className="text-xs text-red-400 text-center mb-2">{claimError}</p>
+        )}
+        {!dailyStatus.loading && !claimError && (
+          <p className={`text-xs text-center mb-2 ${
+            dailyStatus.remaining === 0 ? 'text-red-400' : dailyStatus.remaining <= 1 ? 'text-amber-400' : 'text-on-surface-variant'
+          }`}>
+            {dailyStatus.remaining === 0
+              ? t('browse.noBoxesLeft')
+              : t('browse.boxesLeft', { n: dailyStatus.remaining, total: dailyStatus.limit })}
+          </p>
         )}
         <div className="max-w-5xl mx-auto">
           <GradientButton

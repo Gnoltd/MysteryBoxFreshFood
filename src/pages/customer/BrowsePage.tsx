@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { subscribeToActiveListings } from '../../services/listings'
+import { useDailyBoxStatus } from '../../hooks/useDailyBoxStatus'
 import { getListingRatings } from '../../services/reviews'
 import { MysteryCard } from '../../components/shared/MysteryCard'
 import { MysteryCardSkeleton } from '../../components/shared/ShimmerSkeleton'
@@ -120,6 +121,7 @@ export default function BrowsePage() {
 
   const inputCls = 'w-full bg-surface-container-high/50 border border-white/10 rounded-xl h-10 px-3 text-sm text-on-surface placeholder:text-outline focus:outline-none input-glow transition-all'
   const firstName = userProfile?.displayName?.split(' ')[0] ?? ''
+  const dailyStatus = useDailyBoxStatus(userProfile?.uid)
 
   return (
     <div className="animate-fade-in-up">
@@ -133,6 +135,24 @@ export default function BrowsePage() {
           {t('browse.greeting', { name: firstName }) || `Hey ${firstName} 👋`}
         </h1>
         <p className="text-on-surface-variant text-base mt-2 max-w-lg">{t('browse.subtitle')}</p>
+
+        {/* Daily box quota badge */}
+        {!dailyStatus.loading && (
+          <div className={`inline-flex items-center gap-2 mt-3 px-3 py-1.5 rounded-full text-xs font-semibold border ${
+            dailyStatus.remaining === 0
+              ? 'bg-red-500/10 border-red-500/30 text-red-400'
+              : dailyStatus.remaining <= 1
+              ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+              : 'bg-primary/10 border-primary/30 text-primary'
+          }`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${
+              dailyStatus.remaining === 0 ? 'bg-red-400' : dailyStatus.remaining <= 1 ? 'bg-amber-400' : 'bg-primary'
+            }`} />
+            {dailyStatus.remaining === 0
+              ? t('browse.noBoxesLeft')
+              : t('browse.boxesLeft', { n: dailyStatus.remaining, total: dailyStatus.limit })}
+          </div>
+        )}
       </div>
 
       {/* ── Live Search Bar ── */}

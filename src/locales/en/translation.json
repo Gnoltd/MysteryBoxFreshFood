@@ -57,7 +57,9 @@
     "sortNewest": "Newest",
     "sortPriceAsc": "Price: Low to High",
     "sortPriceDesc": "Price: High to Low",
-    "sortDiscount": "Biggest Discount"
+    "sortDiscount": "Biggest Discount",
+    "boxesLeft": "{{n}} of {{total}} boxes left today",
+    "noBoxesLeft": "Daily limit reached — upgrade your plan for more"
   },
   "listing": {
     "buyNow": "Buy Now",
