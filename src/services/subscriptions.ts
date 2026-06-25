@@ -40,3 +40,9 @@ export async function cancelSubscription(subscriptionId: string): Promise<void> 
   const fn = httpsCallable(functions, 'cancelSubscription')
   await fn({ subscriptionId })
 }
+
+export async function syncSubscription(): Promise<{ synced: boolean; plan?: string }> {
+  const fn = httpsCallable<undefined, { synced: boolean; plan?: string }>(functions, 'syncSubscriptionFromStripe')
+  const result = await fn(undefined)
+  return result.data
+}

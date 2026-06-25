@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { getFollows, unfollowVendor, toggleNotifications } from '../../services/follows'
-import { subscribeToSubscription, createSubscription, cancelSubscription } from '../../services/subscriptions'
+import { subscribeToSubscription, createSubscription, cancelSubscription, syncSubscription } from '../../services/subscriptions'
 import { getUserProfile } from '../../services/auth'
 import { GradientButton } from '../../components/shared/GradientButton'
 import { GhostButton } from '../../components/shared/GhostButton'
@@ -67,10 +67,19 @@ export default function SubscriptionsPage() {
       )
       setVendorNames(names)
     })
-    // Real-time listener — updates instantly when webhook writes the subscription doc
     const unsub = subscribeToSubscription(userProfile.uid, setSubscription)
     return unsub
   }, [userProfile])
+
+  // When returning from Stripe checkout success, sync subscription from Stripe directly.
+  // This acts as a fallback in case the stripeSubscriptionWebhook hasn't fired yet.
+  useEffect(() => {
+    if (subResult !== 'success' || !userProfile) return
+    const timer = setTimeout(() => {
+      syncSubscription().catch(err => console.error('syncSubscription failed:', err))
+    }, 1500)
+    return () => clearTimeout(timer)
+  }, [subResult, userProfile])
 
   const handleToggleNotif = async (follow: Follow) => {
     await toggleNotifications(follow.id, !follow.notificationsEnabled)
