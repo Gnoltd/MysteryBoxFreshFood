@@ -28,8 +28,8 @@ export default function SubscriptionsPage() {
   const PLANS = [
     {
       key: 'free' as SubscriptionPlan,
-      displayName: 'Free Plan',
-      price: t('subs.planFreePrice'),
+      displayName: 'Basic',
+      price: t('subs.planFreeName'),
       features: ['subs.featureFollow', 'subs.featureNotify'],
     },
     {
