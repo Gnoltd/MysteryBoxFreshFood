@@ -2,6 +2,7 @@ import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
 import * as crypto from 'crypto'
 import { v4 as uuidv4 } from 'uuid'
+import { enforceDailyLimit } from './planLimits'
 
 function formatVNDate(date: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0')
@@ -40,6 +41,8 @@ export const createVNPayOrder = functions.https.onCall(
       ?.split(',')[0].trim()
     // VNPAY requires IPv4 — strip IPv6-mapped prefix if present
     const ipAddr = (rawIp ?? '127.0.0.1').replace(/^::ffff:/, '')
+
+    await enforceDailyLimit(customerId)
 
     const listingRef = db.collection('listings').doc(listingId)
     const listingSnap = await listingRef.get()

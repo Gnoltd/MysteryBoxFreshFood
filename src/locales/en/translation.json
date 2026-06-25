@@ -388,7 +388,12 @@
     "whyFreshDesc": "All boxes are packed fresh daily and must be collected within the pickup window.",
     "perMonth": "/ month",
     "perWeek": "/ week",
-    "mostPopular": "Most Popular"
+    "mostPopular": "Most Popular",
+    "dailyLimit": "Up to {{n}} boxes / day",
+    "subSuccess": "Subscription activated! Enjoy your new plan.",
+    "subCancelled": "Subscription checkout cancelled.",
+    "limitReached": "You've reached your {{n}}-box daily limit. Upgrade your plan for more.",
+    "limitReachedGeneric": "Daily box limit reached — upgrade your plan."
   },
   "notif": {
     "title": "Notifications",

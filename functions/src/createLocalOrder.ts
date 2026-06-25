@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
 import { v4 as uuidv4 } from 'uuid'
+import { enforceDailyLimit } from './planLimits'
 
 export const createLocalOrder = functions.https.onCall(
   async (data: { listingId: string; quantity: number; paymentMethod: 'cod' | 'bank_transfer' }, context: functions.https.CallableContext) => {
@@ -11,6 +12,8 @@ export const createLocalOrder = functions.https.onCall(
     const { listingId, quantity, paymentMethod } = data
     const customerId = context.auth.uid
     const db = admin.firestore()
+
+    await enforceDailyLimit(customerId)
 
     const listingRef = db.collection('listings').doc(listingId)
     const orderId = db.collection('orders').doc().id

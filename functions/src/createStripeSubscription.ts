@@ -2,11 +2,13 @@ import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(functions.config().stripe.secret_key, { apiVersion: '2023-10-16' })
+function getStripe() {
+  return new Stripe(functions.config().stripe.secret_key, { apiVersion: '2023-10-16' })
+}
 
-const PLANS: Record<string, { amount: number; interval: Stripe.PriceCreateParams.Recurring.Interval }> = {
-  weekly:  { amount: 49000,  interval: 'week' },
-  monthly: { amount: 179000, interval: 'month' },
+const PLANS: Record<string, { amount: number; name: string }> = {
+  weekly:  { amount: 150000, name: 'Pro' },
+  monthly: { amount: 300000, name: 'Elite' },
 }
 
 export const createStripeSubscription = functions.https.onCall(async (data, context) => {
@@ -16,10 +18,12 @@ export const createStripeSubscription = functions.https.onCall(async (data, cont
   if (!PLANS[plan]) throw new functions.https.HttpsError('invalid-argument', 'Invalid plan')
 
   const uid = context.auth.uid
-  const userSnap = await admin.firestore().doc(`users/${uid}`).get()
+  const db = admin.firestore()
+  const stripe = getStripe()
+
+  const userSnap = await db.doc(`users/${uid}`).get()
   const userData = userSnap.data()!
 
-  // Find or create Stripe customer
   let stripeCustomerId: string | undefined = userData.stripeCustomerId
   if (!stripeCustomerId) {
     const customer = await stripe.customers.create({
@@ -28,38 +32,29 @@ export const createStripeSubscription = functions.https.onCall(async (data, cont
       metadata: { uid },
     })
     stripeCustomerId = customer.id
-    await admin.firestore().doc(`users/${uid}`).update({ stripeCustomerId })
+    await db.doc(`users/${uid}`).update({ stripeCustomerId })
   }
 
-  const { amount, interval } = PLANS[plan]
+  const appUrl = (functions.config().app?.url ?? 'https://mystery-box-fresh-food.vercel.app').trim()
+  const { amount, name } = PLANS[plan]
 
-  const product = await stripe.products.create({ name: `MysteryBoxFreshFood ${plan} plan` })
-  const price = await stripe.prices.create({
-    currency: 'vnd',
-    unit_amount: amount,
-    recurring: { interval },
-    product: product.id,
-  })
-
-  const subscription = await stripe.subscriptions.create({
+  const session = await stripe.checkout.sessions.create({
     customer: stripeCustomerId,
-    items: [{ price: price.id }],
-    payment_behavior: 'default_incomplete',
-    payment_settings: { save_default_payment_method: 'on_subscription' },
-    expand: ['latest_invoice.payment_intent'],
+    mode: 'subscription',
+    line_items: [{
+      price_data: {
+        currency: 'vnd',
+        unit_amount: amount,
+        recurring: { interval: 'month' },
+        product_data: { name: `MysteryBox ${name} Plan` },
+      },
+      quantity: 1,
+    }],
+    success_url: `${appUrl}/subscriptions?sub=success&plan=${plan}`,
+    cancel_url: `${appUrl}/subscriptions?sub=cancelled`,
+    metadata: { uid, plan },
   })
 
-  const invoice = subscription.latest_invoice as Stripe.Invoice
-  const intent = invoice.payment_intent as Stripe.PaymentIntent
-
-  await admin.firestore().collection('subscriptions').add({
-    customerId: uid,
-    plan,
-    stripeSubscriptionId: subscription.id,
-    status: 'active',
-    currentPeriodEnd: admin.firestore.Timestamp.fromMillis(subscription.current_period_end * 1000),
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-  })
-
-  return { clientSecret: intent.client_secret }
+  if (!session.url) throw new functions.https.HttpsError('internal', 'No checkout URL returned')
+  return { url: session.url }
 })

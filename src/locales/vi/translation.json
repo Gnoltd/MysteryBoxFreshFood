@@ -387,7 +387,12 @@
     "whyFreshDesc": "Tất cả hộp được đóng gói tươi mỗi ngày.",
     "perMonth": "/ tháng",
     "perWeek": "/ tuần",
-    "mostPopular": "Phổ biến nhất"
+    "mostPopular": "Phổ biến nhất",
+    "dailyLimit": "Tối đa {{n}} hộp / ngày",
+    "subSuccess": "Đăng ký thành công! Chúc mừng bạn với gói mới.",
+    "subCancelled": "Bạn đã hủy quá trình thanh toán.",
+    "limitReached": "Bạn đã đạt giới hạn {{n}} hộp hôm nay. Nâng cấp gói để mua thêm.",
+    "limitReachedGeneric": "Đã đạt giới hạn hộp hôm nay — nâng cấp gói của bạn."
   },
   "notif": {
     "title": "Thông báo",

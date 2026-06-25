@@ -35,6 +35,7 @@ export default function ListingDetailPage() {
   const [selectedBox, setSelectedBox] = useState<number | null>(null)
   const [boxPickerOpen, setBoxPickerOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [claimError, setClaimError] = useState<string | null>(null)
   const boxPickerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -63,6 +64,7 @@ export default function ListingDetailPage() {
   const handleClaim = async () => {
     if (!listing) return
     setLoading(true)
+    setClaimError(null)
     try {
       if (payMethod === 'card') {
         await initiateCheckout(listing.id, 1, selectedBox ?? undefined)
@@ -72,6 +74,15 @@ export default function ListingDetailPage() {
       } else {
         const { orderId } = await initiateLocalOrder(listing.id, 1, payMethod as 'cod' | 'bank_transfer')
         navigate(`/orders/${orderId}`)
+      }
+    } catch (err: any) {
+      const msg: string = err?.message ?? ''
+      if (msg.startsWith('DAILY_LIMIT_REACHED:')) {
+        const parts = msg.split(':')
+        const n = parts[1]
+        setClaimError(t('subs.limitReached', { n }))
+      } else {
+        setClaimError(t('listing.checkoutFailed'))
       }
     } finally {
       setLoading(false)
@@ -269,6 +280,9 @@ export default function ListingDetailPage() {
 
       {/* Sticky bottom CTA */}
       <div className="fixed bottom-0 left-0 right-0 glass-panel border-t border-outline-variant px-4 sm:px-6 py-4 z-40">
+        {claimError && (
+          <p className="text-xs text-red-400 text-center mb-2">{claimError}</p>
+        )}
         <div className="max-w-5xl mx-auto">
           <GradientButton
             onClick={handleClaim}

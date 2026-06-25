@@ -15,8 +15,8 @@ export async function getSubscription(uid: string): Promise<Subscription | null>
   return { id: snap.docs[0].id, ...snap.docs[0].data() } as Subscription
 }
 
-export async function createSubscription(plan: SubscriptionPlan): Promise<{ clientSecret: string }> {
-  const fn = httpsCallable<{ plan: SubscriptionPlan }, { clientSecret: string }>(functions, 'createStripeSubscription')
+export async function createSubscription(plan: SubscriptionPlan): Promise<{ url: string }> {
+  const fn = httpsCallable<{ plan: SubscriptionPlan }, { url: string }>(functions, 'createStripeSubscription')
   const result = await fn({ plan })
   return result.data
 }

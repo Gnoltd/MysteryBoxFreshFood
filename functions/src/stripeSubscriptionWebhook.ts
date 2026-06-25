@@ -17,6 +17,23 @@ export const stripeSubscriptionWebhook = functions.https.onRequest(async (req, r
 
   const db = admin.firestore()
 
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object as Stripe.CheckoutSession
+    if (session.mode === 'subscription' && session.metadata?.uid && session.metadata?.plan) {
+      const { uid, plan } = session.metadata
+      const stripeSubId = session.subscription as string
+      const sub = await stripe.subscriptions.retrieve(stripeSubId)
+      await db.collection('subscriptions').add({
+        customerId: uid,
+        plan,
+        stripeSubscriptionId: stripeSubId,
+        status: 'active',
+        currentPeriodEnd: admin.firestore.Timestamp.fromMillis(sub.current_period_end * 1000),
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      })
+    }
+  }
+
   if (event.type === 'invoice.paid') {
     const invoice = event.data.object as Stripe.Invoice
     const subId = invoice.subscription as string

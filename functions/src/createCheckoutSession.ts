@@ -2,6 +2,7 @@ import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
 import Stripe from 'stripe'
 import { v4 as uuidv4 } from 'uuid'
+import { enforceDailyLimit } from './planLimits'
 
 function getStripe() {
   return new Stripe(functions.config().stripe.secret_key, { apiVersion: '2023-10-16' })
@@ -20,6 +21,8 @@ export const createCheckoutSession = functions.https.onCall(
     const customerId = context.auth.uid
     const db = admin.firestore()
     const stripe = getStripe()
+
+    await enforceDailyLimit(customerId)
 
     const listingRef = db.collection('listings').doc(listingId)
     const listingSnap = await listingRef.get()

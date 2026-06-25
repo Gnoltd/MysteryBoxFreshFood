@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { getFollows, unfollowVendor, toggleNotifications } from '../../services/follows'
 import { getSubscription, createSubscription, cancelSubscription } from '../../services/subscriptions'
@@ -19,29 +20,34 @@ const WHY_ITEMS = [
 export default function SubscriptionsPage() {
   const { t } = useTranslation()
   const { userProfile } = useAuth()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [follows, setFollows] = useState<Follow[]>([])
   const [vendorNames, setVendorNames] = useState<Record<string, string>>({})
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [loadingPlan, setLoadingPlan] = useState<SubscriptionPlan | null>(null)
   const [cancelling, setCancelling] = useState(false)
+  const subResult = searchParams.get('sub')
 
   const PLANS = [
     {
       key: 'free' as SubscriptionPlan,
       displayName: 'Basic',
       price: t('subs.planFreeName'),
+      limitPerDay: 2,
       features: ['subs.featureFollow', 'subs.featureNotify'],
     },
     {
       key: 'weekly' as SubscriptionPlan,
       displayName: 'Pro',
       price: `150.000 đ ${t('subs.perMonth')}`,
+      limitPerDay: 5,
       features: ['subs.featureFollow', 'subs.featureNotify', 'subs.featurePriority', 'subs.featureWeekly'],
     },
     {
       key: 'monthly' as SubscriptionPlan,
       displayName: 'Elite',
       price: `300.000 đ ${t('subs.perMonth')}`,
+      limitPerDay: 8,
       popular: true,
       features: ['subs.featureFollow', 'subs.featureNotify', 'subs.featurePriority', 'subs.featureWeekly', 'subs.featureVoucher'],
     },
@@ -77,12 +83,10 @@ export default function SubscriptionsPage() {
     if (plan === 'free') return
     setLoadingPlan(plan)
     try {
-      const { clientSecret } = await createSubscription(plan)
-      console.log('Stripe clientSecret:', clientSecret)
-      alert(t('subs.stripeRedirect'))
+      const { url } = await createSubscription(plan)
+      window.location.href = url
     } catch (e) {
       console.error(e)
-    } finally {
       setLoadingPlan(null)
     }
   }
@@ -100,6 +104,18 @@ export default function SubscriptionsPage() {
 
   return (
     <div>
+      {/* Success / cancelled banner */}
+      {subResult && (
+        <div className={`mb-6 rounded-xl px-4 py-3 text-sm font-medium flex items-center justify-between ${
+          subResult === 'success'
+            ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
+            : 'bg-surface-container border border-outline-variant text-on-surface-variant'
+        }`}>
+          <span>{subResult === 'success' ? t('subs.subSuccess') : t('subs.subCancelled')}</span>
+          <button onClick={() => setSearchParams({})} className="ml-4 hover:opacity-70 transition-opacity">✕</button>
+        </div>
+      )}
+
       {/* Hero section */}
       <section className="relative bg-surface-container border border-outline-variant rounded-2xl overflow-hidden mb-12 px-8 py-12 md:py-16">
         <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
@@ -132,7 +148,7 @@ export default function SubscriptionsPage() {
       {/* Plan cards */}
       <section className="mb-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {PLANS.map(({ key, displayName, price, popular, features }) => {
+          {PLANS.map(({ key, displayName, price, popular, features, limitPerDay }) => {
             const isActive = subscription?.plan === key && subscription?.status === 'active'
             return (
               <div
@@ -156,6 +172,10 @@ export default function SubscriptionsPage() {
                   <p className="text-primary font-bold text-mono-stat mt-1">{price}</p>
                 </div>
                 <ul className="flex flex-col gap-2 flex-1">
+                  <li className="flex items-center gap-2 text-body-sm text-on-surface-variant">
+                    <span className="text-emerald-400">✓</span>
+                    {t('subs.dailyLimit', { n: limitPerDay })}
+                  </li>
                   {features.map(f => (
                     <li key={f} className="flex items-center gap-2 text-body-sm text-on-surface-variant">
                       <span className="text-emerald-400">✓</span>
