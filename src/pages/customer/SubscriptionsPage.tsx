@@ -43,6 +43,7 @@ export default function SubscriptionsPage() {
       displayName: 'Pro',
       price: `150.000 đ ${t('subs.perMonth')}`,
       limitPerDay: 5,
+      popular: true,
       features: ['subs.featureFollow', 'subs.featureNotify', 'subs.featurePriority', 'subs.featureWeekly'],
     },
     {
@@ -50,7 +51,6 @@ export default function SubscriptionsPage() {
       displayName: 'Elite',
       price: `300.000 đ ${t('subs.perMonth')}`,
       limitPerDay: 8,
-      popular: true,
       features: ['subs.featureFollow', 'subs.featureNotify', 'subs.featurePriority', 'subs.featureWeekly', 'subs.featureVoucher'],
     },
   ]
@@ -185,21 +185,23 @@ export default function SubscriptionsPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {PLANS.map(({ key, displayName, price, popular, features, limitPerDay }) => {
             const isActive = subscription?.plan === key && subscription?.status === 'active'
+            const hasActivePaidSub = subscription?.status === 'active' && subscription?.plan !== 'free'
+            const isCurrentFree = key === 'free' && !hasActivePaidSub
             return (
               <div
                 key={key}
                 className={`relative bg-surface-container border rounded-xl p-5 flex flex-col gap-4 ${
-                  popular ? 'border-primary gradient-border-box' : isActive ? 'gradient-border-box border-primary' : 'border-outline-variant'
+                  popular && !isActive ? 'border-primary gradient-border-box' : isActive ? 'gradient-border-box border-primary' : 'border-outline-variant'
                 }`}
               >
-                {popular && (
+                {popular && !isActive && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <span className="gradient-bg text-white text-label-caps font-bold px-3 py-1 rounded-full whitespace-nowrap">
                       {t('subs.mostPopular').toUpperCase()}
                     </span>
                   </div>
                 )}
-                {isActive && !popular && (
+                {isActive && (
                   <StatusChip variant="emerald">{t('subs.active')}</StatusChip>
                 )}
                 <div>
@@ -229,9 +231,9 @@ export default function SubscriptionsPage() {
                       {cancelling ? t('subs.cancelling') : t('subs.cancel')}
                     </GhostButton>
                   </div>
-                ) : key === 'free' ? (
+                ) : isCurrentFree ? (
                   <GhostButton className="w-full" disabled>{t('subs.currentFree')}</GhostButton>
-                ) : (
+                ) : key === 'free' ? null : (
                   <GradientButton
                     onClick={() => handleSubscribe(key)}
                     disabled={loadingPlan === key}
