@@ -1,6 +1,6 @@
 # MysteryBox — Progress
 
-## Current Phase: Mystery Box Selection, Distribution & Reveal (Planning Complete)
+## Current Phase: Mystery Box Selection, Distribution & Reveal (Complete)
 
 **Last updated:** 2026-06-25  
 **Spec:** `docs/superpowers/specs/2026-06-17-mysterybox-design.md`  
@@ -185,8 +185,8 @@ Full functional prototype — all features complete:
 | Brainstorming & design | ✅ Complete |
 | Plan 1 — Types + Algorithm + Vendor Side | ✅ Complete |
 | Plan 2 — Customer Side + Cloud Functions | ✅ Complete |
-| Implementation Plan 1 | ⏳ Pending |
-| Implementation Plan 2 | ⏳ Pending |
+| Implementation Plan 1 | ✅ Complete |
+| Implementation Plan 2 | ✅ Complete |
 
 **New features planned:**
 - Value-balanced random box distribution algorithm (`src/utils/boxDistribution.ts`)
