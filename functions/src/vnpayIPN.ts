@@ -50,16 +50,61 @@ export const vnpayIPN = functions.https.onRequest(async (req, res) => {
       if (!freshOrder.exists || !listingSnap.exists) return
       if (freshOrder.data()!.status !== 'pending_vnpay') return
 
-      const newQty = listingSnap.data()!.quantityRemaining - order.quantity
-      t.update(orderRef, {
+      const listingData = listingSnap.data()!
+      const boxPlans: Array<{
+        boxNumber: number
+        items: Array<{ name: string; qty: number; unit?: string }>
+        value: number
+        belowAverage: boolean
+        takenByOrderId?: string
+      }> = listingData.boxPlans ?? []
+
+      const requestedBoxNumber: number | undefined = freshOrder.data()!.requestedBoxNumber
+
+      let assignedBoxNumber: number | undefined
+      let assignedItems: Array<{ name: string; qty: number; unit?: string }> | undefined
+      let boxReassigned = false
+      let originalBoxNumber: number | undefined
+      let updatedPlans = boxPlans
+
+      if (boxPlans.length > 0 && requestedBoxNumber != null) {
+        const requested = boxPlans.find(p => p.boxNumber === requestedBoxNumber && !p.takenByOrderId)
+        const chosen = requested ?? boxPlans.find(p => !p.takenByOrderId)
+        if (chosen) {
+          assignedBoxNumber = chosen.boxNumber
+          assignedItems = chosen.items
+          if (!requested) { boxReassigned = true; originalBoxNumber = requestedBoxNumber }
+          updatedPlans = boxPlans.map(p =>
+            p.boxNumber === chosen.boxNumber ? { ...p, takenByOrderId: orderId } : p,
+          )
+        }
+      }
+
+      const newQty = listingData.quantityRemaining - order.quantity
+      const orderUpdate: Record<string, unknown> = {
         status: 'paid',
         vnpayTransactionNo: params.vnp_TransactionNo ?? '',
-      })
+      }
+      if (assignedBoxNumber != null) {
+        orderUpdate.boxNumber = assignedBoxNumber
+        orderUpdate.boxContents = assignedItems
+        if (boxReassigned) { orderUpdate.boxReassigned = true; orderUpdate.originalBoxNumber = originalBoxNumber }
+      }
+
+      t.update(orderRef, orderUpdate)
       t.update(listingRef, {
         quantityRemaining: newQty,
         status: newQty <= 0 ? 'sold_out' : 'active',
+        ...(updatedPlans !== boxPlans ? { boxPlans: updatedPlans } : {}),
       })
     })
+
+    // Mark discount used if one was applied
+    const discountId = orderSnap.data()!.discountId as string | undefined
+    if (discountId) {
+      await db.collection('discounts').doc(order.customerId).collection('codes')
+        .doc(discountId).update({ used: true })
+    }
   } else {
     await orderRef.update({ status: 'cancelled' })
   }
