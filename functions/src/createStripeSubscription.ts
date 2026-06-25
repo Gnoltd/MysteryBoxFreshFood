@@ -21,6 +21,24 @@ export const createStripeSubscription = functions.https.onCall(async (data, cont
   const db = admin.firestore()
   const stripe = getStripe()
 
+  // Cancel any existing active subscription before subscribing to a new plan
+  const existingSnap = await db.collection('subscriptions')
+    .where('customerId', '==', uid)
+    .where('status', 'in', ['active', 'past_due'])
+    .limit(1)
+    .get()
+
+  if (!existingSnap.empty) {
+    const existingData = existingSnap.docs[0].data()
+    if (existingData.plan === plan) {
+      throw new functions.https.HttpsError('already-exists', 'Already subscribed to this plan')
+    }
+    if (existingData.stripeSubscriptionId) {
+      await stripe.subscriptions.cancel(existingData.stripeSubscriptionId)
+    }
+    await existingSnap.docs[0].ref.update({ status: 'cancelled' })
+  }
+
   const userSnap = await db.doc(`users/${uid}`).get()
   const userData = userSnap.data()!
 
