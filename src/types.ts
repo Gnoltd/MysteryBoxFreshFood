@@ -23,6 +23,26 @@ export type PaymentMethod = 'stripe' | 'cod' | 'bank_transfer' | 'vnpay'
 export interface BoxItem {
   name: string
   qty: number
+  unit?: string   // e.g. "bottle", "loaf", "piece", "bag"
+}
+
+export interface BoxPlan {
+  boxNumber: number          // 1, 2, 3 …
+  items: BoxItem[]
+  value: number              // estimated value in VND
+  belowAverage: boolean      // true when value < 85% of listing average
+  takenByOrderId?: string    // set atomically at payment
+}
+
+// Firestore: discounts/{customerId}/codes/{id}
+export interface Discount {
+  id: string
+  customerId: string
+  percent: number            // 10
+  reason: 'low_value_box'
+  used: boolean
+  expiresAt: Timestamp
+  createdAt: Timestamp
 }
 
 export interface Listing {
@@ -44,6 +64,7 @@ export interface Listing {
   createdAt: Timestamp
   packedAt?: Timestamp
   boxContents?: BoxItem[]
+  boxPlans?: BoxPlan[]       // one plan per box slot; new listings use this
 }
 
 export interface Order {
@@ -62,6 +83,10 @@ export interface Order {
   vnpayTransactionNo?: string
   pickupEnd?: Timestamp
   boxContents?: BoxItem[]
+  boxNumber?: number
+  boxReassigned?: boolean
+  originalBoxNumber?: number
+  requestedBoxNumber?: number
   createdAt: Timestamp
 }
 
