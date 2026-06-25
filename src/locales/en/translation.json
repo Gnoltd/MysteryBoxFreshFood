@@ -276,7 +276,15 @@
     "packing_guide": "Packing guide per box",
     "pickup_start_label": "Start",
     "pickup_end_label": "End",
-    "price_positive": "Price must be > 0"
+    "price_positive": "Price must be > 0",
+    "box_preview": "Box Preview",
+    "rerandomize": "Re-randomize",
+    "box_number": "Box {{n}}",
+    "box_unit": "box",
+    "box_below_average": "Below average value — customer gets 10% off next order",
+    "prepareTitle": "What to prepare",
+    "qrReady": "Customer has QR ready for pickup",
+    "orderNotFound": "Order not found"
   },
   "categories": {
     "bakery": "Bakery",

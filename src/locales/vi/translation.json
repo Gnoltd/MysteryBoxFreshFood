@@ -275,7 +275,15 @@
     "packing_guide": "Hướng dẫn đóng gói mỗi hộp",
     "pickup_start_label": "Bắt đầu",
     "pickup_end_label": "Kết thúc",
-    "price_positive": "Giá phải lớn hơn 0"
+    "price_positive": "Giá phải lớn hơn 0",
+    "box_preview": "Xem trước hộp",
+    "rerandomize": "Tạo lại ngẫu nhiên",
+    "box_number": "Hộp {{n}}",
+    "box_unit": "hộp",
+    "box_below_average": "Giá trị thấp hơn trung bình — khách sẽ được giảm 10% đơn sau",
+    "prepareTitle": "Cần chuẩn bị",
+    "qrReady": "Khách đã có QR để nhận hàng",
+    "orderNotFound": "Không tìm thấy đơn hàng"
   },
   "categories": {
     "bakery": "Bánh",
