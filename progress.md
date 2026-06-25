@@ -235,6 +235,32 @@ Full functional prototype — all features complete:
 **One manual deployment step:**
 - Stripe Dashboard → Webhooks → subscription endpoint → add `checkout.session.completed` event
 
+---
+
+## Subscription & Daily Limit Polish (2026-06-26)
+
+| Task | Status |
+|---|---|
+| Fix subscription plan not updating after Stripe payment | ✅ Complete |
+| Switch subscription loading to real-time `onSnapshot` listener | ✅ Complete |
+| Webhook secret fallback (`subscription_webhook_secret` → `webhook_secret`) | ✅ Complete |
+| Show subscription error in UI instead of silent fail | ✅ Complete |
+| Fix Stripe type error (`CheckoutSession` → `Checkout.Session`) | ✅ Complete |
+| Daily box quota badge on BrowsePage (green/amber/red) | ✅ Complete |
+| Daily box quota line above Buy Now on ListingDetailPage | ✅ Complete |
+| `useDailyBoxStatus` hook — real-time order count + plan limit | ✅ Complete |
+| `src/utils/planLimits.ts` — shared frontend limit constants | ✅ Complete |
+
+**Files changed:**
+- `src/hooks/useDailyBoxStatus.ts` — NEW real-time daily quota hook
+- `src/utils/planLimits.ts` — NEW frontend plan limit constants (mirrors backend)
+- `src/services/subscriptions.ts` — added `subscribeToSubscription` (onSnapshot), `syncSubscription`
+- `src/pages/customer/SubscriptionsPage.tsx` — real-time listener, error display, sync on return
+- `src/pages/customer/BrowsePage.tsx` — daily quota badge below greeting
+- `src/pages/customer/ListingDetailPage.tsx` — daily quota line above CTA
+- `functions/src/stripeSubscriptionWebhook.ts` — webhook secret fallback + type fix
+- Both locale files — `browse.boxesLeft`, `browse.noBoxesLeft`
+
 **Design files used:** `Design/mysterybox_marketplace/`, `Design/intelligent_vendor_core/`, `Design/mysterybox_browse/`, `Design/mysterybox_login/`, `Design/mysterybox_subscriptions/`, etc.
 
 **New features:**
