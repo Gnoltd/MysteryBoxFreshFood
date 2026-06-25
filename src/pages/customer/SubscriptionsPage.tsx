@@ -33,17 +33,17 @@ export default function SubscriptionsPage() {
       features: ['subs.featureFollow', 'subs.featureNotify'],
     },
     {
+      key: 'weekly' as SubscriptionPlan,
+      displayName: 'Pro',
+      price: `150.000 đ ${t('subs.perMonth')}`,
+      features: ['subs.featureFollow', 'subs.featureNotify', 'subs.featurePriority', 'subs.featureWeekly'],
+    },
+    {
       key: 'monthly' as SubscriptionPlan,
       displayName: 'Elite',
       price: `300.000 đ ${t('subs.perMonth')}`,
       popular: true,
       features: ['subs.featureFollow', 'subs.featureNotify', 'subs.featurePriority', 'subs.featureWeekly', 'subs.featureVoucher'],
-    },
-    {
-      key: 'weekly' as SubscriptionPlan,
-      displayName: 'Pro',
-      price: `150.000 đ ${t('subs.perMonth')}`,
-      features: ['subs.featureFollow', 'subs.featureNotify', 'subs.featurePriority', 'subs.featureWeekly'],
     },
   ]
 
