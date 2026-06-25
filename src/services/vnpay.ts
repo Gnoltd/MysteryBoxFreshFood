@@ -3,12 +3,13 @@ import { functions } from '../firebase'
 
 export async function initiateVNPayOrder(
   listingId: string,
-  quantity: number
+  quantity: number,
+  boxNumber?: number,
 ): Promise<{ url: string; orderId: string }> {
   const fn = httpsCallable<
-    { listingId: string; quantity: number },
+    { listingId: string; quantity: number; boxNumber?: number },
     { url: string; orderId: string }
   >(functions, 'createVNPayOrder')
-  const result = await fn({ listingId, quantity })
+  const result = await fn({ listingId, quantity, ...(boxNumber != null ? { boxNumber } : {}) })
   return result.data
 }
