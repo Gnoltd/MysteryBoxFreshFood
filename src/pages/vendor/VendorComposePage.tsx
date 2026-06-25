@@ -8,6 +8,8 @@ import { composeMysteryBox, suggestPrice } from '../../services/ai'
 import type { ComposeMysteryBoxResult, SuggestPriceResult } from '../../services/ai'
 import { createListing } from '../../services/listings'
 import { expiryLabel } from '../../utils/inventoryUtils'
+import { distributeBoxes, formatBoxItem } from '../../utils/boxDistribution'
+import type { BoxPlan } from '../../types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -19,7 +21,7 @@ import type { InventoryItem, ListingCategory } from '../../types'
 import {
   Archive, SlidersHorizontal, Lightbulb, Search, Check,
   AlertTriangle, Minus, Plus, Package, FileEdit, Clock,
-  CreditCard, Send, Wand2
+  CreditCard, Send, Wand2, RefreshCw
 } from 'lucide-react'
 
 const ALL_CATEGORIES: ListingCategory[] = [
@@ -61,6 +63,7 @@ export default function VendorComposePage() {
   const [suggestLoading, setSuggestLoading] = useState(false)
   const [composerResult, setComposerResult] = useState<ComposeMysteryBoxResult | null>(null)
   const [numBoxes, setNumBoxes] = useState(1)
+  const [boxPlans, setBoxPlans] = useState<Omit<BoxPlan, 'takenByOrderId'>[]>([])
   const [composerLoading, setComposerLoading] = useState(false)
   const [composerError, setComposerError] = useState('')
 
@@ -121,6 +124,11 @@ export default function VendorComposePage() {
     if (composerResult) setEditPrice(String(currentSalePrice))
   }, [currentSalePrice])
 
+  useEffect(() => {
+    if (!composerResult || selectedItems.size === 0) return
+    generateBoxPlans()
+  }, [numBoxes, composerResult])
+
   const toggleItem = (item: InventoryItem) => {
     setSelectedItems(prev => {
       const next = new Map(prev)
@@ -170,15 +178,25 @@ export default function VendorComposePage() {
     finally { setComposerLoading(false) }
   }
 
+  const generateBoxPlans = () => {
+    if (selectedItems.size === 0 || numBoxes < 1) return
+    const items = Array.from(selectedItems.values()).map(({ item, qty }) => ({
+      id: item.id,
+      name: item.name,
+      unitPrice: item.unitPrice,
+      qty,
+      unit: item.unit,
+    }))
+    setBoxPlans(distributeBoxes(items, numBoxes))
+  }
+
   const handlePublish = async () => {
     if (!currentUser || !composerResult) return
     const price = parseInt(editPrice)
     if (!price || price <= 0) return
     setPublishLoading(true); setPublishError('')
     try {
-      const boxContents = packingGuide
-        .filter(p => p.perBox > 0)
-        .map(p => ({ name: p.name, qty: p.perBox }))
+      const validPlans = boxPlans.length > 0 ? boxPlans : undefined
 
       await createListing({
         vendorId: currentUser.uid, type: 'mystery_box',
@@ -189,7 +207,10 @@ export default function VendorComposePage() {
         pickupStart: Timestamp.fromDate(new Date(pickupStart)),
         pickupEnd: Timestamp.fromDate(new Date(pickupEnd)),
         status: 'active',
-        boxContents,
+        boxContents: validPlans
+          ? validPlans[0]?.items ?? []
+          : packingGuide.filter(p => p.perBox > 0).map(p => ({ name: p.name, qty: p.perBox })),
+        ...(validPlans ? { boxPlans: validPlans } : {}),
       })
 
       // Decrement inventory — delete item if fully used, otherwise reduce qty
@@ -464,28 +485,49 @@ export default function VendorComposePage() {
               <span className="text-green-400 font-bold text-xl">{currentSalePrice.toLocaleString('vi-VN')} đ</span>
             </div>
 
-            {/* Packing guide */}
-            <div className="border-t border-outline-variant pt-4">
-              <h4 className="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant mb-3 flex items-center gap-1">
-                <Package size={12} /> {t('vendor.packing_guide')}
-              </h4>
-              <ul className="space-y-2">
-                {packingGuide.map(({ name, icon, perBox, leftover }) => (
-                  <li key={name} className="flex justify-between items-center bg-surface-container-high p-2 rounded-lg border border-outline-variant/30">
-                    <div>
-                      <span className="text-on-surface text-body-sm">{icon} {name}</span>
-                      {leftover > 0 && (
-                        <span className="text-amber-400 text-xs ml-2">+{leftover} leftover</span>
+            {/* Per-box preview */}
+            {boxPlans.length > 0 && (
+              <div className="border-t border-outline-variant pt-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant flex items-center gap-1">
+                    <Package size={12} /> {t('vendor.box_preview')}
+                  </h4>
+                  <button
+                    onClick={generateBoxPlans}
+                    className="flex items-center gap-1 text-xs text-on-surface-variant hover:text-primary transition-colors"
+                  >
+                    <RefreshCw size={11} /> {t('vendor.rerandomize')}
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {boxPlans.map(plan => (
+                    <div
+                      key={plan.boxNumber}
+                      className={`p-3 rounded-xl border ${plan.belowAverage ? 'border-amber-500/40 bg-amber-950/20' : 'border-outline-variant bg-surface-container-high'}`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-on-surface font-semibold text-body-sm">
+                          {t('vendor.box_number', { n: plan.boxNumber })}
+                        </span>
+                        <span className="text-outline text-xs">~{plan.value.toLocaleString('vi-VN')} đ</span>
+                      </div>
+                      {plan.belowAverage && (
+                        <p className="text-amber-400 text-xs mb-2 flex items-center gap-1">
+                          <AlertTriangle size={11} /> {t('vendor.box_below_average')}
+                        </p>
                       )}
+                      <ul className="space-y-1">
+                        {plan.items.map(item => (
+                          <li key={item.name} className="text-on-surface-variant text-xs">
+                            {formatBoxItem(item)}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    {perBox > 0
-                      ? <span className="font-bold text-primary bg-primary/10 px-2 py-0.5 rounded text-body-sm">×{perBox}</span>
-                      : <span className="text-outline text-body-sm">—</span>
-                    }
-                  </li>
-                ))}
-              </ul>
-            </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </section>
@@ -613,7 +655,7 @@ export default function VendorComposePage() {
             <div className="p-5 border-t border-outline-variant bg-surface-container-high shrink-0 z-10">
               <button
                 onClick={handlePublish}
-                disabled={publishLoading || !editTitle || !parseInt(editPrice) || parseInt(editPrice) <= 0}
+                disabled={publishLoading || !editTitle || !parseInt(editPrice) || parseInt(editPrice) <= 0 || (!!composerResult && boxPlans.length === 0)}
                 className="gradient-bg text-white w-full py-3 rounded-xl font-bold text-body-sm flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {publishLoading ? t('vendor.saving') : t('vendor.publish_listing')}
