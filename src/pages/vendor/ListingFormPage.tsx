@@ -12,6 +12,12 @@ import { Button } from '@/components/ui/button'
 import { Timestamp } from 'firebase/firestore'
 import type { ListingCategory } from '../../types'
 import { useTranslation } from 'react-i18next'
+import { Plus, Trash2 } from 'lucide-react'
+
+function toLocalDatetime(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
 
 const CATEGORIES: ListingCategory[] = ['bakery', 'fruit', 'vegetables', 'dairy', 'meat', 'drinks', 'other']
 
@@ -35,6 +41,7 @@ export default function ListingFormPage() {
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [existingImageUrl, setExistingImageUrl] = useState('')
+  const [boxItems, setBoxItems] = useState<{ name: string; qty: number; unit: string }[]>([{ name: '', qty: 1, unit: '' }])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -60,26 +67,28 @@ export default function ListingFormPage() {
       setCategory(l.category)
       setType(l.type)
       setExistingImageUrl(l.imageUrl)
-      const toDatetimeLocal = (ts: Timestamp) => {
-        const d = new Date(ts.seconds * 1000)
-        return d.toISOString().slice(0, 16)
+      if (l.boxContents && l.boxContents.length > 0) {
+        setBoxItems(l.boxContents.map(i => ({ name: i.name, qty: i.qty, unit: i.unit ?? '' })))
       }
       const pickupEndMs = l.pickupEnd.seconds * 1000
       if (pickupEndMs < Date.now()) {
-        // Expired listing — pre-fill a fresh pickup window so vendor can renew with one click
-        const freshStart = new Date(Date.now() + 30 * 60 * 1000)   // now + 30 min
-        const freshEnd   = new Date(Date.now() + 4 * 60 * 60 * 1000) // now + 4 h
-        setPickupStart(freshStart.toISOString().slice(0, 16))
-        setPickupEnd(freshEnd.toISOString().slice(0, 16))
+        // Expired listing — pre-fill a fresh pickup window (local time) so vendor can renew
+        setPickupStart(toLocalDatetime(new Date(Date.now() + 30 * 60 * 1000)))
+        setPickupEnd(toLocalDatetime(new Date(Date.now() + 4 * 60 * 60 * 1000)))
       } else {
-        setPickupStart(toDatetimeLocal(l.pickupStart))
-        setPickupEnd(toDatetimeLocal(l.pickupEnd))
+        setPickupStart(toLocalDatetime(new Date(l.pickupStart.seconds * 1000)))
+        setPickupEnd(toLocalDatetime(new Date(l.pickupEnd.seconds * 1000)))
       }
-      if (l.packedAt) setPackedAt(toDatetimeLocal(l.packedAt))
+      if (l.packedAt) setPackedAt(toLocalDatetime(new Date(l.packedAt.seconds * 1000)))
     })
   }, [id])
 
-  const maxPickupEnd = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 16)
+  const maxPickupEnd = toLocalDatetime(new Date(Date.now() + 24 * 60 * 60 * 1000))
+
+  const addBoxItem = () => setBoxItems(prev => [...prev, { name: '', qty: 1, unit: '' }])
+  const removeBoxItem = (i: number) => setBoxItems(prev => prev.filter((_, idx) => idx !== i))
+  const updateBoxItem = (i: number, field: 'name' | 'qty' | 'unit', val: string | number) =>
+    setBoxItems(prev => prev.map((item, idx) => idx === i ? { ...item, [field]: val } : item))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -105,6 +114,7 @@ export default function ListingFormPage() {
         imageUrl = await uploadListingImage(currentUser.uid, imageFile)
       }
 
+      const filledBoxItems = boxItems.filter(i => i.name.trim())
       const data = {
         vendorId: currentUser.uid,
         type,
@@ -119,6 +129,9 @@ export default function ListingFormPage() {
         pickupEnd: Timestamp.fromDate(new Date(pickupEnd)),
         ...(packedAt ? { packedAt: Timestamp.fromDate(new Date(packedAt)) } : {}),
         status: 'active' as const,
+        ...(type === 'mystery_box' && filledBoxItems.length > 0
+          ? { boxContents: filledBoxItems.map(i => ({ name: i.name.trim(), qty: i.qty, ...(i.unit.trim() ? { unit: i.unit.trim() } : {}) })) }
+          : {}),
       }
 
       if (isEdit && id) {
@@ -192,14 +205,14 @@ export default function ListingFormPage() {
           <div className="space-y-1">
             <Label className="text-on-surface-variant">Pickup start</Label>
             <Input value={pickupStart} onChange={e => setPickupStart(e.target.value)} type="datetime-local" required
-              min={new Date().toISOString().slice(0, 16)}
+              min={toLocalDatetime(new Date())}
               max={maxPickupEnd}
               className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
           </div>
           <div className="space-y-1">
             <Label className="text-on-surface-variant">Pickup end</Label>
             <Input value={pickupEnd} onChange={e => setPickupEnd(e.target.value)} type="datetime-local" required
-              min={new Date().toISOString().slice(0, 16)}
+              min={toLocalDatetime(new Date())}
               max={maxPickupEnd}
               className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
           </div>
@@ -217,6 +230,56 @@ export default function ListingFormPage() {
             className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl"
           />
         </div>
+
+        {type === 'mystery_box' && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-on-surface-variant">Box contents</Label>
+              <button
+                type="button"
+                onClick={addBoxItem}
+                className="flex items-center gap-1 text-xs text-primary hover:opacity-80 transition-opacity"
+              >
+                <Plus size={13} /> Add item
+              </button>
+            </div>
+            <div className="space-y-2 p-3 bg-surface-container-high border border-outline-variant rounded-xl">
+              {boxItems.map((item, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <Input
+                    value={item.name}
+                    onChange={e => updateBoxItem(i, 'name', e.target.value)}
+                    placeholder="Item name (e.g. Bánh mì)"
+                    className="flex-1 bg-surface-container border-outline-variant text-on-surface rounded-lg text-sm h-9"
+                  />
+                  <Input
+                    value={item.qty}
+                    onChange={e => updateBoxItem(i, 'qty', Math.max(1, parseInt(e.target.value) || 1))}
+                    type="number"
+                    min="1"
+                    className="w-16 bg-surface-container border-outline-variant text-on-surface rounded-lg text-sm h-9"
+                  />
+                  <Input
+                    value={item.unit}
+                    onChange={e => updateBoxItem(i, 'unit', e.target.value)}
+                    placeholder="unit"
+                    className="w-20 bg-surface-container border-outline-variant text-on-surface rounded-lg text-sm h-9"
+                  />
+                  {boxItems.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeBoxItem(i)}
+                      className="p-1.5 text-on-surface-variant hover:text-error-token transition-colors"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                </div>
+              ))}
+              <p className="text-xs text-outline pt-1">These items are shown to the vendor when packing each order.</p>
+            </div>
+          </div>
+        )}
 
         <div className="space-y-1">
           <Label className="text-on-surface-variant">Image</Label>
