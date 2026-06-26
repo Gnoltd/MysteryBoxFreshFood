@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { createListing, getListing, updateListing } from '../../services/listings'
 import { uploadListingImage } from '../../services/storage'
+import { subscribeToInventory } from '../../services/inventory'
 import { GradientButton } from '../../components/shared/GradientButton'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -10,9 +11,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Timestamp } from 'firebase/firestore'
-import type { ListingCategory } from '../../types'
+import type { InventoryItem, ListingCategory } from '../../types'
 import { useTranslation } from 'react-i18next'
-import { AlertTriangle, Package, Plus, RefreshCw, Trash2 } from 'lucide-react'
+import { AlertTriangle, Check, Minus, Package, Plus, RefreshCw, Search, Trash2 } from 'lucide-react'
 import { distributeBoxes, formatBoxItem } from '../../utils/boxDistribution'
 
 function toLocalDatetime(d: Date): string {
@@ -22,6 +23,14 @@ function toLocalDatetime(d: Date): string {
 
 const CATEGORIES: ListingCategory[] = ['bakery', 'fruit', 'vegetables', 'dairy', 'meat', 'drinks', 'other']
 
+interface BoxEntry {
+  inventoryId?: string   // set when sourced from inventory
+  name: string
+  qty: number
+  unit: string
+  unitPrice: number
+}
+
 export default function ListingFormPage() {
   const { t } = useTranslation()
   const { id } = useParams<{ id?: string }>()
@@ -29,6 +38,7 @@ export default function ListingFormPage() {
   const { currentUser } = useAuth()
   const navigate = useNavigate()
 
+  // Listing fields
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [price, setPrice] = useState('')
@@ -42,20 +52,29 @@ export default function ListingFormPage() {
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [existingImageUrl, setExistingImageUrl] = useState('')
-  const [boxItems, setBoxItems] = useState<{ name: string; qty: number; unit: string; unitPrice: number }[]>([{ name: '', qty: 1, unit: '', unitPrice: 0 }])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // Box contents
+  const [boxItems, setBoxItems] = useState<BoxEntry[]>([])
+  const [invSearch, setInvSearch] = useState('')
+
+  // Inventory
+  const [inventory, setInventory] = useState<InventoryItem[]>([])
   useEffect(() => {
-    if (!imageFile) {
-      setPreviewUrl(null)
-      return
-    }
+    if (!currentUser) return
+    return subscribeToInventory(currentUser.uid, setInventory)
+  }, [currentUser])
+
+  // Image preview
+  useEffect(() => {
+    if (!imageFile) { setPreviewUrl(null); return }
     const url = URL.createObjectURL(imageFile)
     setPreviewUrl(url)
     return () => URL.revokeObjectURL(url)
   }, [imageFile])
 
+  // Load existing listing for edit
   useEffect(() => {
     if (!id) return
     getListing(id).then(l => {
@@ -73,7 +92,6 @@ export default function ListingFormPage() {
       }
       const pickupEndMs = l.pickupEnd.seconds * 1000
       if (pickupEndMs < Date.now()) {
-        // Expired listing — pre-fill a fresh pickup window (local time) so vendor can renew
         setPickupStart(toLocalDatetime(new Date(Date.now() + 30 * 60 * 1000)))
         setPickupEnd(toLocalDatetime(new Date(Date.now() + 4 * 60 * 60 * 1000)))
       } else {
@@ -84,13 +102,54 @@ export default function ListingFormPage() {
     })
   }, [id])
 
+  // Sync unitPrice from inventory when inventory loads (edit mode may have 0 prices)
+  useEffect(() => {
+    if (inventory.length === 0) return
+    setBoxItems(prev => prev.map(entry => {
+      if (entry.inventoryId) {
+        const inv = inventory.find(i => i.id === entry.inventoryId)
+        if (inv && entry.unitPrice === 0) return { ...entry, unitPrice: inv.unitPrice }
+      }
+      return entry
+    }))
+  }, [inventory])
+
   const maxPickupEnd = toLocalDatetime(new Date(Date.now() + 24 * 60 * 60 * 1000))
 
-  const addBoxItem = () => setBoxItems(prev => [...prev, { name: '', qty: 1, unit: '', unitPrice: 0 }])
-  const removeBoxItem = (i: number) => setBoxItems(prev => prev.filter((_, idx) => idx !== i))
-  const updateBoxItem = (i: number, field: 'name' | 'qty' | 'unit' | 'unitPrice', val: string | number) =>
-    setBoxItems(prev => prev.map((item, idx) => idx === i ? { ...item, [field]: val } : item))
+  // Inventory picker helpers
+  const selectedInvIds = new Set(boxItems.map(e => e.inventoryId).filter(Boolean) as string[])
 
+  const toggleInventoryItem = (inv: InventoryItem) => {
+    if (selectedInvIds.has(inv.id)) {
+      setBoxItems(prev => prev.filter(e => e.inventoryId !== inv.id))
+    } else {
+      setBoxItems(prev => [...prev, {
+        inventoryId: inv.id,
+        name: inv.name,
+        qty: inv.defaultQty > 0 ? inv.defaultQty : 1,
+        unit: inv.unit,
+        unitPrice: inv.unitPrice,
+      }])
+    }
+  }
+
+  const setEntryQty = (i: number, val: number) =>
+    setBoxItems(prev => prev.map((e, idx) => idx === i ? { ...e, qty: Math.max(1, val) } : e))
+
+  const removeEntry = (i: number) =>
+    setBoxItems(prev => prev.filter((_, idx) => idx !== i))
+
+  const addManualItem = () =>
+    setBoxItems(prev => [...prev, { name: '', qty: 1, unit: '', unitPrice: 0 }])
+
+  const updateManualField = (i: number, field: 'name' | 'unit' | 'unitPrice', val: string | number) =>
+    setBoxItems(prev => prev.map((e, idx) => idx === i ? { ...e, [field]: val } : e))
+
+  const filteredInventory = inventory.filter(i =>
+    i.name.toLowerCase().includes(invSearch.toLowerCase())
+  )
+
+  // Live box preview
   const [seed, setSeed] = useState(0)
   const previewPlans = useMemo(() => {
     const numBoxes = parseInt(quantity) || 0
@@ -98,7 +157,7 @@ export default function ListingFormPage() {
     if (type !== 'mystery_box' || numBoxes < 1 || filled.length === 0) return []
     return distributeBoxes(
       filled.map((i, idx) => ({
-        id: String(idx),
+        id: i.inventoryId ?? String(idx),
         name: i.name.trim(),
         unitPrice: i.unitPrice > 0 ? i.unitPrice : 1,
         qty: i.qty,
@@ -106,7 +165,6 @@ export default function ListingFormPage() {
       })),
       numBoxes,
     )
-  // seed forces a re-roll without changing items/qty
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boxItems, quantity, type, seed])
 
@@ -115,7 +173,6 @@ export default function ListingFormPage() {
     if (!currentUser) return
     setError('')
 
-    // Enforce fresh-food rule: pickup window must end within 24 h from now
     const endDate = new Date(pickupEnd)
     const maxEnd = new Date(Date.now() + 24 * 60 * 60 * 1000)
     if (endDate > maxEnd) {
@@ -130,9 +187,7 @@ export default function ListingFormPage() {
     setLoading(true)
     try {
       let imageUrl = existingImageUrl
-      if (imageFile) {
-        imageUrl = await uploadListingImage(currentUser.uid, imageFile)
-      }
+      if (imageFile) imageUrl = await uploadListingImage(currentUser.uid, imageFile)
 
       const filledBoxItems = boxItems.filter(i => i.name.trim())
       const numBoxes = parseInt(quantity)
@@ -140,7 +195,7 @@ export default function ListingFormPage() {
       const boxPlans = type === 'mystery_box' && filledBoxItems.length > 0
         ? distributeBoxes(
             filledBoxItems.map((i, idx) => ({
-              id: String(idx),
+              id: i.inventoryId ?? String(idx),
               name: i.name.trim(),
               unitPrice: i.unitPrice > 0 ? i.unitPrice : 1,
               qty: i.qty,
@@ -168,9 +223,7 @@ export default function ListingFormPage() {
         pickupEnd: Timestamp.fromDate(new Date(pickupEnd)),
         ...(packedAt ? { packedAt: Timestamp.fromDate(new Date(packedAt)) } : {}),
         status: 'active' as const,
-        ...(type === 'mystery_box' && filledBoxItems.length > 0
-          ? { boxContents, boxPlans }
-          : {}),
+        ...(type === 'mystery_box' && filledBoxItems.length > 0 ? { boxContents, boxPlans } : {}),
       }
 
       if (isEdit && id) {
@@ -190,6 +243,8 @@ export default function ListingFormPage() {
     <div className="max-w-xl">
       <h1 className="text-2xl font-bold text-on-surface mb-6">{isEdit ? 'Edit Listing' : 'New Listing'}</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
+
+        {/* Type toggle */}
         <div className="grid grid-cols-2 gap-2">
           {(['mystery_box', 'item'] as const).map(tp => (
             <button key={tp} type="button" onClick={() => setType(tp)}
@@ -244,15 +299,13 @@ export default function ListingFormPage() {
           <div className="space-y-1">
             <Label className="text-on-surface-variant">Pickup start</Label>
             <Input value={pickupStart} onChange={e => setPickupStart(e.target.value)} type="datetime-local" required
-              min={toLocalDatetime(new Date())}
-              max={maxPickupEnd}
+              min={toLocalDatetime(new Date())} max={maxPickupEnd}
               className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
           </div>
           <div className="space-y-1">
             <Label className="text-on-surface-variant">Pickup end</Label>
             <Input value={pickupEnd} onChange={e => setPickupEnd(e.target.value)} type="datetime-local" required
-              min={toLocalDatetime(new Date())}
-              max={maxPickupEnd}
+              min={toLocalDatetime(new Date())} max={maxPickupEnd}
               className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
           </div>
         </div>
@@ -262,76 +315,127 @@ export default function ListingFormPage() {
 
         <div className="space-y-1">
           <Label className="text-on-surface-variant">Packed at (optional)</Label>
-          <Input
-            value={packedAt}
-            onChange={e => setPackedAt(e.target.value)}
-            type="datetime-local"
-            className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl"
-          />
+          <Input value={packedAt} onChange={e => setPackedAt(e.target.value)} type="datetime-local"
+            className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
         </div>
 
+        {/* ── Box Contents ── */}
         {type === 'mystery_box' && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-on-surface-variant">Box contents</Label>
-              <button
-                type="button"
-                onClick={addBoxItem}
-                className="flex items-center gap-1 text-xs text-primary hover:opacity-80 transition-opacity"
-              >
-                <Plus size={13} /> Add item
-              </button>
-            </div>
-            <div className="space-y-2 p-3 bg-surface-container-high border border-outline-variant rounded-xl">
-              <div className="grid grid-cols-[1fr_3rem_4rem_4rem_auto] gap-1.5 pb-1">
-                <span className="text-[10px] text-outline uppercase font-bold tracking-wider">Name</span>
-                <span className="text-[10px] text-outline uppercase font-bold tracking-wider">Qty</span>
-                <span className="text-[10px] text-outline uppercase font-bold tracking-wider">Unit</span>
-                <span className="text-[10px] text-outline uppercase font-bold tracking-wider">Price</span>
-                <span />
-              </div>
-              {boxItems.map((item, i) => (
-                <div key={i} className="grid grid-cols-[1fr_3rem_4rem_4rem_auto] items-center gap-1.5">
-                  <Input
-                    value={item.name}
-                    onChange={e => updateBoxItem(i, 'name', e.target.value)}
-                    placeholder="Bánh mì"
-                    className="bg-surface-container border-outline-variant text-on-surface rounded-lg text-sm h-9"
-                  />
-                  <Input
-                    value={item.qty}
-                    onChange={e => updateBoxItem(i, 'qty', Math.max(1, parseInt(e.target.value) || 1))}
-                    type="number"
-                    min="1"
-                    className="bg-surface-container border-outline-variant text-on-surface rounded-lg text-sm h-9 text-center px-1"
-                  />
-                  <Input
-                    value={item.unit}
-                    onChange={e => updateBoxItem(i, 'unit', e.target.value)}
-                    placeholder="loaf"
-                    className="bg-surface-container border-outline-variant text-on-surface rounded-lg text-sm h-9 px-2"
-                  />
-                  <Input
-                    value={item.unitPrice || ''}
-                    onChange={e => updateBoxItem(i, 'unitPrice', parseInt(e.target.value) || 0)}
-                    type="number"
-                    min="0"
-                    placeholder="opt."
-                    className="bg-surface-container border-outline-variant text-on-surface rounded-lg text-sm h-9 px-2"
-                  />
-                  {boxItems.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeBoxItem(i)}
-                      className="p-1.5 text-on-surface-variant hover:text-error-token transition-colors"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+          <div className="space-y-3">
+            <Label className="text-on-surface-variant">Box contents</Label>
+
+            {/* Inventory picker */}
+            {inventory.length > 0 && (
+              <div className="border border-outline-variant rounded-xl overflow-hidden">
+                <div className="p-2.5 border-b border-outline-variant bg-surface-container-high">
+                  <div className="relative">
+                    <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none" />
+                    <input
+                      type="text"
+                      value={invSearch}
+                      onChange={e => setInvSearch(e.target.value)}
+                      placeholder="Search inventory…"
+                      className="w-full pl-8 pr-3 py-1.5 bg-surface-container border border-outline-variant rounded-lg text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary transition-colors"
+                    />
+                  </div>
+                </div>
+                <div className="max-h-44 overflow-y-auto divide-y divide-outline-variant/40">
+                  {filteredInventory.map(inv => {
+                    const selected = selectedInvIds.has(inv.id)
+                    return (
+                      <button
+                        key={inv.id}
+                        type="button"
+                        onClick={() => toggleInventoryItem(inv)}
+                        className={`w-full flex items-center justify-between px-3 py-2.5 text-left transition-colors ${selected ? 'bg-primary/10' : 'hover:bg-surface-container-high'}`}
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${selected ? 'bg-primary border-primary' : 'border-outline-variant'}`}>
+                            {selected && <Check size={10} className="text-white" />}
+                          </div>
+                          <span className="text-on-surface text-sm truncate">{inv.name}</span>
+                          <span className="text-outline text-xs shrink-0">{inv.unit}</span>
+                        </div>
+                        <span className="text-primary text-xs font-semibold shrink-0 ml-2">
+                          {inv.unitPrice.toLocaleString('vi-VN')} đ
+                        </span>
+                      </button>
+                    )
+                  })}
+                  {filteredInventory.length === 0 && (
+                    <p className="px-3 py-3 text-outline text-sm">No items match</p>
                   )}
                 </div>
-              ))}
-              <p className="text-xs text-outline pt-1">Qty = total across all boxes. Price (optional) improves value balancing between boxes.</p>
-            </div>
+              </div>
+            )}
+
+            {/* Selected items with qty steppers */}
+            {boxItems.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs text-outline uppercase font-bold tracking-wider">
+                  Selected ({boxItems.length}) — qty = total across all boxes
+                </p>
+                {boxItems.map((entry, i) => (
+                  <div key={i} className="flex items-center gap-2 p-2.5 bg-surface-container-high border border-outline-variant rounded-xl">
+                    <div className="flex-1 min-w-0">
+                      {entry.inventoryId ? (
+                        <div>
+                          <p className="text-on-surface text-sm font-medium truncate">{entry.name}</p>
+                          <p className="text-outline text-xs">{entry.unitPrice.toLocaleString('vi-VN')} đ / {entry.unit || 'unit'}</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-1">
+                          <Input
+                            value={entry.name}
+                            onChange={e => updateManualField(i, 'name', e.target.value)}
+                            placeholder="Item name"
+                            className="bg-surface-container border-outline-variant text-on-surface rounded-lg text-sm h-8"
+                          />
+                          <div className="flex gap-1">
+                            <Input
+                              value={entry.unit}
+                              onChange={e => updateManualField(i, 'unit', e.target.value)}
+                              placeholder="unit"
+                              className="w-20 bg-surface-container border-outline-variant text-on-surface rounded-lg text-xs h-7 px-2"
+                            />
+                            <Input
+                              value={entry.unitPrice || ''}
+                              onChange={e => updateManualField(i, 'unitPrice', parseInt(e.target.value) || 0)}
+                              type="number" min="0" placeholder="price (đ)"
+                              className="flex-1 bg-surface-container border-outline-variant text-on-surface rounded-lg text-xs h-7 px-2"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Qty stepper */}
+                    <div className="flex items-center border border-outline-variant rounded-lg bg-surface-container shrink-0">
+                      <button type="button" onClick={() => setEntryQty(i, entry.qty - 1)}
+                        className="px-2 py-1 border-r border-outline-variant text-on-surface-variant hover:text-primary transition-colors">
+                        <Minus size={12} />
+                      </button>
+                      <span className="px-2.5 text-on-surface font-bold text-sm w-8 text-center">{entry.qty}</span>
+                      <button type="button" onClick={() => setEntryQty(i, entry.qty + 1)}
+                        className="px-2 py-1 border-l border-outline-variant text-on-surface-variant hover:text-primary transition-colors">
+                        <Plus size={12} />
+                      </button>
+                    </div>
+
+                    <button type="button" onClick={() => removeEntry(i)}
+                      className="p-1.5 text-on-surface-variant hover:text-error-token transition-colors shrink-0">
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Add manual item button (always available as fallback) */}
+            <button type="button" onClick={addManualItem}
+              className="flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-primary transition-colors">
+              <Plus size={13} /> Add item manually
+            </button>
           </div>
         )}
 
@@ -342,20 +446,15 @@ export default function ListingFormPage() {
               <span className="text-on-surface-variant text-sm font-medium flex items-center gap-1.5">
                 <Package size={14} /> Box preview ({previewPlans.length} boxes)
               </span>
-              <button
-                type="button"
-                onClick={() => setSeed(s => s + 1)}
-                className="flex items-center gap-1 text-xs text-on-surface-variant hover:text-primary transition-colors"
-              >
+              <button type="button" onClick={() => setSeed(s => s + 1)}
+                className="flex items-center gap-1 text-xs text-on-surface-variant hover:text-primary transition-colors">
                 <RefreshCw size={11} /> Re-randomize
               </button>
             </div>
             <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
               {previewPlans.map(plan => (
-                <div
-                  key={plan.boxNumber}
-                  className={`p-3 rounded-xl border text-sm ${plan.belowAverage ? 'border-amber-500/40 bg-amber-950/20' : 'border-outline-variant bg-surface-container-high'}`}
-                >
+                <div key={plan.boxNumber}
+                  className={`p-3 rounded-xl border text-sm ${plan.belowAverage ? 'border-amber-500/40 bg-amber-950/20' : 'border-outline-variant bg-surface-container-high'}`}>
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="font-semibold text-on-surface">Box {plan.boxNumber}</span>
                     {plan.value > 1 && (
@@ -378,15 +477,12 @@ export default function ListingFormPage() {
           </div>
         )}
 
+        {/* Image */}
         <div className="space-y-1">
           <Label className="text-on-surface-variant">Image</Label>
           <Input type="file" accept="image/*" onChange={e => setImageFile(e.target.files?.[0] ?? null)} className="bg-surface-container-high border-outline-variant text-on-surface rounded-xl" />
           {(previewUrl || (existingImageUrl && !imageFile)) && (
-            <img
-              src={previewUrl ?? existingImageUrl}
-              className="mt-2 h-32 w-full rounded-xl object-cover"
-              alt="Listing preview"
-            />
+            <img src={previewUrl ?? existingImageUrl} className="mt-2 h-32 w-full rounded-xl object-cover" alt="Listing preview" />
           )}
         </div>
 
