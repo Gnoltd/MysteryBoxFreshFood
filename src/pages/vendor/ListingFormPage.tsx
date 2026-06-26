@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { createListing, getListing, updateListing } from '../../services/listings'
@@ -12,8 +12,8 @@ import { Button } from '@/components/ui/button'
 import { Timestamp } from 'firebase/firestore'
 import type { ListingCategory } from '../../types'
 import { useTranslation } from 'react-i18next'
-import { Plus, Trash2 } from 'lucide-react'
-import { distributeBoxes } from '../../utils/boxDistribution'
+import { AlertTriangle, Package, Plus, RefreshCw, Trash2 } from 'lucide-react'
+import { distributeBoxes, formatBoxItem } from '../../utils/boxDistribution'
 
 function toLocalDatetime(d: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0')
@@ -90,6 +90,25 @@ export default function ListingFormPage() {
   const removeBoxItem = (i: number) => setBoxItems(prev => prev.filter((_, idx) => idx !== i))
   const updateBoxItem = (i: number, field: 'name' | 'qty' | 'unit' | 'unitPrice', val: string | number) =>
     setBoxItems(prev => prev.map((item, idx) => idx === i ? { ...item, [field]: val } : item))
+
+  const [seed, setSeed] = useState(0)
+  const previewPlans = useMemo(() => {
+    const numBoxes = parseInt(quantity) || 0
+    const filled = boxItems.filter(i => i.name.trim())
+    if (type !== 'mystery_box' || numBoxes < 1 || filled.length === 0) return []
+    return distributeBoxes(
+      filled.map((i, idx) => ({
+        id: String(idx),
+        name: i.name.trim(),
+        unitPrice: i.unitPrice > 0 ? i.unitPrice : 1,
+        qty: i.qty,
+        unit: i.unit.trim(),
+      })),
+      numBoxes,
+    )
+  // seed forces a re-roll without changing items/qty
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [boxItems, quantity, type, seed])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -312,6 +331,49 @@ export default function ListingFormPage() {
                 </div>
               ))}
               <p className="text-xs text-outline pt-1">Qty = total across all boxes. Price (optional) improves value balancing between boxes.</p>
+            </div>
+          </div>
+        )}
+
+        {/* Live box preview */}
+        {previewPlans.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-on-surface-variant text-sm font-medium flex items-center gap-1.5">
+                <Package size={14} /> Box preview ({previewPlans.length} boxes)
+              </span>
+              <button
+                type="button"
+                onClick={() => setSeed(s => s + 1)}
+                className="flex items-center gap-1 text-xs text-on-surface-variant hover:text-primary transition-colors"
+              >
+                <RefreshCw size={11} /> Re-randomize
+              </button>
+            </div>
+            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+              {previewPlans.map(plan => (
+                <div
+                  key={plan.boxNumber}
+                  className={`p-3 rounded-xl border text-sm ${plan.belowAverage ? 'border-amber-500/40 bg-amber-950/20' : 'border-outline-variant bg-surface-container-high'}`}
+                >
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="font-semibold text-on-surface">Box {plan.boxNumber}</span>
+                    {plan.value > 1 && (
+                      <span className="text-xs text-outline">~{plan.value.toLocaleString('vi-VN')} đ</span>
+                    )}
+                  </div>
+                  {plan.belowAverage && (
+                    <p className="text-amber-400 text-xs mb-1.5 flex items-center gap-1">
+                      <AlertTriangle size={11} /> Below average — customer gets 10% discount
+                    </p>
+                  )}
+                  <ul className="space-y-0.5">
+                    {plan.items.map(item => (
+                      <li key={item.name} className="text-on-surface-variant text-xs">{formatBoxItem(item)}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           </div>
         )}
