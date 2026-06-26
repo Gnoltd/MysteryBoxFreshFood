@@ -13,6 +13,7 @@ import { Timestamp } from 'firebase/firestore'
 import type { ListingCategory } from '../../types'
 import { useTranslation } from 'react-i18next'
 import { Plus, Trash2 } from 'lucide-react'
+import { distributeBoxes } from '../../utils/boxDistribution'
 
 function toLocalDatetime(d: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0')
@@ -41,7 +42,7 @@ export default function ListingFormPage() {
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [existingImageUrl, setExistingImageUrl] = useState('')
-  const [boxItems, setBoxItems] = useState<{ name: string; qty: number; unit: string }[]>([{ name: '', qty: 1, unit: '' }])
+  const [boxItems, setBoxItems] = useState<{ name: string; qty: number; unit: string; unitPrice: number }[]>([{ name: '', qty: 1, unit: '', unitPrice: 0 }])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -68,7 +69,7 @@ export default function ListingFormPage() {
       setType(l.type)
       setExistingImageUrl(l.imageUrl)
       if (l.boxContents && l.boxContents.length > 0) {
-        setBoxItems(l.boxContents.map(i => ({ name: i.name, qty: i.qty, unit: i.unit ?? '' })))
+        setBoxItems(l.boxContents.map(i => ({ name: i.name, qty: i.qty, unit: i.unit ?? '', unitPrice: 0 })))
       }
       const pickupEndMs = l.pickupEnd.seconds * 1000
       if (pickupEndMs < Date.now()) {
@@ -85,9 +86,9 @@ export default function ListingFormPage() {
 
   const maxPickupEnd = toLocalDatetime(new Date(Date.now() + 24 * 60 * 60 * 1000))
 
-  const addBoxItem = () => setBoxItems(prev => [...prev, { name: '', qty: 1, unit: '' }])
+  const addBoxItem = () => setBoxItems(prev => [...prev, { name: '', qty: 1, unit: '', unitPrice: 0 }])
   const removeBoxItem = (i: number) => setBoxItems(prev => prev.filter((_, idx) => idx !== i))
-  const updateBoxItem = (i: number, field: 'name' | 'qty' | 'unit', val: string | number) =>
+  const updateBoxItem = (i: number, field: 'name' | 'qty' | 'unit' | 'unitPrice', val: string | number) =>
     setBoxItems(prev => prev.map((item, idx) => idx === i ? { ...item, [field]: val } : item))
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -115,6 +116,25 @@ export default function ListingFormPage() {
       }
 
       const filledBoxItems = boxItems.filter(i => i.name.trim())
+      const numBoxes = parseInt(quantity)
+
+      const boxPlans = type === 'mystery_box' && filledBoxItems.length > 0
+        ? distributeBoxes(
+            filledBoxItems.map((i, idx) => ({
+              id: String(idx),
+              name: i.name.trim(),
+              unitPrice: i.unitPrice > 0 ? i.unitPrice : 1,
+              qty: i.qty,
+              unit: i.unit.trim(),
+            })),
+            numBoxes,
+          )
+        : []
+
+      const boxContents = boxPlans.length > 0
+        ? (boxPlans[0]?.items ?? [])
+        : filledBoxItems.map(i => ({ name: i.name.trim(), qty: i.qty, ...(i.unit.trim() ? { unit: i.unit.trim() } : {}) }))
+
       const data = {
         vendorId: currentUser.uid,
         type,
@@ -122,7 +142,7 @@ export default function ListingFormPage() {
         description,
         price: parseInt(price),
         originalPrice: parseInt(originalPrice),
-        quantityTotal: parseInt(quantity),
+        quantityTotal: numBoxes,
         category,
         imageUrl,
         pickupStart: Timestamp.fromDate(new Date(pickupStart)),
@@ -130,7 +150,7 @@ export default function ListingFormPage() {
         ...(packedAt ? { packedAt: Timestamp.fromDate(new Date(packedAt)) } : {}),
         status: 'active' as const,
         ...(type === 'mystery_box' && filledBoxItems.length > 0
-          ? { boxContents: filledBoxItems.map(i => ({ name: i.name.trim(), qty: i.qty, ...(i.unit.trim() ? { unit: i.unit.trim() } : {}) })) }
+          ? { boxContents, boxPlans }
           : {}),
       }
 
@@ -244,26 +264,41 @@ export default function ListingFormPage() {
               </button>
             </div>
             <div className="space-y-2 p-3 bg-surface-container-high border border-outline-variant rounded-xl">
+              <div className="grid grid-cols-[1fr_3rem_4rem_4rem_auto] gap-1.5 pb-1">
+                <span className="text-[10px] text-outline uppercase font-bold tracking-wider">Name</span>
+                <span className="text-[10px] text-outline uppercase font-bold tracking-wider">Qty</span>
+                <span className="text-[10px] text-outline uppercase font-bold tracking-wider">Unit</span>
+                <span className="text-[10px] text-outline uppercase font-bold tracking-wider">Price</span>
+                <span />
+              </div>
               {boxItems.map((item, i) => (
-                <div key={i} className="flex items-center gap-2">
+                <div key={i} className="grid grid-cols-[1fr_3rem_4rem_4rem_auto] items-center gap-1.5">
                   <Input
                     value={item.name}
                     onChange={e => updateBoxItem(i, 'name', e.target.value)}
-                    placeholder="Item name (e.g. Bánh mì)"
-                    className="flex-1 bg-surface-container border-outline-variant text-on-surface rounded-lg text-sm h-9"
+                    placeholder="Bánh mì"
+                    className="bg-surface-container border-outline-variant text-on-surface rounded-lg text-sm h-9"
                   />
                   <Input
                     value={item.qty}
                     onChange={e => updateBoxItem(i, 'qty', Math.max(1, parseInt(e.target.value) || 1))}
                     type="number"
                     min="1"
-                    className="w-16 bg-surface-container border-outline-variant text-on-surface rounded-lg text-sm h-9"
+                    className="bg-surface-container border-outline-variant text-on-surface rounded-lg text-sm h-9 text-center px-1"
                   />
                   <Input
                     value={item.unit}
                     onChange={e => updateBoxItem(i, 'unit', e.target.value)}
-                    placeholder="unit"
-                    className="w-20 bg-surface-container border-outline-variant text-on-surface rounded-lg text-sm h-9"
+                    placeholder="loaf"
+                    className="bg-surface-container border-outline-variant text-on-surface rounded-lg text-sm h-9 px-2"
+                  />
+                  <Input
+                    value={item.unitPrice || ''}
+                    onChange={e => updateBoxItem(i, 'unitPrice', parseInt(e.target.value) || 0)}
+                    type="number"
+                    min="0"
+                    placeholder="opt."
+                    className="bg-surface-container border-outline-variant text-on-surface rounded-lg text-sm h-9 px-2"
                   />
                   {boxItems.length > 1 && (
                     <button
@@ -276,7 +311,7 @@ export default function ListingFormPage() {
                   )}
                 </div>
               ))}
-              <p className="text-xs text-outline pt-1">These items are shown to the vendor when packing each order.</p>
+              <p className="text-xs text-outline pt-1">Qty = total across all boxes. Price (optional) improves value balancing between boxes.</p>
             </div>
           </div>
         )}
