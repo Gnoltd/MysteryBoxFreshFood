@@ -9,10 +9,13 @@ import { StatusChip } from '../../components/shared/StatusChip'
 import { StatCardSkeleton } from '../../components/shared/ShimmerSkeleton'
 import { useCountUp } from '../../hooks/useCountUp'
 import type { Listing, Order } from '../../types'
-import { Package, ShoppingBag, TrendingUp, Star, QrCode, Wand2, PlusCircle, Pencil, Check, X, Zap } from 'lucide-react'
+import { Package, ShoppingBag, TrendingUp, Star, QrCode, Wand2, PlusCircle, Pencil, Check, X, Zap, BarChart2, PieChart, Target } from 'lucide-react'
 import { VN_BANKS } from '../../data/vnBanks'
 
 const RevenueChart = lazy(() => import('../../components/shared/RevenueChart'))
+const DailyRevenueChart = lazy(() => import('../../components/shared/DailyRevenueChart'))
+const CategorySalesChart = lazy(() => import('../../components/shared/CategorySalesChart'))
+const SellThroughChart = lazy(() => import('../../components/shared/SellThroughChart'))
 
 function AnimatedStat({ value, prefix = '', suffix = '', className = '' }: {
   value: number; prefix?: string; suffix?: string; className?: string
@@ -106,6 +109,49 @@ export default function VendorDashboardPage() {
     i: i + 1,
     revenue: o.totalPrice,
   }))
+
+  // Daily revenue — last 30 days
+  const dailyRevenue = (() => {
+    const days: Record<string, { day: string; revenue: number; orders: number }> = {}
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date()
+      d.setDate(d.getDate() - i)
+      const key = d.toLocaleDateString('vi-VN', { month: 'short', day: 'numeric' })
+      days[key] = { day: key, revenue: 0, orders: 0 }
+    }
+    orders
+      .filter(o => o.status === 'paid' || o.status === 'picked_up')
+      .forEach(o => {
+        const d = new Date(o.createdAt.seconds * 1000)
+        const key = d.toLocaleDateString('vi-VN', { month: 'short', day: 'numeric' })
+        if (days[key]) {
+          days[key].revenue += o.totalPrice
+          days[key].orders += 1
+        }
+      })
+    return Object.values(days)
+  })()
+
+  // Revenue by category (from listings sold qty × price)
+  const categorySales = (() => {
+    const cat: Record<string, number> = {}
+    listings.forEach(l => {
+      const sold = l.quantityTotal - l.quantityRemaining
+      if (sold > 0) cat[l.category] = (cat[l.category] ?? 0) + sold * l.price
+    })
+    return Object.entries(cat).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value)
+  })()
+
+  // Sell-through rate per listing (top 6 by activity)
+  const sellThrough = listings
+    .filter(l => l.quantityTotal > 0)
+    .map(l => ({
+      name: l.title.length > 22 ? l.title.slice(0, 20) + '…' : l.title,
+      rate: Math.round(((l.quantityTotal - l.quantityRemaining) / l.quantityTotal) * 100),
+      remaining: l.quantityRemaining,
+    }))
+    .sort((a, b) => b.rate - a.rate)
+    .slice(0, 6)
 
   const statCards = [
     {
@@ -237,6 +283,58 @@ export default function VendorDashboardPage() {
               {label}
             </Link>
           ))}
+        </div>
+      </div>
+
+      {/* ── Analytics Section ── */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <BarChart2 size={14} className="text-primary" />
+          <span className="text-xs text-on-surface-variant uppercase tracking-wider font-semibold">Analytics</span>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+          {/* Daily Revenue + Orders (last 7 days) */}
+          <div className="lg:col-span-3 glass glow-border rounded-2xl p-5">
+            <h2 className="text-sm font-bold text-on-surface mb-1 flex items-center gap-2">
+              <TrendingUp size={14} className="text-emerald-400" />
+              Revenue & Orders — Last 30 Days
+            </h2>
+            <p className="text-xs text-on-surface-variant mb-4">Bars = revenue (đ) · Line = order count</p>
+            <Suspense fallback={<div className="h-[200px] animate-pulse bg-white/5 rounded-xl" />}>
+              <DailyRevenueChart data={dailyRevenue} />
+            </Suspense>
+          </div>
+
+          {/* Revenue by Category */}
+          <div className="glass glow-border rounded-2xl p-5">
+            <h2 className="text-sm font-bold text-on-surface mb-1 flex items-center gap-2">
+              <PieChart size={14} className="text-purple-400" />
+              Revenue by Category
+            </h2>
+            <p className="text-xs text-on-surface-variant mb-3">Estimated from sold quantity × listing price</p>
+            <Suspense fallback={<div className="h-[180px] animate-pulse bg-white/5 rounded-xl" />}>
+              <CategorySalesChart data={categorySales} />
+            </Suspense>
+          </div>
+
+          {/* Sell-through Rate */}
+          <div className="lg:col-span-2 glass glow-border rounded-2xl p-5">
+            <h2 className="text-sm font-bold text-on-surface mb-1 flex items-center gap-2">
+              <Target size={14} className="text-amber-400" />
+              Sell-through Rate by Listing
+            </h2>
+            <p className="text-xs text-on-surface-variant mb-4">
+              <span className="text-emerald-400 font-semibold">Green ≥ 80%</span>
+              &ensp;·&ensp;<span className="text-indigo-400 font-semibold">Blue ≥ 50%</span>
+              &ensp;·&ensp;<span className="text-amber-400 font-semibold">Amber ≥ 25%</span>
+              &ensp;·&ensp;<span className="text-rose-400 font-semibold">Red = high waste</span>
+            </p>
+            <Suspense fallback={<div className="h-[200px] animate-pulse bg-white/5 rounded-xl" />}>
+              <SellThroughChart data={sellThrough} />
+            </Suspense>
+          </div>
+
         </div>
       </div>
 
