@@ -47,12 +47,12 @@ export default function SellThroughChart({ data }: Props) {
         />
         <Tooltip
           {...tooltipStyle}
-          formatter={(v: number, _name, props) => [
-            `${v}% sold · ${props.payload.remaining} remaining`,
+          formatter={(v, _name, props) => [
+            `${Number(v ?? 0)}% sold · ${(props?.payload as { remaining?: number })?.remaining ?? 0} remaining`,
             'Sell-through',
           ]}
         />
-        <Bar dataKey="rate" radius={[0, 6, 6, 0]} maxBarSize={20} label={{ position: 'right', fill: '#64748b', fontSize: 10, formatter: (v: number) => `${v}%` }}>
+        <Bar dataKey="rate" radius={[0, 6, 6, 0]} maxBarSize={20} label={{ position: 'right', fill: '#64748b', fontSize: 10, formatter: (v: unknown) => `${Number(v ?? 0)}%` }}>
           {data.map(entry => (
             <Cell key={entry.name} fill={rateColor(entry.rate)} />
           ))}

@@ -46,7 +46,7 @@ export default function CategorySalesChart({ data }: Props) {
         </Pie>
         <Tooltip
           {...tooltipStyle}
-          formatter={(v: number) => [v.toLocaleString('vi-VN') + ' đ', 'Revenue']}
+          formatter={(v) => [Number(v ?? 0).toLocaleString('vi-VN') + ' đ', 'Revenue']}
         />
         <Legend
           iconType="circle"
